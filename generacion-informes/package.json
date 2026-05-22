@@ -1,0 +1,24 @@
+{
+  "name": "generacion-informes",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "android:dev": "expo start --android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "test:audio": "node scripts/test-audio-pipeline.mjs"
+  },
+  "dependencies": {
+    "expo": "~55.0.24",
+    "expo-audio": "~55.0.14",
+    "expo-audio-stream": "^0.1.13",
+    "expo-audio-stream-pcm": "^0.2.0",
+    "expo-crypto": "~55.0.15",
+    "expo-status-bar": "~55.0.6",
+    "react": "19.2.0",
+    "react-native": "0.83.6"
+  },
+  "private": true
+}

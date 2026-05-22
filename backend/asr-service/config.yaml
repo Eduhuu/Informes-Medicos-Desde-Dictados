@@ -1,0 +1,6 @@
+asr:
+  provider: whisper
+  model: base
+  device: cpu
+  language: es
+  compute_type: int8

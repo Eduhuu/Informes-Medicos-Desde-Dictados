@@ -1,0 +1,39 @@
+/** Constants shared by the WebSocket gateway and ASR integration. */
+
+const DEFAULT_GATEWAY_PORT = 8000;
+const DEFAULT_ASR_SERVICE_URL = 'http://127.0.0.1:8001';
+
+const ENV_ASR_SERVICE_URL = 'ASR_SERVICE_URL';
+
+const ASR_TRANSCRIBE_PATH = '/transcribe';
+
+const HEADER_SESSION_ID = 'X-Session-Id';
+const HEADER_SEQUENCE = 'X-Sequence';
+const HEADER_TIMESTAMP = 'X-Timestamp';
+
+const CONTENT_TYPE_OCTET_STREAM = 'application/octet-stream';
+
+const WS_MESSAGE_TYPE_AUDIO_CHUNK = 'audio_chunk';
+const WS_MESSAGE_TYPE_SESSION_END = 'session_end';
+const WS_RESPONSE_TYPE_TRANSCRIPTION = 'transcription';
+const WS_RESPONSE_TYPE_ERROR = 'error';
+const WS_RESPONSE_TYPE_SESSION_END = 'session_end';
+
+const JSON_MESSAGE_START_BYTE = 0x7b;
+
+module.exports = {
+    DEFAULT_GATEWAY_PORT,
+    DEFAULT_ASR_SERVICE_URL,
+    ENV_ASR_SERVICE_URL,
+    ASR_TRANSCRIBE_PATH,
+    HEADER_SESSION_ID,
+    HEADER_SEQUENCE,
+    HEADER_TIMESTAMP,
+    CONTENT_TYPE_OCTET_STREAM,
+    WS_MESSAGE_TYPE_AUDIO_CHUNK,
+    WS_MESSAGE_TYPE_SESSION_END,
+    WS_RESPONSE_TYPE_TRANSCRIPTION,
+    WS_RESPONSE_TYPE_ERROR,
+    WS_RESPONSE_TYPE_SESSION_END,
+    JSON_MESSAGE_START_BYTE,
+};

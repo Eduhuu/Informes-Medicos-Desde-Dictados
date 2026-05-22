@@ -1,0 +1,8 @@
+# Copy to config.yaml and adjust for your experiments.
+# Change only "provider" to switch engines (whisper | mock).
+asr:
+  provider: mock
+  model: base
+  device: cpu
+  language: es
+  compute_type: int8

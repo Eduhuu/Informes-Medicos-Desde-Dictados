@@ -1,0 +1,10 @@
+"""User-facing API messages (Spanish)."""
+
+MSG_SERVICE_READY = "Servicio ASR operativo"
+MSG_HEALTH_OK = "Motor de transcripción disponible"
+MSG_HEALTH_UNAVAILABLE = "Motor de transcripción no disponible"
+MSG_TRANSCRIPTION_EMPTY = "No se detectó habla en el fragmento de audio"
+MSG_INVALID_PROVIDER = "Proveedor ASR no soportado: {provider}"
+MSG_MISSING_AUDIO = "Se requiere el cuerpo del fragmento de audio"
+MSG_INVALID_SEQUENCE = "Cabecera X-Sequence inválida"
+MSG_CONFIG_NOT_FOUND = "No se encontró el archivo de configuración: {path}"
