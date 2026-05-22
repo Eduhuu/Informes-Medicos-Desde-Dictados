@@ -1,6 +1,11 @@
 asr:
   provider: whisper
-  model: base
-  device: cpu
+  model: medium
+  device: cuda  # cpu | cuda
   language: es
-  compute_type: int8
+  compute_type: float16 # int8 | float16 | float32
+
+pln:
+  task: ner
+  model: rigonsallauka/spanish_medical_ner
+  aggregation_strategy: max

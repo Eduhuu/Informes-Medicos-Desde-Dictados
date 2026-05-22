@@ -20,6 +20,7 @@ from shared.constants.AsrConstants import (
     HEADER_SESSION_ID,
     HEADER_TIMESTAMP,
 )
+from app.pln.base import PLNModel
 
 router = APIRouter()
 
@@ -34,6 +35,14 @@ def _get_provider(request: Request) -> ASRProvider:
     return provider
 
 
+def _get_pln_model(request: Request) -> PLNModel:
+    model = getattr(request.app.state, "pln_provider", None)
+    if model is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_HEALTH_UNAVAILABLE,
+        )
+    return model
 def _parse_sequence(raw_sequence: str | None) -> int:
     if raw_sequence is None:
         return 0
@@ -114,5 +123,9 @@ async def transcribe(
     
     if not result.text:
         response["warning"] = MSG_TRANSCRIPTION_EMPTY
+        return
+    pln_model = _get_pln_model(request)
+    process = pln_model.process(result.text)
     print(result.text)
+    print(process)
     return response
