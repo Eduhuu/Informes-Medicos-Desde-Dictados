@@ -1,0 +1,33 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms8g -Xmx8g"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    # Revisa si Elasticsearch responde realmente a peticiones HTTP
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  snowstorm:
+    image: snomedinternational/snowstorm:latest
+    environment:
+      - SNOMED_WIZARD_ENABLED=true
+      - ELASTICSEARCH_URLS=http://elasticsearch:9200
+      # - java_opts=-Xms4g -Xmx4g
+      - JAVA_TOOL_OPTIONS=--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED -Xms4g -Xmx4g
+    ports:
+      - "8080:8080"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy # Espera obligatoriamente al healthcheck de arriba
+
+volumes:
+  es_data:
