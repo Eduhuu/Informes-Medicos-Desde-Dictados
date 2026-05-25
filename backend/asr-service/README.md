@@ -58,3 +58,34 @@ Estado del motor y metadatos para métricas del TFM (motor, versión, dispositiv
 ## Contrato de salida
 
 Todos los proveedores devuelven el mismo esquema: `text`, `segments`, `confidence`, `engine`, `model_version`, `device`, `latency_ms`, `session_id`, `sequence`.
+
+Cuando hay texto transcrito, la respuesta incluye además `entities`: entidades NER del PLN enriquecidas con SNOMED CT (si `snomed.enabled` es `true`).
+
+## SNOMED CT (Snowstorm)
+
+El servicio consulta Snowstorm por cada entidad detectada por el PLN. Levanta Snowstorm desde la raíz del repositorio:
+
+```bash
+docker compose -f snomed/docker-compose.yml up -d
+```
+
+Prueba directa de la API:
+
+```bash
+curl "http://localhost:8080/MAIN/SNOMEDCT-ES/concepts?term=EPOC&active=true&preferredLanguage=es&limit=3"
+```
+
+Configuración en `config.yaml` (solo activar o desactivar):
+
+```yaml
+snomed:
+  enabled: true
+```
+
+El resto de parámetros (URL, rama, límite, etc.) usan los valores por defecto de `shared/constants/SnomedConstants`. Para sobreescribirlos sin tocar el YAML: `SNOMED_PROVIDER`, `SNOMED_BASE_URL`, `SNOMED_BRANCH`, `SNOMED_LIMIT`, `SNOMED_ACTIVE`, `SNOMED_PREFERRED_LANGUAGE`, `SNOMED_TIMEOUT_SECONDS`.
+
+Con `SNOMED_PROVIDER=mock` no hace falta Snowstorm. Si Snowstorm no responde, cada entidad devuelve `snomed.items` vacío y `snomed.error` con un mensaje en español; el resto de la transcripción sigue disponible.
+
+### Campo `entities`
+
+Cada elemento combina la salida NER (`word`, `score`, `entity_group`, `start`, `end`) con `snomed`, que replica la respuesta paginada de Snowstorm (`items`, `total`, `limit`, `offset`, `searchAfter`, `searchAfterArray`) más `error` cuando falla la consulta.

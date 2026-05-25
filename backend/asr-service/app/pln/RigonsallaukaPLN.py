@@ -1,3 +1,5 @@
+from typing import Any
+
 from app.pln.base import PLNModel
 
 
@@ -18,5 +20,5 @@ class RigonsallaukaPLN(PLNModel):
             aggregation_strategy=self._aggregation_strategy
         )
 
-    def process(self, text: str) -> str:
-        return self._model(text) 
+    def process(self, text: str) -> list[dict[str, Any]]:
+        return self._model(text)

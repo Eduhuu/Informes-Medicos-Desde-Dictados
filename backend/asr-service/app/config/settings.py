@@ -34,6 +34,26 @@ from shared.constants.PlnConstants import (
     DEFAULT_TASK_AGGREGATION_STRATEGY,
 )
 
+from shared.constants.SnomedConstants import (
+    CONFIG_KEY_SNOMED,
+    CONFIG_KEY_ACTIVE,
+    CONFIG_KEY_BASE_URL,
+    CONFIG_KEY_BRANCH,
+    CONFIG_KEY_ENABLED,
+    CONFIG_KEY_LIMIT,
+    CONFIG_KEY_PREFERRED_LANGUAGE,
+    CONFIG_KEY_PROVIDER,
+    CONFIG_KEY_TIMEOUT_SECONDS,
+    DEFAULT_SNOMED_ACTIVE,
+    DEFAULT_SNOMED_BASE_URL,
+    DEFAULT_SNOMED_BRANCH,
+    DEFAULT_SNOMED_ENABLED,
+    DEFAULT_SNOMED_LIMIT,
+    DEFAULT_SNOMED_PREFERRED_LANGUAGE,
+    DEFAULT_SNOMED_PROVIDER,
+    DEFAULT_SNOMED_TIMEOUT_SECONDS,
+)
+
 @dataclass(frozen=True)
 class AsrSettings:
     provider: str
@@ -48,10 +68,24 @@ class PlnSettings:
     model: str
     aggregation_strategy: str
 
+
+@dataclass(frozen=True)
+class SnomedSettings:
+    enabled: bool
+    provider: str
+    base_url: str
+    branch: str
+    limit: int
+    active: bool
+    preferred_language: str
+    timeout_seconds: float
+
+
 @dataclass(frozen=True)
 class Settings:
     asr: AsrSettings
     pln: PlnSettings
+    snomed: SnomedSettings
 
 def _default_config_path() -> Path:
     env_path = os.getenv("ASR_CONFIG_PATH")
@@ -59,6 +93,78 @@ def _default_config_path() -> Path:
         return Path(env_path)
 
     return Path(__file__).resolve().parents[2] / "config.yaml"
+
+
+def _parse_bool(value: object, default: bool) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return default
+    return str(value).lower() in ("1", "true", "yes", "on")
+
+
+def _build_snomed_settings(
+    snomed_section: dict[str, Any],
+) -> SnomedSettings:
+    return SnomedSettings(
+        enabled=_parse_bool(
+            snomed_section.get(CONFIG_KEY_ENABLED),
+            DEFAULT_SNOMED_ENABLED,
+        ),
+        provider=str(
+            snomed_section.get(CONFIG_KEY_PROVIDER, DEFAULT_SNOMED_PROVIDER),
+        ),
+        base_url=str(
+            snomed_section.get(CONFIG_KEY_BASE_URL, DEFAULT_SNOMED_BASE_URL),
+        ),
+        branch=str(
+            snomed_section.get(CONFIG_KEY_BRANCH, DEFAULT_SNOMED_BRANCH),
+        ),
+        limit=int(snomed_section.get(CONFIG_KEY_LIMIT, DEFAULT_SNOMED_LIMIT)),
+        active=_parse_bool(
+            snomed_section.get(CONFIG_KEY_ACTIVE),
+            DEFAULT_SNOMED_ACTIVE,
+        ),
+        preferred_language=str(
+            snomed_section.get(
+                CONFIG_KEY_PREFERRED_LANGUAGE,
+                DEFAULT_SNOMED_PREFERRED_LANGUAGE,
+            ),
+        ),
+        timeout_seconds=float(
+            snomed_section.get(
+                CONFIG_KEY_TIMEOUT_SECONDS,
+                DEFAULT_SNOMED_TIMEOUT_SECONDS,
+            ),
+        ),
+    )
+
+
+def _default_snomed_settings_from_env() -> SnomedSettings:
+    return SnomedSettings(
+        enabled=_parse_bool(
+            os.getenv("SNOMED_ENABLED"),
+            DEFAULT_SNOMED_ENABLED,
+        ),
+        provider=os.getenv("SNOMED_PROVIDER", DEFAULT_SNOMED_PROVIDER),
+        base_url=os.getenv("SNOMED_BASE_URL", DEFAULT_SNOMED_BASE_URL),
+        branch=os.getenv("SNOMED_BRANCH", DEFAULT_SNOMED_BRANCH),
+        limit=int(os.getenv("SNOMED_LIMIT", str(DEFAULT_SNOMED_LIMIT))),
+        active=_parse_bool(
+            os.getenv("SNOMED_ACTIVE"),
+            DEFAULT_SNOMED_ACTIVE,
+        ),
+        preferred_language=os.getenv(
+            "SNOMED_PREFERRED_LANGUAGE",
+            DEFAULT_SNOMED_PREFERRED_LANGUAGE,
+        ),
+        timeout_seconds=float(
+            os.getenv(
+                "SNOMED_TIMEOUT_SECONDS",
+                str(DEFAULT_SNOMED_TIMEOUT_SECONDS),
+            ),
+        ),
+    )
 
 
 def load_settings(config_path: Path | None = None) -> Settings:
@@ -78,11 +184,13 @@ def load_settings(config_path: Path | None = None) -> Settings:
                 model=os.getenv("PLN_MODEL", "bert-base-uncased"),
                 aggregation_strategy=os.getenv("PLN_AGGREGATION_STRATEGY", "mean"),
             ),
+            snomed=_default_snomed_settings_from_env(),
         )
     with path.open(encoding="utf-8") as config_file:
         raw: dict[str, Any] = yaml.safe_load(config_file) or {}
     asr_section = raw.get(CONFIG_KEY_ASR, {})
     pln_section = raw.get(CONFIG_KEY_PLN, {})
+    snomed_section = raw.get(CONFIG_KEY_SNOMED, {})
     return Settings(
         asr=AsrSettings(
             provider=str(asr_section.get(CONFIG_KEY_PROVIDER, os.getenv("ASR_PROVIDER", PROVIDER_MOCK))),
@@ -96,4 +204,5 @@ def load_settings(config_path: Path | None = None) -> Settings:
             model=str(pln_section.get(CONFIG_KEY_MODEL, DEFAULT_TASK_MODEL)),
             aggregation_strategy=str(pln_section.get(CONFIG_KEY_AGGREGATION_STRATEGY, DEFAULT_TASK_AGGREGATION_STRATEGY)),
         ),
+        snomed=_build_snomed_settings(snomed_section),
     )

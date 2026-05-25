@@ -1,0 +1,44 @@
+"""Constants shared across SNOMED-related services."""
+
+CONFIG_KEY_SNOMED = "snomed"
+
+# Provider identifiers (config.yaml values)
+PROVIDER_SNOWSTORM = "snowstorm"
+PROVIDER_MOCK = "mock"
+
+SUPPORTED_SNOMED_PROVIDERS = (PROVIDER_SNOWSTORM, PROVIDER_MOCK)
+
+# Config file keys
+CONFIG_KEY_ENABLED = "enabled"
+CONFIG_KEY_PROVIDER = "provider"
+CONFIG_KEY_BASE_URL = "base_url"
+CONFIG_KEY_BRANCH = "branch"
+CONFIG_KEY_LIMIT = "limit"
+CONFIG_KEY_ACTIVE = "active"
+CONFIG_KEY_PREFERRED_LANGUAGE = "preferred_language"
+CONFIG_KEY_TIMEOUT_SECONDS = "timeout_seconds"
+
+# Snowstorm API path and query parameters
+SNOMED_CONCEPTS_PATH_SUFFIX = "concepts"
+QUERY_PARAM_TERM = "term"
+QUERY_PARAM_ACTIVE = "active"
+QUERY_PARAM_PREFERRED_LANGUAGE = "preferredLanguage"
+QUERY_PARAM_LIMIT = "limit"
+
+# Default config values
+DEFAULT_SNOMED_ENABLED = True
+DEFAULT_SNOMED_BASE_URL = "http://localhost:8080"
+DEFAULT_SNOMED_BRANCH = "MAIN/SNOMEDCT-ES"
+DEFAULT_SNOMED_LIMIT = 3
+DEFAULT_SNOMED_ACTIVE = True
+DEFAULT_SNOMED_PREFERRED_LANGUAGE = "es"
+DEFAULT_SNOMED_TIMEOUT_SECONDS = 10
+DEFAULT_SNOMED_PROVIDER = PROVIDER_SNOWSTORM
+
+# Snowstorm JSON response keys
+RESPONSE_KEY_ITEMS = "items"
+RESPONSE_KEY_TOTAL = "total"
+RESPONSE_KEY_LIMIT = "limit"
+RESPONSE_KEY_OFFSET = "offset"
+RESPONSE_KEY_SEARCH_AFTER = "searchAfter"
+RESPONSE_KEY_SEARCH_AFTER_ARRAY = "searchAfterArray"

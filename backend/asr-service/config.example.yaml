@@ -6,3 +6,11 @@ asr:
   device: cpu
   language: es
   compute_type: int8
+
+pln:
+  task: ner
+  model: rigonsallauka/spanish_medical_ner
+  aggregation_strategy: max
+
+snomed:
+  enabled: true

@@ -9,3 +9,6 @@ pln:
   task: ner
   model: rigonsallauka/spanish_medical_ner
   aggregation_strategy: max
+
+snomed:
+  enabled: true

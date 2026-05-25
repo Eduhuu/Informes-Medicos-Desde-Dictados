@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Header, HTTPException, Request, status
 
@@ -11,7 +11,10 @@ from app.constants.messages import (
     MSG_TRANSCRIPTION_EMPTY,
 )
 from app.models.audio_chunk import AudioChunk
+from app.pln.base import PLNModel
 from app.providers.base import ASRProvider
+from app.services.entity_enrichment import enrich_entities, normalize_ner_entity
+from app.snomed.base import SnomedClient
 from shared.constants.AsrConstants import (
     DEFAULT_CHANNELS,
     DEFAULT_SAMPLE_RATE_HZ,
@@ -20,7 +23,6 @@ from shared.constants.AsrConstants import (
     HEADER_SESSION_ID,
     HEADER_TIMESTAMP,
 )
-from app.pln.base import PLNModel
 
 router = APIRouter()
 
@@ -43,6 +45,18 @@ def _get_pln_model(request: Request) -> PLNModel:
             detail=MSG_HEALTH_UNAVAILABLE,
         )
     return model
+
+
+def _get_snomed_client(request: Request) -> SnomedClient:
+    client = getattr(request.app.state, "snomed_client", None)
+    if client is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_HEALTH_UNAVAILABLE,
+        )
+    return client
+
+
 def _parse_sequence(raw_sequence: str | None) -> int:
     if raw_sequence is None:
         return 0
@@ -92,6 +106,8 @@ async def metadata(request: Request) -> dict[str, str]:
     provider = _get_provider(request)
     return provider.get_metadata()
 
+print_transcripted_text = lambda text: print("Transcripción:", text)
+print_ner_entities = lambda ner_entities: [print("NER Entidad:", entity["word"]) for entity in ner_entities]
 
 @router.post("/transcribe")
 async def transcribe(
@@ -120,12 +136,24 @@ async def transcribe(
     provider = _get_provider(request)
     result = provider.transcribe(chunk)
     response = result.to_dict()
-    
+
     if not result.text:
         response["warning"] = MSG_TRANSCRIPTION_EMPTY
-        return
+        return response
+
     pln_model = _get_pln_model(request)
-    process = pln_model.process(result.text)
-    print(result.text)
-    print(process)
+    ner_entities = pln_model.process(result.text)
+    # response["ner_entities"] = ner_entities
+    print_transcripted_text(result.text)
+    # print_ner_entities(ner_entities)
+    snomed = _get_snomed_client(request)
+    for entity in ner_entities:
+        snomed_result = snomed.search_concepts(entity["word"]).to_dict()
+        if not snomed_result or snomed_result["total"] == 0:
+            print("No se encontró SNOMED para la entidad:", entity["word"])
+            continue
+        snomed_item = snomed_result["items"][0]
+        print("NER Entidad:", entity["word"])
+        print("SNOMED:", snomed_item)
+
     return response
