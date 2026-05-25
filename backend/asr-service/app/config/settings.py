@@ -34,6 +34,16 @@ from shared.constants.PlnConstants import (
     DEFAULT_TASK_AGGREGATION_STRATEGY,
 )
 
+from shared.constants.ReportConstants import (
+    CONFIG_KEY_REPORTS,
+    CONFIG_KEY_REPORTS_DIR,
+    CONFIG_KEY_REPORTS_ENABLED,
+    DEFAULT_REPORTS_DIR_NAME,
+    DEFAULT_REPORTS_ENABLED,
+    ENV_REPORTS_DIR,
+    ENV_REPORTS_ENABLED,
+)
+
 from shared.constants.SnomedConstants import (
     CONFIG_KEY_SNOMED,
     CONFIG_KEY_ACTIVE,
@@ -70,6 +80,12 @@ class PlnSettings:
 
 
 @dataclass(frozen=True)
+class ReportSettings:
+    enabled: bool
+    directory: Path
+
+
+@dataclass(frozen=True)
 class SnomedSettings:
     enabled: bool
     provider: str
@@ -86,6 +102,38 @@ class Settings:
     asr: AsrSettings
     pln: PlnSettings
     snomed: SnomedSettings
+    reports: ReportSettings
+
+def _default_reports_directory() -> Path:
+    return Path(__file__).resolve().parents[2] / DEFAULT_REPORTS_DIR_NAME
+
+
+def _build_report_settings(reports_section: dict[str, Any]) -> ReportSettings:
+    raw_dir = reports_section.get(CONFIG_KEY_REPORTS_DIR)
+    directory = (
+        Path(str(raw_dir))
+        if raw_dir
+        else _default_reports_directory()
+    )
+    return ReportSettings(
+        enabled=_parse_bool(
+            reports_section.get(CONFIG_KEY_REPORTS_ENABLED),
+            DEFAULT_REPORTS_ENABLED,
+        ),
+        directory=directory,
+    )
+
+
+def _default_report_settings_from_env() -> ReportSettings:
+    env_dir = os.getenv(ENV_REPORTS_DIR)
+    return ReportSettings(
+        enabled=_parse_bool(
+            os.getenv(ENV_REPORTS_ENABLED),
+            DEFAULT_REPORTS_ENABLED,
+        ),
+        directory=Path(env_dir) if env_dir else _default_reports_directory(),
+    )
+
 
 def _default_config_path() -> Path:
     env_path = os.getenv("ASR_CONFIG_PATH")
@@ -185,12 +233,14 @@ def load_settings(config_path: Path | None = None) -> Settings:
                 aggregation_strategy=os.getenv("PLN_AGGREGATION_STRATEGY", "mean"),
             ),
             snomed=_default_snomed_settings_from_env(),
+            reports=_default_report_settings_from_env(),
         )
     with path.open(encoding="utf-8") as config_file:
         raw: dict[str, Any] = yaml.safe_load(config_file) or {}
     asr_section = raw.get(CONFIG_KEY_ASR, {})
     pln_section = raw.get(CONFIG_KEY_PLN, {})
     snomed_section = raw.get(CONFIG_KEY_SNOMED, {})
+    reports_section = raw.get(CONFIG_KEY_REPORTS, {})
     return Settings(
         asr=AsrSettings(
             provider=str(asr_section.get(CONFIG_KEY_PROVIDER, os.getenv("ASR_PROVIDER", PROVIDER_MOCK))),
@@ -205,4 +255,5 @@ def load_settings(config_path: Path | None = None) -> Settings:
             aggregation_strategy=str(pln_section.get(CONFIG_KEY_AGGREGATION_STRATEGY, DEFAULT_TASK_AGGREGATION_STRATEGY)),
         ),
         snomed=_build_snomed_settings(snomed_section),
+        reports=_build_report_settings(reports_section),
     )

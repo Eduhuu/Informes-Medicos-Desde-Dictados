@@ -80,6 +80,9 @@ xcuserdata/
 # --- Local ASR configuration (template: config.example.yaml) ---
 express-backend/asr-service/config.yaml
 
+# --- ASR per-session transcription reports ---
+backend/asr-service/reports/
+
 # --- Logs & temp files ---
 *.log
 logs/
