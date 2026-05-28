@@ -11,9 +11,9 @@ from app.constants.messages import (
     MSG_TRANSCRIPTION_EMPTY,
 )
 from app.models.audio_chunk import AudioChunk
-from app.pln.base import PLNModel
 from app.providers.base import ASRProvider
 from app.services.entity_enrichment import enrich_entities
+from app.services.pln_orchestrator import PlnOrchestrator
 from app.services.session_report import SessionReportWriter
 from app.services.transcription_console_log import log_transcription_call_to_console
 from app.snomed.base import SnomedClient
@@ -39,14 +39,14 @@ def _get_provider(request: Request) -> ASRProvider:
     return provider
 
 
-def _get_pln_model(request: Request) -> PLNModel:
-    model = getattr(request.app.state, "pln_provider", None)
-    if model is None:
+def _get_pln_orchestrator(request: Request) -> PlnOrchestrator:
+    orchestrator = getattr(request.app.state, "pln_orchestrator", None)
+    if orchestrator is None:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=MSG_HEALTH_UNAVAILABLE,
         )
-    return model
+    return orchestrator
 
 
 def _get_session_report_writer(request: Request) -> SessionReportWriter:
@@ -151,11 +151,12 @@ async def transcribe(
     if not result.text:
         warning = MSG_TRANSCRIPTION_EMPTY
         response["warning"] = warning
-    else:
-        pln_model = _get_pln_model(request)
-        ner_entities = pln_model.process(result.text)
-        snomed_client = _get_snomed_client(request)
-        enriched_entities = enrich_entities(ner_entities, snomed_client)
+        return
+
+    pln_orchestrator = _get_pln_orchestrator(request)
+    ner_entities = await pln_orchestrator.process_text(result.text)
+    snomed_client = _get_snomed_client(request)
+    enriched_entities = enrich_entities(ner_entities, snomed_client)
 
     report_writer = _get_session_report_writer(request)
     if report_writer.enabled:

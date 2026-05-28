@@ -27,6 +27,7 @@ from app.constants.messages import (
     REPORT_WARNING_PREFIX,
 )
 from app.models.snomed import EnrichedEntity
+from app.services.pln_labels import pln_source_label
 from shared.constants.ReportConstants import (
     REPORT_FILENAME_PREFIX,
     REPORT_FILENAME_SUFFIX,
@@ -147,6 +148,7 @@ class SessionReportWriter:
                         index=index,
                         word=entity.word,
                         entity_group=entity.entity_group,
+                        pln_source_label=pln_source_label(entity.pln_source),
                         score=entity.score,
                         start=entity.start,
                         end=entity.end,

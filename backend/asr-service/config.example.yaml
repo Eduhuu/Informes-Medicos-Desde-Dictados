@@ -7,10 +7,15 @@ asr:
   language: es
   compute_type: int8
 
-pln:
+pln_medical:
   task: ner
   model: rigonsallauka/spanish_medical_ner
   aggregation_strategy: max
+
+pln_farmacos:
+  task: token-classification
+  model: PlanTL-GOB-ES/bsc-bio-ehr-es-pharmaconer
+  aggregation_strategy: simple
 
 snomed:
   enabled: true

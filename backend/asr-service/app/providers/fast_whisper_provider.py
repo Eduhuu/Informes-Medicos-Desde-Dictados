@@ -9,10 +9,10 @@ from app.providers.base import ASRProvider
 from app.utils.audio import chunk_to_float32_array
 
 
-class WhisperProvider(ASRProvider):
-    """Whisper transcription via faster-whisper (CTranslate2)."""
+class FastWhisperProvider(ASRProvider):
+    """Fast-whisper transcription via faster-whisper (CTranslate2)."""
 
-    ENGINE_NAME = "whisper"
+    ENGINE_NAME = "fast-whisper"
 
     def __init__(
         self,
@@ -48,7 +48,7 @@ class WhisperProvider(ASRProvider):
 
     def transcribe(self, chunk: AudioChunk) -> TranscriptionResult:
         if not self.health_check():
-            raise RuntimeError("Whisper model is not loaded. Call preload() first.")
+            raise RuntimeError("Fast-whisper model is not loaded. Call preload() first.")
 
         started_at = time.perf_counter()
         audio = chunk_to_float32_array(chunk)

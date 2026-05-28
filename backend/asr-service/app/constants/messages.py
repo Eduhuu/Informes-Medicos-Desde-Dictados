@@ -13,7 +13,7 @@ MSG_INVALID_SNOMED_PROVIDER = "Proveedor SNOMED no soportado: {provider}"
 
 # Console debug logs when reports.enabled is false (Spanish)
 LOG_TRANSCRIPTION = "Transcripción: {text}"
-LOG_NER_ENTITY = "NER Entidad: {word}"
+LOG_NER_ENTITY = "NER Entidad: {word} | origen: {pln_source_label}"
 LOG_SNOMED_NOT_FOUND = "No se encontró SNOMED para la entidad: {word}"
 LOG_SNOMED_RESULT = "SNOMED: {snomed}"
 LOG_SNOMED_ERROR = "Error SNOMED para la entidad {word}: {error}"
@@ -31,8 +31,13 @@ REPORT_TRANSCRIPTION_EMPTY = "(sin texto detectado)"
 REPORT_WARNING_PREFIX = "Aviso: {message}"
 REPORT_NER_NO_ENTITIES = "No se detectaron entidades."
 REPORT_SNOMED_NOT_APPLICABLE = "No aplica (sin entidades NER)."
+REPORT_PLN_SOURCE_MEDICAL = "PLN médico"
+REPORT_PLN_SOURCE_FARMACOS = "PLN fármacos"
+REPORT_PLN_SOURCE_UNKNOWN = "PLN desconocido"
+
 REPORT_NER_ENTITY_LINE = (
     "  [{index}] {word} | etiqueta: {entity_group} | "
+    "origen: {pln_source_label} | "
     "confianza: {score:.4f} | posición: {start}-{end}"
 )
 REPORT_SNOMED_ENTITY_HEADER = "  [{index}] Entidad: {word}"

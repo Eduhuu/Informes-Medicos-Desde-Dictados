@@ -99,6 +99,7 @@ class EnrichedEntity:
     entity_group: str
     start: int
     end: int
+    pln_source: str
     snomed: SnomedSearchResult
 
     def to_dict(self) -> dict[str, Any]:
@@ -108,6 +109,7 @@ class EnrichedEntity:
             "entity_group": self.entity_group,
             "start": self.start,
             "end": self.end,
+            "pln_source": self.pln_source,
             "snomed": self.snomed.to_dict(),
         }
 
@@ -123,5 +125,6 @@ class EnrichedEntity:
             entity_group=str(ner_entity["entity_group"]),
             start=int(ner_entity["start"]),
             end=int(ner_entity["end"]),
+            pln_source=str(ner_entity["pln_source"]),
             snomed=snomed_result,
         )

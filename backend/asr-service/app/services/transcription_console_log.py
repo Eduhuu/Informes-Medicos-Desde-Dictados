@@ -8,6 +8,7 @@ from app.constants.messages import (
     LOG_TRANSCRIPTION,
 )
 from app.models.snomed import EnrichedEntity
+from app.services.pln_labels import pln_source_label
 
 
 def log_transcription_call_to_console(
@@ -22,7 +23,12 @@ def log_transcription_call_to_console(
     print(LOG_TRANSCRIPTION.format(text=transcription_text))
 
     for entity in enriched_entities:
-        print(LOG_NER_ENTITY.format(word=entity.word))
+        print(
+            LOG_NER_ENTITY.format(
+                word=entity.word,
+                pln_source_label=pln_source_label(entity.pln_source),
+            ),
+        )
         snomed = entity.snomed
 
         if snomed.error:

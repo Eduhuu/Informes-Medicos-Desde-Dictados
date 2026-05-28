@@ -21,9 +21,9 @@ class ASRFactory:
         resolved = settings or load_settings()
 
         if resolved.provider == PROVIDER_WHISPER:
-            from app.providers.whisper_provider import WhisperProvider
+            from app.providers.fast_whisper_provider import FastWhisperProvider
 
-            return WhisperProvider(
+            return FastWhisperProvider(
                 model_name=resolved.model,
                 device=resolved.device,
                 language=resolved.language,

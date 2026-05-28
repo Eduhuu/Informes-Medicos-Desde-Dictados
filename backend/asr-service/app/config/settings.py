@@ -25,13 +25,18 @@ from shared.constants.AsrConstants import (
 )
 
 from shared.constants.PlnConstants import (
-    CONFIG_KEY_PLN,
-    CONFIG_KEY_TASK,
-    CONFIG_KEY_MODEL,
     CONFIG_KEY_AGGREGATION_STRATEGY,
+    CONFIG_KEY_MODEL,
+    CONFIG_KEY_PLN,
+    CONFIG_KEY_PLN_FARMACOS,
+    CONFIG_KEY_PLN_MEDICAL,
+    CONFIG_KEY_TASK,
+    DEFAULT_FARMACOS_AGGREGATION_STRATEGY,
+    DEFAULT_FARMACOS_MODEL,
+    DEFAULT_FARMACOS_TASK,
     DEFAULT_TASK,
-    DEFAULT_TASK_MODEL,
     DEFAULT_TASK_AGGREGATION_STRATEGY,
+    DEFAULT_TASK_MODEL,
 )
 
 from shared.constants.ReportConstants import (
@@ -100,9 +105,54 @@ class SnomedSettings:
 @dataclass(frozen=True)
 class Settings:
     asr: AsrSettings
-    pln: PlnSettings
+    pln_medical: PlnSettings
+    pln_farmacos: PlnSettings
     snomed: SnomedSettings
     reports: ReportSettings
+
+
+def _build_pln_settings(
+    section: dict[str, Any],
+    *,
+    default_task: str,
+    default_model: str,
+    default_aggregation_strategy: str,
+) -> PlnSettings:
+    return PlnSettings(
+        task=str(section.get(CONFIG_KEY_TASK, default_task)),
+        model=str(section.get(CONFIG_KEY_MODEL, default_model)),
+        aggregation_strategy=str(
+            section.get(
+                CONFIG_KEY_AGGREGATION_STRATEGY,
+                default_aggregation_strategy,
+            ),
+        ),
+    )
+
+
+def _default_pln_medical_from_env() -> PlnSettings:
+    return PlnSettings(
+        task=os.getenv("PLN_MEDICAL_TASK", os.getenv("PLN_TASK", DEFAULT_TASK)),
+        model=os.getenv(
+            "PLN_MEDICAL_MODEL",
+            os.getenv("PLN_MODEL", DEFAULT_TASK_MODEL),
+        ),
+        aggregation_strategy=os.getenv(
+            "PLN_MEDICAL_AGGREGATION_STRATEGY",
+            os.getenv("PLN_AGGREGATION_STRATEGY", DEFAULT_TASK_AGGREGATION_STRATEGY),
+        ),
+    )
+
+
+def _default_pln_farmacos_from_env() -> PlnSettings:
+    return PlnSettings(
+        task=os.getenv("PLN_FARMACOS_TASK", DEFAULT_FARMACOS_TASK),
+        model=os.getenv("PLN_FARMACOS_MODEL", DEFAULT_FARMACOS_MODEL),
+        aggregation_strategy=os.getenv(
+            "PLN_FARMACOS_AGGREGATION_STRATEGY",
+            DEFAULT_FARMACOS_AGGREGATION_STRATEGY,
+        ),
+    )
 
 def _default_reports_directory() -> Path:
     return Path(__file__).resolve().parents[2] / DEFAULT_REPORTS_DIR_NAME
@@ -227,18 +277,18 @@ def load_settings(config_path: Path | None = None) -> Settings:
                 language=os.getenv("ASR_LANGUAGE", DEFAULT_LANGUAGE),
                 compute_type=os.getenv("ASR_COMPUTE_TYPE", DEFAULT_COMPUTE_TYPE),
             ),
-            pln=PlnSettings(
-                task=os.getenv("PLN_TASK", "text-classification"),
-                model=os.getenv("PLN_MODEL", "bert-base-uncased"),
-                aggregation_strategy=os.getenv("PLN_AGGREGATION_STRATEGY", "mean"),
-            ),
+            pln_medical=_default_pln_medical_from_env(),
+            pln_farmacos=_default_pln_farmacos_from_env(),
             snomed=_default_snomed_settings_from_env(),
             reports=_default_report_settings_from_env(),
         )
     with path.open(encoding="utf-8") as config_file:
         raw: dict[str, Any] = yaml.safe_load(config_file) or {}
     asr_section = raw.get(CONFIG_KEY_ASR, {})
-    pln_section = raw.get(CONFIG_KEY_PLN, {})
+    pln_medical_section = raw.get(CONFIG_KEY_PLN_MEDICAL, {})
+    if not pln_medical_section:
+        pln_medical_section = raw.get(CONFIG_KEY_PLN, {})
+    pln_farmacos_section = raw.get(CONFIG_KEY_PLN_FARMACOS, {})
     snomed_section = raw.get(CONFIG_KEY_SNOMED, {})
     reports_section = raw.get(CONFIG_KEY_REPORTS, {})
     return Settings(
@@ -249,10 +299,17 @@ def load_settings(config_path: Path | None = None) -> Settings:
             language=str(asr_section.get(CONFIG_KEY_LANGUAGE, DEFAULT_LANGUAGE)),
             compute_type=str(asr_section.get(CONFIG_KEY_COMPUTE_TYPE, DEFAULT_COMPUTE_TYPE)),
         ),
-        pln=PlnSettings(
-            task=str(pln_section.get(CONFIG_KEY_TASK, DEFAULT_TASK)),
-            model=str(pln_section.get(CONFIG_KEY_MODEL, DEFAULT_TASK_MODEL)),
-            aggregation_strategy=str(pln_section.get(CONFIG_KEY_AGGREGATION_STRATEGY, DEFAULT_TASK_AGGREGATION_STRATEGY)),
+        pln_medical=_build_pln_settings(
+            pln_medical_section,
+            default_task=DEFAULT_TASK,
+            default_model=DEFAULT_TASK_MODEL,
+            default_aggregation_strategy=DEFAULT_TASK_AGGREGATION_STRATEGY,
+        ),
+        pln_farmacos=_build_pln_settings(
+            pln_farmacos_section,
+            default_task=DEFAULT_FARMACOS_TASK,
+            default_model=DEFAULT_FARMACOS_MODEL,
+            default_aggregation_strategy=DEFAULT_FARMACOS_AGGREGATION_STRATEGY,
         ),
         snomed=_build_snomed_settings(snomed_section),
         reports=_build_report_settings(reports_section),

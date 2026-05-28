@@ -12,6 +12,7 @@ def normalize_ner_entity(ner_entity: dict[str, Any]) -> dict[str, Any]:
         "entity_group": str(ner_entity["entity_group"]),
         "start": int(ner_entity["start"]),
         "end": int(ner_entity["end"]),
+        "pln_source": str(ner_entity["pln_source"]),
     }
 
 

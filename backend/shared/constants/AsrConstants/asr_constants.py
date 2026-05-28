@@ -1,7 +1,7 @@
 """Constants shared across ASR-related services."""
 
 # Provider identifiers (config.yaml values)
-PROVIDER_WHISPER = "whisper"
+PROVIDER_WHISPER = "fast-whisper"
 PROVIDER_MOCK = "mock"
 
 SUPPORTED_PROVIDERS = (PROVIDER_WHISPER, PROVIDER_MOCK)

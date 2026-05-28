@@ -30,6 +30,33 @@ asr:
 
 Variables de entorno equivalentes: `ASR_PROVIDER`, `ASR_MODEL`, `ASR_DEVICE`, `ASR_LANGUAGE`, `ASR_COMPUTE_TYPE`, `ASR_CONFIG_PATH`.
 
+## PLN (extracción de entidades)
+
+El servicio ejecuta dos modelos en **paralelo** tras cada transcripción con texto:
+
+- **`pln_medical`**: NER médico general (p. ej. `rigonsallauka/spanish_medical_ner`).
+- **`pln_farmacos`**: terminología farmacológica (p. ej. `PlanTL-GOB-ES/bsc-bio-ehr-es-pharmaconer`).
+
+Ejemplo en `config.yaml`:
+
+```yaml
+pln_medical:
+  task: ner
+  model: rigonsallauka/spanish_medical_ner
+  aggregation_strategy: max
+
+pln_farmacos:
+  task: token-classification
+  model: PlanTL-GOB-ES/bsc-bio-ehr-es-pharmaconer
+  aggregation_strategy: simple
+```
+
+**Fusión de entidades:** si ambos modelos detectan el mismo intervalo de texto, se conserva solo la entidad de `pln_farmacos`. Las entidades médicas que no solapan con fármacos se mantienen. En reportes y logs cada entidad indica su origen (`PLN médico` o `PLN fármacos`).
+
+**Migración:** la clave antigua `pln` en el YAML se interpreta como `pln_medical` si no existe `pln_medical`.
+
+Variables de entorno: `PLN_MEDICAL_TASK`, `PLN_MEDICAL_MODEL`, `PLN_MEDICAL_AGGREGATION_STRATEGY`, `PLN_FARMACOS_TASK`, `PLN_FARMACOS_MODEL`, `PLN_FARMACOS_AGGREGATION_STRATEGY` (y los legacy `PLN_TASK`, `PLN_MODEL`, `PLN_AGGREGATION_STRATEGY` para el bloque médico).
+
 ## Añadir un nuevo proveedor
 
 1. Crea `app/providers/mi_proveedor.py` implementando `ASRProvider` (`transcribe`, `health_check`, `get_metadata`, opcional `preload`).
@@ -59,7 +86,7 @@ Estado del motor y metadatos para métricas del TFM (motor, versión, dispositiv
 
 Todos los proveedores devuelven el mismo esquema: `text`, `segments`, `confidence`, `engine`, `model_version`, `device`, `latency_ms`, `session_id`, `sequence`.
 
-Cuando hay texto transcrito, la respuesta incluye además `entities`: entidades NER del PLN enriquecidas con SNOMED CT (si `snomed.enabled` es `true`).
+Cuando hay texto transcrito, el pipeline ejecuta ambos PLN y enriquece las entidades fusionadas con SNOMED CT (si `snomed.enabled` es `true`). Los reportes de sesión y los logs de consola incluyen el origen PLN de cada entidad.
 
 ## SNOMED CT (Snowstorm)
 
@@ -88,4 +115,4 @@ Con `SNOMED_PROVIDER=mock` no hace falta Snowstorm. Si Snowstorm no responde, ca
 
 ### Campo `entities`
 
-Cada elemento combina la salida NER (`word`, `score`, `entity_group`, `start`, `end`) con `snomed`, que replica la respuesta paginada de Snowstorm (`items`, `total`, `limit`, `offset`, `searchAfter`, `searchAfterArray`) más `error` cuando falla la consulta.
+Cada elemento combina la salida NER (`word`, `score`, `entity_group`, `start`, `end`, `pln_source`) con `snomed`, que replica la respuesta paginada de Snowstorm (`items`, `total`, `limit`, `offset`, `searchAfter`, `searchAfterArray`) más `error` cuando falla la consulta. El campo `pln_source` indica si la entidad proviene de `pln_medical` o `pln_farmacos`.
