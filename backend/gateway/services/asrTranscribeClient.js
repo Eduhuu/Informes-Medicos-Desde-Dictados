@@ -1,5 +1,6 @@
 const {
     ASR_TRANSCRIBE_PATH,
+    ASR_GENERATE_REPORT_PATH,
     ASR_BATCH_TIMEOUT_MS,
     CONTENT_TYPE_OCTET_STREAM,
     DEFAULT_ASR_SERVICE_URL,
@@ -98,6 +99,12 @@ async function transcribeAudioChunk(audioBuffer, metadata, options = {}) {
     return _doFetch(url, fetchOptions);
 }
 
+async function generateReport(sessionId) {
+    const url = `${resolveAsrBaseUrl()}${ASR_GENERATE_REPORT_PATH}/${sessionId}`;
+    return _doFetch(url, { method: 'POST' });
+}
+
 module.exports = {
     transcribeAudioChunk,
+    generateReport,
 };

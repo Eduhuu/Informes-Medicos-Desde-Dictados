@@ -54,3 +54,10 @@ REPORT_SNOMED_FSN_LINE = "      FSN: {term} ({lang})"
 REPORT_SNOMED_ACTIVE_LINE = "      activo: {active}"
 REPORT_SNOMED_DEFINITION_LINE = "      estado definición: {status}"
 REPORT_SNOMED_TOTAL_HINT = "      (total coincidencias: {total})"
+
+# LLM report generation messages (Spanish)
+MSG_LLM_REPORT_NOT_FOUND = "No se encontró el reporte de sesión: {session_id}"
+MSG_LLM_UNAVAILABLE = "Generador de reporte LLM no disponible"
+MSG_LLM_DISABLED = "La generación de reporte LLM está deshabilitada en la configuración"
+MSG_LLM_CONNECTION_ERROR = "No se pudo conectar con el servicio LLM: {error}"
+MSG_LLM_GENERATION_ERROR = "Error al generar el reporte médico: {error}"

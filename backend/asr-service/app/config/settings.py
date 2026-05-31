@@ -71,6 +71,24 @@ from shared.constants.SnomedConstants import (
     DEFAULT_SNOMED_TIMEOUT_SECONDS,
 )
 
+from shared.constants.LlmConstants import (
+    CONFIG_KEY_LLM,
+    CONFIG_KEY_LLM_BASE_URL,
+    CONFIG_KEY_LLM_ENABLED,
+    CONFIG_KEY_LLM_MODEL,
+    CONFIG_KEY_LLM_SYSTEM_PROMPT,
+    CONFIG_KEY_LLM_TIMEOUT_SECONDS,
+    DEFAULT_LLM_BASE_URL,
+    DEFAULT_LLM_ENABLED,
+    DEFAULT_LLM_MODEL,
+    DEFAULT_LLM_TIMEOUT_SECONDS,
+    ENV_LLM_BASE_URL,
+    ENV_LLM_ENABLED,
+    ENV_LLM_MODEL,
+    ENV_LLM_SYSTEM_PROMPT,
+    ENV_LLM_TIMEOUT_SECONDS,
+)
+
 @dataclass(frozen=True)
 class AsrSettings:
     provider: str
@@ -106,12 +124,22 @@ class SnomedSettings:
 
 
 @dataclass(frozen=True)
+class LlmSettings:
+    enabled: bool
+    model: str
+    base_url: str
+    system_prompt: str
+    timeout_seconds: float
+
+
+@dataclass(frozen=True)
 class Settings:
     asr: AsrSettings
     pln_medical: PlnSettings
     pln_farmacos: PlnSettings
     snomed: SnomedSettings
     reports: ReportSettings
+    llm: LlmSettings
 
 
 def _build_pln_settings(
@@ -185,6 +213,36 @@ def _default_report_settings_from_env() -> ReportSettings:
             DEFAULT_REPORTS_ENABLED,
         ),
         directory=Path(env_dir) if env_dir else _default_reports_directory(),
+    )
+
+
+def _build_llm_settings(llm_section: dict[str, Any]) -> LlmSettings:
+    return LlmSettings(
+        enabled=_parse_bool(
+            llm_section.get(CONFIG_KEY_LLM_ENABLED),
+            DEFAULT_LLM_ENABLED,
+        ),
+        model=str(llm_section.get(CONFIG_KEY_LLM_MODEL, DEFAULT_LLM_MODEL)),
+        base_url=str(llm_section.get(CONFIG_KEY_LLM_BASE_URL, DEFAULT_LLM_BASE_URL)),
+        system_prompt=str(llm_section.get(CONFIG_KEY_LLM_SYSTEM_PROMPT, "")),
+        timeout_seconds=float(
+            llm_section.get(CONFIG_KEY_LLM_TIMEOUT_SECONDS, DEFAULT_LLM_TIMEOUT_SECONDS),
+        ),
+    )
+
+
+def _default_llm_settings_from_env() -> LlmSettings:
+    return LlmSettings(
+        enabled=_parse_bool(
+            os.getenv(ENV_LLM_ENABLED),
+            DEFAULT_LLM_ENABLED,
+        ),
+        model=os.getenv(ENV_LLM_MODEL, DEFAULT_LLM_MODEL),
+        base_url=os.getenv(ENV_LLM_BASE_URL, DEFAULT_LLM_BASE_URL),
+        system_prompt=os.getenv(ENV_LLM_SYSTEM_PROMPT, ""),
+        timeout_seconds=float(
+            os.getenv(ENV_LLM_TIMEOUT_SECONDS, str(DEFAULT_LLM_TIMEOUT_SECONDS)),
+        ),
     )
 
 
@@ -310,6 +368,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
             pln_farmacos=_default_pln_farmacos_from_env(),
             snomed=_default_snomed_settings_from_env(),
             reports=_default_report_settings_from_env(),
+            llm=_default_llm_settings_from_env(),
         )
     with path.open(encoding="utf-8") as config_file:
         raw: dict[str, Any] = yaml.safe_load(config_file) or {}
@@ -320,6 +379,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
     pln_farmacos_section = raw.get(CONFIG_KEY_PLN_FARMACOS, {})
     snomed_section = raw.get(CONFIG_KEY_SNOMED, {})
     reports_section = raw.get(CONFIG_KEY_REPORTS, {})
+    llm_section = raw.get(CONFIG_KEY_LLM, {})
     return Settings(
         asr=AsrSettings(
             provider=str(asr_section.get(CONFIG_KEY_PROVIDER, os.getenv("ASR_PROVIDER", PROVIDER_MOCK))),
@@ -344,4 +404,5 @@ def load_settings(config_path: Path | None = None) -> Settings:
         ),
         snomed=_build_snomed_settings(snomed_section),
         reports=_build_report_settings(reports_section),
+        llm=_build_llm_settings(llm_section),
     )

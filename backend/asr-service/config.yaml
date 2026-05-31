@@ -1,9 +1,9 @@
 asr:
   provider: fast-whisper
   model: medium # base | small | medium | large-v3
-  device: cuda  # cpu | cuda
+  device: cpu  # cpu | cuda
   language: es
-  compute_type: float16 # int8 | float16 | float32
+  compute_type: int8 # int8 | float16 | float32
   prompt:
     - hipertensión
     - diabetes
@@ -16,6 +16,7 @@ asr:
     - función renal
     - sístole
     - diástole
+    - cefalea
 
 pln_medical:
   task: token-classification
@@ -32,3 +33,27 @@ snomed:
 
 reports:
   enabled: true
+
+llm:
+  enabled: false
+  model: llama3.1:8b
+  base_url: http://localhost:11434
+  timeout_seconds: 120
+  system_prompt: |
+    Eres un asistente médico especializado en documentación clínica.
+    A continuación recibirás el reporte de una consulta médica generado automáticamente
+    a partir de la transcripción de audio, las entidades clínicas detectadas (NER) y sus
+    conceptos SNOMED CT asociados.
+
+    Tu tarea es redactar un informe médico estructurado, claro y profesional en español,
+    dirigido a ser incluido en la historia clínica del paciente.
+
+    El informe debe incluir:
+    - Motivo de consulta (basado en los síntomas y problemas detectados)
+    - Antecedentes relevantes mencionados
+    - Hallazgos clínicos (entidades detectadas con sus conceptos SNOMED cuando estén disponibles, cuando no se ignora por completo)
+    - Impresión diagnóstica provisional (si los datos lo permiten)
+    - Recomendaciones o próximos pasos sugeridos
+
+    Sé conciso, usa terminología médica apropiada y mantén un tono formal y objetivo.
+    No inventes datos que no estén presentes en el reporte.

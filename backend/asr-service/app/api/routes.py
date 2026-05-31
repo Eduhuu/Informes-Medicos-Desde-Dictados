@@ -7,6 +7,11 @@ from app.constants.messages import (
     MSG_HEALTH_OK,
     MSG_HEALTH_UNAVAILABLE,
     MSG_INVALID_SEQUENCE,
+    MSG_LLM_CONNECTION_ERROR,
+    MSG_LLM_DISABLED,
+    MSG_LLM_GENERATION_ERROR,
+    MSG_LLM_REPORT_NOT_FOUND,
+    MSG_LLM_UNAVAILABLE,
     MSG_MISSING_AUDIO,
     MSG_SERVICE_READY,
     MSG_TRANSCRIPTION_EMPTY,
@@ -15,6 +20,7 @@ from app.models.audio_chunk import AudioChunk
 from app.models.chunk_processing_timings import ChunkProcessingTimings
 from app.providers.base import ASRProvider
 from app.services.entity_enrichment import enrich_entities
+from app.services.llm_report_generator import LlmReportGenerator
 from app.services.pln_orchestrator import PlnOrchestrator
 from app.services.session_report import SessionReportWriter
 from app.services.transcription_console_log import log_transcription_call_to_console
@@ -69,6 +75,16 @@ def _get_snomed_client(request: Request) -> SnomedClient:
             detail=MSG_HEALTH_UNAVAILABLE,
         )
     return client
+
+
+def _get_llm_report_generator(request: Request) -> LlmReportGenerator:
+    generator = getattr(request.app.state, "llm_report_generator", None)
+    if generator is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_LLM_UNAVAILABLE,
+        )
+    return generator
 
 
 def _parse_sequence(raw_sequence: str | None) -> int:
@@ -216,3 +232,35 @@ async def transcribe(
         )
 
     return response
+
+
+@router.post("/generate-report/{session_id}")
+async def generate_report(session_id: str, request: Request) -> dict[str, str]:
+    generator = _get_llm_report_generator(request)
+
+    if not generator.enabled:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_LLM_DISABLED,
+        )
+
+    try:
+        report = await generator.generate(session_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=MSG_LLM_REPORT_NOT_FOUND.format(session_id=session_id),
+        ) from exc
+    except ConnectionError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(exc),
+        ) from exc
+    except RuntimeError as exc:
+        print(exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(exc),
+        ) from exc
+
+    return {"session_id": session_id, "report": report}

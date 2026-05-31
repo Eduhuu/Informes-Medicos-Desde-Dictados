@@ -12,6 +12,7 @@ if str(_REPO_ROOT) not in sys.path:
 from app.api.routes import router
 from app.config.settings import load_settings
 from app.factory.asr_factory import ASRFactory
+from app.factory.llm_factory import LlmFactory
 from app.factory.pln_factory import PNLFactory
 from app.factory.snomed_factory import SnomedFactory
 from app.services.pln_orchestrator import PlnOrchestrator
@@ -37,18 +38,21 @@ async def lifespan(app: FastAPI):
         settings.reports.directory,
         enabled=settings.reports.enabled,
     )
+    llm_report_generator = LlmFactory.create(settings.llm, settings.reports.directory)
 
     app.state.asr_settings = settings.asr
     app.state.pln_medical_settings = settings.pln_medical
     app.state.pln_farmacos_settings = settings.pln_farmacos
     app.state.snomed_settings = settings.snomed
     app.state.report_settings = settings.reports
+    app.state.llm_settings = settings.llm
 
     app.state.asr_provider = provider
     app.state.pln_orchestrator = pln_orchestrator
     app.state.pln_executor = pln_executor
     app.state.snomed_client = snomed_client
     app.state.session_report_writer = session_report_writer
+    app.state.llm_report_generator = llm_report_generator
 
     yield
 
@@ -57,6 +61,7 @@ async def lifespan(app: FastAPI):
     app.state.pln_farmacos_settings = None
     app.state.snomed_settings = None
     app.state.report_settings = None
+    app.state.llm_settings = None
 
     app.state.asr_provider = None
     app.state.pln_orchestrator = None
@@ -64,6 +69,7 @@ async def lifespan(app: FastAPI):
     app.state.pln_executor = None
     app.state.snomed_client = None
     app.state.session_report_writer = None
+    app.state.llm_report_generator = None
 
 
 app = FastAPI(
