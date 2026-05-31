@@ -1,3 +1,4 @@
+import time
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Header, HTTPException, Request, status
@@ -11,6 +12,7 @@ from app.constants.messages import (
     MSG_TRANSCRIPTION_EMPTY,
 )
 from app.models.audio_chunk import AudioChunk
+from app.models.chunk_processing_timings import ChunkProcessingTimings
 from app.providers.base import ASRProvider
 from app.services.entity_enrichment import enrich_entities
 from app.services.pln_orchestrator import PlnOrchestrator
@@ -142,21 +144,59 @@ async def transcribe(
         sample_width_bytes=DEFAULT_SAMPLE_WIDTH_BYTES,
     )
 
+    chunk_started_at = time.perf_counter()
+
     provider = _get_provider(request)
+    asr_started_at = time.perf_counter()
     result = provider.transcribe(chunk)
+    asr_ms = (time.perf_counter() - asr_started_at) * 1000
+
     response = result.to_dict()
     warning: str | None = None
     enriched_entities = []
+    ner_ms = 0.0
+    snomed_ms = 0.0
 
     if not result.text:
         warning = MSG_TRANSCRIPTION_EMPTY
         response["warning"] = warning
-        return
+        total_ms = (time.perf_counter() - chunk_started_at) * 1000
+        timings = ChunkProcessingTimings(
+            asr_ms=asr_ms,
+            ner_ms=ner_ms,
+            snomed_ms=snomed_ms,
+            total_ms=total_ms,
+        )
+        report_writer = _get_session_report_writer(request)
+        if report_writer.enabled:
+            report_writer.append_call(
+                session_id=chunk.session_id,
+                sequence=chunk.sequence,
+                timestamp_ms=chunk.timestamp_ms,
+                transcription_text=result.text,
+                enriched_entities=enriched_entities,
+                timings=timings,
+                warning=warning,
+            )
+        return response
 
     pln_orchestrator = _get_pln_orchestrator(request)
+    ner_started_at = time.perf_counter()
     ner_entities = await pln_orchestrator.process_text(result.text)
+    ner_ms = (time.perf_counter() - ner_started_at) * 1000
+
     snomed_client = _get_snomed_client(request)
+    snomed_started_at = time.perf_counter()
     enriched_entities = enrich_entities(ner_entities, snomed_client)
+    snomed_ms = (time.perf_counter() - snomed_started_at) * 1000
+
+    total_ms = (time.perf_counter() - chunk_started_at) * 1000
+    timings = ChunkProcessingTimings(
+        asr_ms=asr_ms,
+        ner_ms=ner_ms,
+        snomed_ms=snomed_ms,
+        total_ms=total_ms,
+    )
 
     report_writer = _get_session_report_writer(request)
     if report_writer.enabled:
@@ -166,6 +206,7 @@ async def transcribe(
             timestamp_ms=chunk.timestamp_ms,
             transcription_text=result.text,
             enriched_entities=enriched_entities,
+            timings=timings,
             warning=warning,
         )
     else:

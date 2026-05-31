@@ -1,3 +1,4 @@
+const {resolveProcessingMode} = require('./handlers/audioWebSocketHandler');
 const express = require('express');
 const http = require('http');
 const { WebSocketServer } = require('ws');
@@ -35,4 +36,5 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Servidor escuchando en http://0.0.0.0:${PORT}`);
     console.log(`🔌 WebSocket disponible en ws://<IP-de-tu-PC>:${PORT}/audio`);
     console.log(`🌐 En tu red local usa la IP de tu PC, ej: 192.168.0.100:${PORT}`);
+    console.log(`🔍 Processing mode: ${resolveProcessingMode()}`);
 });

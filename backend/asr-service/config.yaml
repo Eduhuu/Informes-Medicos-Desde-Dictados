@@ -4,16 +4,28 @@ asr:
   device: cuda  # cpu | cuda
   language: es
   compute_type: float16 # int8 | float16 | float32
+  prompt:
+    - hipertensión
+    - diabetes
+    - Enalapril
+    - Metformina
+    - Losartán
+    - Atorvastatina
+    - Omeprazol
+    - hemoglobina glicosilada
+    - función renal
+    - sístole
+    - diástole
 
 pln_medical:
-  task: ner
+  task: token-classification
   model: rigonsallauka/spanish_medical_ner
   aggregation_strategy: max
 
 pln_farmacos:
   task: token-classification
   model: PlanTL-GOB-ES/bsc-bio-ehr-es-pharmaconer
-  aggregation_strategy: simple
+  aggregation_strategy: max
 
 snomed:
   enabled: true

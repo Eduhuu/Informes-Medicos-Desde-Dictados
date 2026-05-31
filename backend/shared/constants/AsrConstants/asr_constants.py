@@ -23,6 +23,12 @@ CONFIG_KEY_MODEL = "model"
 CONFIG_KEY_DEVICE = "device"
 CONFIG_KEY_LANGUAGE = "language"
 CONFIG_KEY_COMPUTE_TYPE = "compute_type"
+CONFIG_KEY_PROMPT = "prompt"
+
+# initial_prompt built from config prompt word list
+INITIAL_PROMPT_WORD_SEPARATOR = ", "
+
+ENV_ASR_PROMPT = "ASR_PROMPT"
 
 # Default config values
 DEFAULT_WHISPER_MODEL = "base"

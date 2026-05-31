@@ -10,6 +10,7 @@ from app.config.settings import AsrSettings, load_settings
 from app.constants.messages import MSG_INVALID_PROVIDER
 from app.providers.base import ASRProvider
 from app.providers.mock_provider import MockProvider
+from app.utils.initial_prompt import build_initial_prompt
 from shared.constants.AsrConstants import PROVIDER_MOCK, PROVIDER_WHISPER
 
 
@@ -22,12 +23,12 @@ class ASRFactory:
 
         if resolved.provider == PROVIDER_WHISPER:
             from app.providers.fast_whisper_provider import FastWhisperProvider
-
             return FastWhisperProvider(
                 model_name=resolved.model,
                 device=resolved.device,
                 language=resolved.language,
                 compute_type=resolved.compute_type,
+                initial_prompt=build_initial_prompt(resolved.prompt),
             )
 
         if resolved.provider == PROVIDER_MOCK:

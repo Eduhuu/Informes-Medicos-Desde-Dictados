@@ -5,8 +5,11 @@ const {
     WS_RESPONSE_TYPE_ERROR,
     WS_RESPONSE_TYPE_SESSION_END,
     WS_RESPONSE_TYPE_TRANSCRIPTION,
+    DEFAULT_PROCESSING_MODE,
+    PROCESSING_MODE_BATCH,
 } = require('../../shared/constants/GatewayConstants/gatewayConstants');
 const { transcribeAudioChunk } = require('../services/asrTranscribeClient');
+const { addChunk, flushSession, clearSession } = require('../services/batchAudioBuffer');
 
 function toBuffer(message) {
     if (Buffer.isBuffer(message)) {
@@ -34,7 +37,12 @@ function sendJson(ws, payload) {
     ws.send(JSON.stringify(payload));
 }
 
+function resolveProcessingMode() {
+    return DEFAULT_PROCESSING_MODE;
+}
+
 function attachAudioWebSocketHandlers(ws) {
+    const processingMode = resolveProcessingMode();
     let pendingMetadata = null;
 
     ws.on('message', async (message) => {
@@ -44,6 +52,12 @@ function attachAudioWebSocketHandlers(ws) {
 
                 if (metadata.type === WS_MESSAGE_TYPE_SESSION_END) {
                     pendingMetadata = null;
+
+                    if (processingMode === PROCESSING_MODE_BATCH) {
+                        await _handleBatchSessionEnd(ws, metadata);
+                        return;
+                    }
+
                     sendJson(ws, {
                         type: WS_RESPONSE_TYPE_SESSION_END,
                         message: 'Sesión finalizada correctamente',
@@ -77,8 +91,16 @@ function attachAudioWebSocketHandlers(ws) {
             const metadata = pendingMetadata;
             pendingMetadata = null;
 
+            if (processingMode === PROCESSING_MODE_BATCH) {
+                addChunk(metadata.sessionId, audioBuffer, metadata);
+                console.log(
+                    `Fragmento acumulado (sesión=${metadata.sessionId}, secuencia=${metadata.sequence}, bytes=${audioBuffer.length})`,
+                );
+                return;
+            }
+
             console.log(
-                `🎙️ Fragmento recibido (sesión=${metadata.sessionId}, secuencia=${metadata.sequence}, bytes=${audioBuffer.length})`,
+                `Fragmento recibido (sesión=${metadata.sessionId}, secuencia=${metadata.sequence}, bytes=${audioBuffer.length})`,
             );
 
             const transcription = await transcribeAudioChunk(audioBuffer, metadata);
@@ -101,6 +123,41 @@ function attachAudioWebSocketHandlers(ws) {
     });
 }
 
+async function _handleBatchSessionEnd(ws, sessionEndMetadata) {
+    const { sessionId } = sessionEndMetadata;
+    const flushed = flushSession(sessionId);
+
+    if (!flushed) {
+        sendJson(ws, {
+            type: WS_RESPONSE_TYPE_SESSION_END,
+            message: 'Sesión finalizada. No se encontraron fragmentos de audio acumulados.',
+            sessionId,
+        });
+        return;
+    }
+
+    const { audioBuffer, metadata: firstMetadata } = flushed;
+
+    console.log(
+        `Procesando audio batch (sesión=${sessionId}, bytes totales=${audioBuffer.length})`,
+    );
+
+    try {
+        const transcription = await transcribeAudioChunk(audioBuffer, firstMetadata, { batch: true });
+
+        sendJson(ws, {
+            type: WS_RESPONSE_TYPE_TRANSCRIPTION,
+            sessionId,
+            sequence: firstMetadata.sequence,
+            ...transcription,
+        });
+    } catch (error) {
+        clearSession(sessionId);
+        throw error;
+    }
+}
+
 module.exports = {
     attachAudioWebSocketHandlers,
+    resolveProcessingMode,
 };

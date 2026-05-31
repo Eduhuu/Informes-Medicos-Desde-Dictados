@@ -20,11 +20,13 @@ class FastWhisperProvider(ASRProvider):
         device: str,
         language: str,
         compute_type: str,
+        initial_prompt: str | None = None,
     ) -> None:
         self._model_name = model_name
         self._device = device
         self._language = language
         self._compute_type = compute_type
+        self._initial_prompt = initial_prompt
         self._model: Any = None
 
     def preload(self) -> None:
@@ -56,11 +58,14 @@ class FastWhisperProvider(ASRProvider):
         if audio.size == 0:
             return self._empty_result(chunk, started_at)
 
-        segments_iter, info = self._model.transcribe(
-            audio,
-            language=self._language,
-            vad_filter=True,
-        )
+        transcribe_kwargs: dict[str, Any] = {
+            "language": self._language,
+            "vad_filter": True,
+        }
+        if self._initial_prompt:
+            transcribe_kwargs["initial_prompt"] = self._initial_prompt
+
+        segments_iter, info = self._model.transcribe(audio, **transcribe_kwargs)
 
         segments: list[TranscriptionSegment] = []
         text_parts: list[str] = []

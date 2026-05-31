@@ -1,5 +1,6 @@
 const {
     ASR_TRANSCRIBE_PATH,
+    ASR_BATCH_TIMEOUT_MS,
     CONTENT_TYPE_OCTET_STREAM,
     DEFAULT_ASR_SERVICE_URL,
     ENV_ASR_SERVICE_URL,
@@ -42,15 +43,8 @@ function buildTranscribeHeaders(metadata) {
     return headers;
 }
 
-async function transcribeAudioChunk(audioBuffer, metadata) {
-    const url = `${resolveAsrBaseUrl()}${ASR_TRANSCRIBE_PATH}`;
-    const headers = buildTranscribeHeaders(metadata);
-
-    const response = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: audioBuffer,
-    });
+async function _doFetch(url, fetchOptions) {
+    const response = await fetch(url, fetchOptions);
 
     const responseBody = await response.text();
     let parsedBody = null;
@@ -77,6 +71,31 @@ async function transcribeAudioChunk(audioBuffer, metadata) {
     }
 
     return parsedBody ?? {};
+}
+
+async function transcribeAudioChunk(audioBuffer, metadata, options = {}) {
+    const url = `${resolveAsrBaseUrl()}${ASR_TRANSCRIBE_PATH}`;
+    const headers = buildTranscribeHeaders(metadata);
+
+    const fetchOptions = {
+        method: 'POST',
+        headers,
+        body: audioBuffer,
+    };
+
+    if (options.batch) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), ASR_BATCH_TIMEOUT_MS);
+        fetchOptions.signal = controller.signal;
+
+        try {
+            return await _doFetch(url, fetchOptions);
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
+    return _doFetch(url, fetchOptions);
 }
 
 module.exports = {

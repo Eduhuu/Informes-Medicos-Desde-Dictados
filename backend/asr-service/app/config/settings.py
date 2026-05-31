@@ -16,11 +16,13 @@ from shared.constants.AsrConstants import (
     CONFIG_KEY_DEVICE,
     CONFIG_KEY_LANGUAGE,
     CONFIG_KEY_MODEL,
+    CONFIG_KEY_PROMPT,
     CONFIG_KEY_PROVIDER,
     DEFAULT_COMPUTE_TYPE,
     DEFAULT_DEVICE,
     DEFAULT_LANGUAGE,
     DEFAULT_WHISPER_MODEL,
+    ENV_ASR_PROMPT,
     PROVIDER_MOCK,
 )
 
@@ -76,6 +78,7 @@ class AsrSettings:
     device: str
     language: str
     compute_type: str
+    prompt: tuple[str, ...] = ()
 
 @dataclass(frozen=True)
 class PlnSettings:
@@ -193,6 +196,31 @@ def _default_config_path() -> Path:
     return Path(__file__).resolve().parents[2] / "config.yaml"
 
 
+def _parse_prompt_words(raw_value: object) -> tuple[str, ...]:
+    if raw_value is None:
+        return ()
+
+    if isinstance(raw_value, list):
+        return tuple(
+            str(item).strip()
+            for item in raw_value
+            if item is not None and str(item).strip()
+        )
+
+    return ()
+
+
+def _parse_prompt_words_from_env() -> tuple[str, ...]:
+    raw_env = os.getenv(ENV_ASR_PROMPT)
+    if not raw_env:
+        return ()
+    return tuple(
+        word.strip()
+        for word in raw_env.split(",")
+        if word.strip()
+    )
+
+
 def _parse_bool(value: object, default: bool) -> bool:
     if isinstance(value, bool):
         return value
@@ -271,11 +299,12 @@ def load_settings(config_path: Path | None = None) -> Settings:
     if not path.exists():
         return Settings(
             asr=AsrSettings(
-            provider=os.getenv("ASR_PROVIDER", PROVIDER_MOCK),
-            model=os.getenv("ASR_MODEL", DEFAULT_WHISPER_MODEL),
+                provider=os.getenv("ASR_PROVIDER", PROVIDER_MOCK),
+                model=os.getenv("ASR_MODEL", DEFAULT_WHISPER_MODEL),
                 device=os.getenv("ASR_DEVICE", DEFAULT_DEVICE),
                 language=os.getenv("ASR_LANGUAGE", DEFAULT_LANGUAGE),
                 compute_type=os.getenv("ASR_COMPUTE_TYPE", DEFAULT_COMPUTE_TYPE),
+                prompt=_parse_prompt_words_from_env(),
             ),
             pln_medical=_default_pln_medical_from_env(),
             pln_farmacos=_default_pln_farmacos_from_env(),
@@ -298,6 +327,8 @@ def load_settings(config_path: Path | None = None) -> Settings:
             device=str(asr_section.get(CONFIG_KEY_DEVICE, DEFAULT_DEVICE)),
             language=str(asr_section.get(CONFIG_KEY_LANGUAGE, DEFAULT_LANGUAGE)),
             compute_type=str(asr_section.get(CONFIG_KEY_COMPUTE_TYPE, DEFAULT_COMPUTE_TYPE)),
+            prompt=_parse_prompt_words(asr_section.get(CONFIG_KEY_PROMPT))
+            or _parse_prompt_words_from_env(),
         ),
         pln_medical=_build_pln_settings(
             pln_medical_section,

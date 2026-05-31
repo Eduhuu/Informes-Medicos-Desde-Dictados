@@ -6,10 +6,12 @@ CONFIG_KEY_PLN_FARMACOS = "pln_farmacos"
 # PLN model identifiers (config.yaml values)
 PLN_MODEL_RIGONSALLAUKA = "rigonsallauka/spanish_medical_ner"
 PLN_MODEL_PHARMACONER = "PlanTL-GOB-ES/bsc-bio-ehr-es-pharmaconer"
+PLN_MODEL_MEDICAL = "PlanTL-GOB-ES/bsc-bio-ehr-es"
 
 SUPPORTED_PLN_MODELS = frozenset({
     PLN_MODEL_RIGONSALLAUKA,
     PLN_MODEL_PHARMACONER,
+    PLN_MODEL_MEDICAL,
 })
 
 # Internal entity source identifiers

@@ -6,6 +6,12 @@ asr:
   device: cpu
   language: es
   compute_type: int8
+  # Word list passed to fast-whisper as initial_prompt (comma-separated)
+  prompt:
+    - hipertensión
+    - diabetes
+    - Enalapril
+    - Metformina
 
 pln_medical:
   task: ner

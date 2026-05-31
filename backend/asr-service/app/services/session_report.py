@@ -6,6 +6,11 @@ from app.constants.messages import (
     REPORT_LABEL_TIMESTAMP_MS,
     REPORT_LABEL_TIMESTAMP_UNKNOWN,
     REPORT_NER_ENTITY_LINE,
+    REPORT_SECTION_TIMINGS,
+    REPORT_TIMING_ASR,
+    REPORT_TIMING_NER,
+    REPORT_TIMING_SNOMED,
+    REPORT_TIMING_TOTAL,
     REPORT_NER_NO_ENTITIES,
     REPORT_SECTION_CALL,
     REPORT_SECTION_NER,
@@ -26,13 +31,16 @@ from app.constants.messages import (
     REPORT_TRANSCRIPTION_EMPTY,
     REPORT_WARNING_PREFIX,
 )
+from app.models.chunk_processing_timings import ChunkProcessingTimings
 from app.models.snomed import EnrichedEntity
 from app.services.pln_labels import pln_source_label
 from shared.constants.ReportConstants import (
+    MILLISECONDS_PER_SECOND,
     REPORT_FILENAME_PREFIX,
     REPORT_FILENAME_SUFFIX,
     REPORT_SECTION_SEPARATOR,
     REPORT_SUBSECTION_SEPARATOR,
+    REPORT_TIMING_DECIMAL_PLACES,
 )
 
 _SAFE_SESSION_ID_PATTERN = re.compile(r"[^\w\-]+")
@@ -60,6 +68,7 @@ class SessionReportWriter:
         timestamp_ms: int | None,
         transcription_text: str,
         enriched_entities: list[EnrichedEntity],
+        timings: ChunkProcessingTimings,
         warning: str | None = None,
     ) -> None:
         if not self._enabled:
@@ -72,6 +81,7 @@ class SessionReportWriter:
             timestamp_ms=timestamp_ms,
             transcription_text=transcription_text,
             enriched_entities=enriched_entities,
+            timings=timings,
             warning=warning,
             is_new_file=not report_path.exists(),
         )
@@ -99,6 +109,7 @@ class SessionReportWriter:
         timestamp_ms: int | None,
         transcription_text: str,
         enriched_entities: list[EnrichedEntity],
+        timings: ChunkProcessingTimings,
         warning: str | None,
         is_new_file: bool,
     ) -> str:
@@ -128,6 +139,26 @@ class SessionReportWriter:
             )
         else:
             lines.append(REPORT_LABEL_TIMESTAMP_UNKNOWN)
+
+        lines.extend(
+            [
+                "",
+                REPORT_SECTION_TIMINGS,
+                REPORT_SUBSECTION_SEPARATOR,
+                REPORT_TIMING_TOTAL.format(
+                    duration_s=self._format_duration_seconds(timings.total_ms),
+                ),
+                REPORT_TIMING_ASR.format(
+                    duration_s=self._format_duration_seconds(timings.asr_ms),
+                ),
+                REPORT_TIMING_NER.format(
+                    duration_s=self._format_duration_seconds(timings.ner_ms),
+                ),
+                REPORT_TIMING_SNOMED.format(
+                    duration_s=self._format_duration_seconds(timings.snomed_ms),
+                ),
+            ],
+        )
 
         lines.extend(["", REPORT_SECTION_TRANSCRIPTION, REPORT_SUBSECTION_SEPARATOR])
         if transcription_text.strip():
@@ -168,6 +199,10 @@ class SessionReportWriter:
 
         lines.append("")
         return "\n".join(lines) + "\n"
+
+    def _format_duration_seconds(self, duration_ms: float) -> str:
+        duration_s = duration_ms / MILLISECONDS_PER_SECOND
+        return f"{duration_s:.{REPORT_TIMING_DECIMAL_PLACES}f}"
 
     def _format_snomed_lines(
         self,
