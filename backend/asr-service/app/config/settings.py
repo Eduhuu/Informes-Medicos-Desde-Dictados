@@ -89,6 +89,13 @@ from shared.constants.LlmConstants import (
     ENV_LLM_TIMEOUT_SECONDS,
 )
 
+from shared.constants.FhirReportConstants import (
+    CONFIG_KEY_FHIR_REPORT,
+    CONFIG_KEY_FHIR_REPORT_ENABLED,
+    DEFAULT_FHIR_REPORT_ENABLED,
+    ENV_FHIR_REPORT_ENABLED,
+)
+
 @dataclass(frozen=True)
 class AsrSettings:
     provider: str
@@ -133,6 +140,11 @@ class LlmSettings:
 
 
 @dataclass(frozen=True)
+class FhirReportSettings:
+    enabled: bool
+
+
+@dataclass(frozen=True)
 class Settings:
     asr: AsrSettings
     pln_medical: PlnSettings
@@ -140,7 +152,7 @@ class Settings:
     snomed: SnomedSettings
     reports: ReportSettings
     llm: LlmSettings
-
+    fhir_report: FhirReportSettings
 
 def _build_pln_settings(
     section: dict[str, Any],
@@ -242,6 +254,26 @@ def _default_llm_settings_from_env() -> LlmSettings:
         system_prompt=os.getenv(ENV_LLM_SYSTEM_PROMPT, ""),
         timeout_seconds=float(
             os.getenv(ENV_LLM_TIMEOUT_SECONDS, str(DEFAULT_LLM_TIMEOUT_SECONDS)),
+        ),
+    )
+
+
+def _build_fhir_report_settings(
+    fhir_report_section: dict[str, Any],
+) -> FhirReportSettings:
+    return FhirReportSettings(
+        enabled=_parse_bool(
+            fhir_report_section.get(CONFIG_KEY_FHIR_REPORT_ENABLED),
+            DEFAULT_FHIR_REPORT_ENABLED,
+        ),
+    )
+
+
+def _default_fhir_report_settings_from_env() -> FhirReportSettings:
+    return FhirReportSettings(
+        enabled=_parse_bool(
+            os.getenv(ENV_FHIR_REPORT_ENABLED),
+            DEFAULT_FHIR_REPORT_ENABLED,
         ),
     )
 
@@ -369,6 +401,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
             snomed=_default_snomed_settings_from_env(),
             reports=_default_report_settings_from_env(),
             llm=_default_llm_settings_from_env(),
+            fhir_report=_default_fhir_report_settings_from_env(),
         )
     with path.open(encoding="utf-8") as config_file:
         raw: dict[str, Any] = yaml.safe_load(config_file) or {}
@@ -380,6 +413,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
     snomed_section = raw.get(CONFIG_KEY_SNOMED, {})
     reports_section = raw.get(CONFIG_KEY_REPORTS, {})
     llm_section = raw.get(CONFIG_KEY_LLM, {})
+    fhir_report_section = raw.get(CONFIG_KEY_FHIR_REPORT, {})
     return Settings(
         asr=AsrSettings(
             provider=str(asr_section.get(CONFIG_KEY_PROVIDER, os.getenv("ASR_PROVIDER", PROVIDER_MOCK))),
@@ -405,4 +439,5 @@ def load_settings(config_path: Path | None = None) -> Settings:
         snomed=_build_snomed_settings(snomed_section),
         reports=_build_report_settings(reports_section),
         llm=_build_llm_settings(llm_section),
+        fhir_report=_build_fhir_report_settings(fhir_report_section),
     )

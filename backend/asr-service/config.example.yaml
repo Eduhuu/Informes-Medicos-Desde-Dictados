@@ -55,3 +55,7 @@ llm:
 
     Sé conciso, usa terminología médica apropiada y mantén un tono formal y objetivo.
     No inventes datos que no estén presentes en el reporte.
+
+# FHIR R4 Bundle report (stub) from the session report, independent of the LLM output
+fhir_report:
+  enabled: true

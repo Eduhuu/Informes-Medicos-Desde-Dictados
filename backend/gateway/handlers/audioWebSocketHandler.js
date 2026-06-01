@@ -4,12 +4,17 @@ const {
     WS_MESSAGE_TYPE_SESSION_END,
     WS_RESPONSE_TYPE_ERROR,
     WS_RESPONSE_TYPE_SESSION_END,
+    WS_RESPONSE_TYPE_FHIR_REPORT,
     WS_RESPONSE_TYPE_LLM_REPORT,
     WS_RESPONSE_TYPE_TRANSCRIPTION,
     DEFAULT_PROCESSING_MODE,
     PROCESSING_MODE_BATCH,
 } = require('../../shared/constants/GatewayConstants/gatewayConstants');
-const { transcribeAudioChunk, generateReport } = require('../services/asrTranscribeClient');
+const {
+    transcribeAudioChunk,
+    generateReport,
+    generateFhirReport,
+} = require('../services/asrTranscribeClient');
 const { addChunk, flushSession, clearSession } = require('../services/batchAudioBuffer');
 
 function toBuffer(message) {
@@ -88,6 +93,32 @@ function attachAudioWebSocketHandlers(ws) {
                                 type: WS_RESPONSE_TYPE_ERROR,
                                 message: `Error al generar el reporte médico: ${err.message ?? err}`,
                             });
+                        })
+                        .finally(() => {
+                            generateFhirReport(metadata.sessionId)
+                                .then((result) => {
+                                    sendJson(ws, {
+                                        type: WS_RESPONSE_TYPE_FHIR_REPORT,
+                                        sessionId: metadata.sessionId,
+                                        fhirReport: result.fhir_report,
+                                    });
+                                })
+                                .catch((err) => {
+                                    if (err.statusCode === 503) {
+                                        console.log(
+                                            `Generación de reporte FHIR deshabilitada (sesión=${metadata.sessionId})`,
+                                        );
+                                        return;
+                                    }
+                                    console.error(
+                                        `Error al generar el reporte FHIR (sesión=${metadata.sessionId}):`,
+                                        err,
+                                    );
+                                    sendJson(ws, {
+                                        type: WS_RESPONSE_TYPE_ERROR,
+                                        message: `Error al generar el reporte FHIR: ${err.message ?? err}`,
+                                    });
+                                });
                         });
 
                     return;

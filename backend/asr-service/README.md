@@ -116,3 +116,41 @@ Con `SNOMED_PROVIDER=mock` no hace falta Snowstorm. Si Snowstorm no responde, ca
 ### Campo `entities`
 
 Cada elemento combina la salida NER (`word`, `score`, `entity_group`, `start`, `end`, `pln_source`) con `snomed`, que replica la respuesta paginada de Snowstorm (`items`, `total`, `limit`, `offset`, `searchAfter`, `searchAfterArray`) más `error` cuando falla la consulta. El campo `pln_source` indica si la entidad proviene de `pln_medical` o `pln_farmacos`.
+
+## Reportes de fin de sesión
+
+Tras finalizar una sesión (vía gateway WebSocket), el pipeline de informes se ejecuta en este orden:
+
+1. **LLM** (`POST /generate-report/{session_id}`): lee `reports/<session_id>/Reporte.txt` y genera `Informe.txt` con Ollama.
+2. **FHIR** (`POST /generate-fhir-report/{session_id}`): se ejecuta después del LLM; lee el mismo `Reporte.txt` (no depende del `Informe.txt`) y genera `Fhir_Reporte.json` (Bundle FHIR R4 mínimo).
+
+Estructura por sesión:
+
+```text
+reports/
+  <session_id>/
+    Reporte.txt        # transcripción, NER y SNOMED (control)
+    Informe.txt        # informe médico LLM
+    Fhir_Reporte.json  # Bundle FHIR
+```
+
+Configuración en `config.yaml`:
+
+```yaml
+llm:
+  enabled: true
+  # ...
+
+fhir_report:
+  enabled: true
+```
+
+Variable de entorno para FHIR: `FHIR_REPORT_ENABLED`.
+
+Ejemplo manual del informe FHIR:
+
+```bash
+curl -X POST http://localhost:8001/generate-fhir-report/consulta-001
+```
+
+Respuesta: `{"session_id": "consulta-001", "fhir_report": { "resourceType": "Bundle", ... }}`.

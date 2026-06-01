@@ -61,3 +61,8 @@ MSG_LLM_UNAVAILABLE = "Generador de reporte LLM no disponible"
 MSG_LLM_DISABLED = "La generación de reporte LLM está deshabilitada en la configuración"
 MSG_LLM_CONNECTION_ERROR = "No se pudo conectar con el servicio LLM: {error}"
 MSG_LLM_GENERATION_ERROR = "Error al generar el reporte médico: {error}"
+
+# FHIR report generation messages (Spanish)
+MSG_FHIR_REPORT_NOT_FOUND = "No se encontró el reporte de sesión: {session_id}"
+MSG_FHIR_UNAVAILABLE = "Generador de reporte FHIR no disponible"
+MSG_FHIR_DISABLED = "La generación de reporte FHIR está deshabilitada en la configuración"

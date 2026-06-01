@@ -4,6 +4,9 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Header, HTTPException, Request, status
 
 from app.constants.messages import (
+    MSG_FHIR_DISABLED,
+    MSG_FHIR_REPORT_NOT_FOUND,
+    MSG_FHIR_UNAVAILABLE,
     MSG_HEALTH_OK,
     MSG_HEALTH_UNAVAILABLE,
     MSG_INVALID_SEQUENCE,
@@ -20,6 +23,7 @@ from app.models.audio_chunk import AudioChunk
 from app.models.chunk_processing_timings import ChunkProcessingTimings
 from app.providers.base import ASRProvider
 from app.services.entity_enrichment import enrich_entities
+from app.services.fhir_report_generator import FhirReportGenerator
 from app.services.llm_report_generator import LlmReportGenerator
 from app.services.pln_orchestrator import PlnOrchestrator
 from app.services.session_report import SessionReportWriter
@@ -83,6 +87,16 @@ def _get_llm_report_generator(request: Request) -> LlmReportGenerator:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=MSG_LLM_UNAVAILABLE,
+        )
+    return generator
+
+
+def _get_fhir_report_generator(request: Request) -> FhirReportGenerator:
+    generator = getattr(request.app.state, "fhir_report_generator", None)
+    if generator is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_FHIR_UNAVAILABLE,
         )
     return generator
 
@@ -264,3 +278,24 @@ async def generate_report(session_id: str, request: Request) -> dict[str, str]:
         ) from exc
 
     return {"session_id": session_id, "report": report}
+
+
+@router.post("/generate-fhir-report/{session_id}")
+async def generate_fhir_report(session_id: str, request: Request) -> dict[str, object]:
+    generator = _get_fhir_report_generator(request)
+
+    if not generator.enabled:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_FHIR_DISABLED,
+        )
+
+    try:
+        fhir_report = await generator.generate(session_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=MSG_FHIR_REPORT_NOT_FOUND.format(session_id=session_id),
+        ) from exc
+
+    return {"session_id": session_id, "fhir_report": fhir_report}

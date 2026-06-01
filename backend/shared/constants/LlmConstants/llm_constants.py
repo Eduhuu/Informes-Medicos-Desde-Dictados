@@ -26,6 +26,5 @@ OLLAMA_CHAT_PATH = "/api/chat"
 OLLAMA_ROLE_SYSTEM = "system"
 OLLAMA_ROLE_USER = "user"
 
-# LLM report file naming
-LLM_REPORT_FILENAME_PREFIX = "llm_report_"
-LLM_REPORT_FILENAME_SUFFIX = ".txt"
+# LLM report file naming (inside reports/<session_id>/)
+LLM_REPORT_FILENAME = "Informe.txt"

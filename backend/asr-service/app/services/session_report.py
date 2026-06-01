@@ -1,4 +1,3 @@
-import re
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,16 +33,13 @@ from app.constants.messages import (
 from app.models.chunk_processing_timings import ChunkProcessingTimings
 from app.models.snomed import EnrichedEntity
 from app.services.pln_labels import pln_source_label
+from app.services.report_paths import control_report_path, ensure_session_reports_dir
 from shared.constants.ReportConstants import (
     MILLISECONDS_PER_SECOND,
-    REPORT_FILENAME_PREFIX,
-    REPORT_FILENAME_SUFFIX,
     REPORT_SECTION_SEPARATOR,
     REPORT_SUBSECTION_SEPARATOR,
     REPORT_TIMING_DECIMAL_PLACES,
 )
-
-_SAFE_SESSION_ID_PATTERN = re.compile(r"[^\w\-]+")
 
 
 class SessionReportWriter:
@@ -74,7 +70,8 @@ class SessionReportWriter:
         if not self._enabled:
             return
 
-        report_path = self._report_path(session_id)
+        ensure_session_reports_dir(self._reports_dir, session_id)
+        report_path = control_report_path(self._reports_dir, session_id)
         block = self._format_call_block(
             session_id=session_id,
             sequence=sequence,
@@ -95,11 +92,6 @@ class SessionReportWriter:
         if session_id not in self._locks:
             self._locks[session_id] = threading.Lock()
         return self._locks[session_id]
-
-    def _report_path(self, session_id: str) -> Path:
-        safe_id = _SAFE_SESSION_ID_PATTERN.sub("_", session_id).strip("_") or "default"
-        filename = f"{REPORT_FILENAME_PREFIX}{safe_id}{REPORT_FILENAME_SUFFIX}"
-        return self._reports_dir / filename
 
     def _format_call_block(
         self,

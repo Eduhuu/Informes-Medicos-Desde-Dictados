@@ -1,4 +1,3 @@
-import re
 from pathlib import Path
 
 import httpx
@@ -9,16 +8,16 @@ from app.constants.messages import (
     MSG_LLM_GENERATION_ERROR,
     MSG_LLM_REPORT_NOT_FOUND,
 )
+from app.services.report_paths import (
+    control_report_path,
+    ensure_session_reports_dir,
+    llm_report_path,
+)
 from shared.constants.LlmConstants import (
-    LLM_REPORT_FILENAME_PREFIX,
-    LLM_REPORT_FILENAME_SUFFIX,
     OLLAMA_CHAT_PATH,
     OLLAMA_ROLE_SYSTEM,
     OLLAMA_ROLE_USER,
 )
-from shared.constants.ReportConstants import REPORT_FILENAME_PREFIX, REPORT_FILENAME_SUFFIX
-
-_SAFE_SESSION_ID_PATTERN = re.compile(r"[^\w\-]+")
 
 
 class LlmReportGenerator:
@@ -33,19 +32,18 @@ class LlmReportGenerator:
         return self._settings.enabled
 
     async def generate(self, session_id: str) -> str:
-        print(f"Generating LLM report for session {session_id}")
-        session_report_path = self._session_report_path(session_id)
-        print(f"Session report path: {session_report_path}")
+        session_report_path = control_report_path(self._reports_dir, session_id)
         if not session_report_path.exists():
             raise FileNotFoundError(
                 MSG_LLM_REPORT_NOT_FOUND.format(session_id=session_id),
             )
-        print(f"Session report exists: {session_report_path.exists()}")
+
         session_report_content = session_report_path.read_text(encoding="utf-8")
         generated_report = await self._call_ollama(session_report_content)
 
-        llm_report_path = self._llm_report_path(session_id)
-        llm_report_path.write_text(generated_report, encoding="utf-8")
+        ensure_session_reports_dir(self._reports_dir, session_id)
+        output_path = llm_report_path(self._reports_dir, session_id)
+        output_path.write_text(generated_report, encoding="utf-8")
 
         return generated_report
 
@@ -83,13 +81,3 @@ class LlmReportGenerator:
 
         data = response.json()
         return str(data["message"]["content"])
-
-    def _session_report_path(self, session_id: str) -> Path:
-        safe_id = _SAFE_SESSION_ID_PATTERN.sub("_", session_id).strip("_") or "default"
-        filename = f"{REPORT_FILENAME_PREFIX}{safe_id}{REPORT_FILENAME_SUFFIX}"
-        return self._reports_dir / filename
-
-    def _llm_report_path(self, session_id: str) -> Path:
-        safe_id = _SAFE_SESSION_ID_PATTERN.sub("_", session_id).strip("_") or "default"
-        filename = f"{LLM_REPORT_FILENAME_PREFIX}{safe_id}{LLM_REPORT_FILENAME_SUFFIX}"
-        return self._reports_dir / filename
