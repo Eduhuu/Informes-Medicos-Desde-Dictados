@@ -35,7 +35,7 @@ reports:
   enabled: true
 
 llm:
-  enabled: false
+  enabled: true
   model: llama3.1:8b
   base_url: http://localhost:11434
   timeout_seconds: 120
