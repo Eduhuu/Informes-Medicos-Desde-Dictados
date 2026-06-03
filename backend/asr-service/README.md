@@ -122,7 +122,7 @@ Cada elemento combina la salida NER (`word`, `score`, `entity_group`, `start`, `
 Tras finalizar una sesión (vía gateway WebSocket), el pipeline de informes se ejecuta en este orden:
 
 1. **LLM** (`POST /generate-report/{session_id}`): lee `reports/<session_id>/Reporte.txt` y genera `Informe.txt` con Ollama.
-2. **FHIR** (`POST /generate-fhir-report/{session_id}`): se ejecuta después del LLM; lee el mismo `Reporte.txt` (no depende del `Informe.txt`) y genera `Fhir_Reporte.json` (Bundle FHIR R4 mínimo).
+2. **FHIR** (`POST /generate-fhir-report/{session_id}`): se ejecuta después del LLM. El gateway envía en el cuerpo JSON las entidades acumuladas de cada `/transcribe` (`entities`).
 
 Estructura por sesión:
 
@@ -131,8 +131,15 @@ reports/
   <session_id>/
     Reporte.txt        # transcripción, NER y SNOMED (control)
     Informe.txt        # informe médico LLM
-    Fhir_Reporte.json  # Bundle FHIR
+    Fhir_Reporte.json  # Bundle FHIR (Patient + recursos por entidad NER/SNOMED)
 ```
+
+El informe FHIR se construye a partir de `entities` usando la librería [`fhir.resources`](https://pypi.org/project/fhir.resources/) (subpaquete `R4B`, compatible con Pydantic v2). Cada entidad NER/SNOMED se valida y serializa mediante modelos tipados antes de escribirse a disco. El tipo de recurso se elige según la etiqueta NER y el concepto SNOMED:
+
+- `Condition` — problemas/síntomas (p. ej. PROBLEM, FSN con *finding*)
+- `MedicationStatement` — fármacos (PLN fármacos, NORMALIZABLES, FSN con *medicinal product*)
+- `Procedure` — pruebas/procedimientos (TEST, FSN con *procedure*)
+- `Observation` — resto de entidades detectadas
 
 Configuración en `config.yaml`:
 
@@ -147,10 +154,12 @@ fhir_report:
 
 Variable de entorno para FHIR: `FHIR_REPORT_ENABLED`.
 
-Ejemplo manual del informe FHIR:
+Ejemplo manual del informe FHIR (requiere cuerpo JSON con entidades):
 
 ```bash
-curl -X POST http://localhost:8001/generate-fhir-report/consulta-001
+curl -X POST http://localhost:8001/generate-fhir-report/consulta-001 \
+  -H "Content-Type: application/json" \
+  -d '{"entities": []}'
 ```
 
 Respuesta: `{"session_id": "consulta-001", "fhir_report": { "resourceType": "Bundle", ... }}`.

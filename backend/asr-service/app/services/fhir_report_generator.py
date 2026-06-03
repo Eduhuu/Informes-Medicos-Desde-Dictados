@@ -3,17 +3,16 @@ from pathlib import Path
 from typing import Any
 
 from app.config.settings import FhirReportSettings
-from app.constants.messages import MSG_FHIR_REPORT_NOT_FOUND
-from app.fhir_report.bundle_builder import build_stub_bundle
+from app.fhir_report.bundle_builder import build_bundle_from_entities
+from app.fhir_report.entity_adapter import entities_from_api_payload
 from app.services.report_paths import (
-    control_report_path,
     ensure_session_reports_dir,
     fhir_report_path,
 )
 
 
 class FhirReportGenerator:
-    """Reads a session report and generates a FHIR Bundle JSON report."""
+    """Generates a FHIR Bundle JSON report from enriched entities."""
 
     def __init__(self, settings: FhirReportSettings, reports_dir: Path) -> None:
         self._settings = settings
@@ -23,20 +22,22 @@ class FhirReportGenerator:
     def enabled(self) -> bool:
         return self._settings.enabled
 
-    async def generate(self, session_id: str) -> dict[str, Any]:
-        session_report_path = control_report_path(self._reports_dir, session_id)
-        if not session_report_path.exists():
-            raise FileNotFoundError(
-                MSG_FHIR_REPORT_NOT_FOUND.format(session_id=session_id),
-            )
+    async def generate(
+        self,
+        session_id: str,
+        *,
+        entities: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        parsed_entities = entities_from_api_payload(entities)
+        bundle = build_bundle_from_entities(session_id, parsed_entities)
 
-        bundle = build_stub_bundle(session_id)
+        payload = bundle.model_dump(mode="json", exclude_none=True)
 
         ensure_session_reports_dir(self._reports_dir, session_id)
         output_path = fhir_report_path(self._reports_dir, session_id)
         output_path.write_text(
-            json.dumps(bundle, ensure_ascii=False, indent=2),
+            json.dumps(payload, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
 
-        return bundle
+        return payload

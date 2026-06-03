@@ -11,6 +11,9 @@ DEFAULT_SAMPLE_RATE_HZ = 16000
 DEFAULT_CHANNELS = 1
 DEFAULT_SAMPLE_WIDTH_BYTES = 2
 
+# Transcription API response keys
+TRANSCRIBE_RESPONSE_KEY_ENTITIES = "entities"
+
 # HTTP header names for chunk metadata
 HEADER_SESSION_ID = "X-Session-Id"
 HEADER_SEQUENCE = "X-Sequence"

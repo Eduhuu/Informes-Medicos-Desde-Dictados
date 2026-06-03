@@ -2,17 +2,15 @@ import time
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Header, HTTPException, Request, status
+from pydantic import BaseModel, Field
 
 from app.constants.messages import (
     MSG_FHIR_DISABLED,
-    MSG_FHIR_REPORT_NOT_FOUND,
     MSG_FHIR_UNAVAILABLE,
     MSG_HEALTH_OK,
     MSG_HEALTH_UNAVAILABLE,
     MSG_INVALID_SEQUENCE,
-    MSG_LLM_CONNECTION_ERROR,
     MSG_LLM_DISABLED,
-    MSG_LLM_GENERATION_ERROR,
     MSG_LLM_REPORT_NOT_FOUND,
     MSG_LLM_UNAVAILABLE,
     MSG_MISSING_AUDIO,
@@ -36,9 +34,20 @@ from shared.constants.AsrConstants import (
     HEADER_SEQUENCE,
     HEADER_SESSION_ID,
     HEADER_TIMESTAMP,
+    TRANSCRIBE_RESPONSE_KEY_ENTITIES,
 )
+from shared.constants.FhirReportConstants import FHIR_REQUEST_BODY_KEY_ENTITIES
 
 router = APIRouter()
+
+
+class GenerateFhirReportRequest(BaseModel):
+    entities: list[dict[str, Any]] = Field(
+        default_factory=list,
+        alias=FHIR_REQUEST_BODY_KEY_ENTITIES,
+    )
+
+    model_config = {"populate_by_name": True}
 
 
 def _get_provider(request: Request) -> ASRProvider:
@@ -208,6 +217,9 @@ async def transcribe(
                 timings=timings,
                 warning=warning,
             )
+        response[TRANSCRIBE_RESPONSE_KEY_ENTITIES] = [
+            entity.to_dict() for entity in enriched_entities
+        ]
         return response
 
     pln_orchestrator = _get_pln_orchestrator(request)
@@ -245,6 +257,9 @@ async def transcribe(
             enriched_entities=enriched_entities,
         )
 
+    response[TRANSCRIBE_RESPONSE_KEY_ENTITIES] = [
+        entity.to_dict() for entity in enriched_entities
+    ]
     return response
 
 
@@ -281,7 +296,11 @@ async def generate_report(session_id: str, request: Request) -> dict[str, str]:
 
 
 @router.post("/generate-fhir-report/{session_id}")
-async def generate_fhir_report(session_id: str, request: Request) -> dict[str, object]:
+async def generate_fhir_report(
+    session_id: str,
+    request: Request,
+    body: GenerateFhirReportRequest,
+) -> dict[str, object]:
     generator = _get_fhir_report_generator(request)
 
     if not generator.enabled:
@@ -290,12 +309,9 @@ async def generate_fhir_report(session_id: str, request: Request) -> dict[str, o
             detail=MSG_FHIR_DISABLED,
         )
 
-    try:
-        fhir_report = await generator.generate(session_id)
-    except FileNotFoundError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=MSG_FHIR_REPORT_NOT_FOUND.format(session_id=session_id),
-        ) from exc
+    fhir_report = await generator.generate(
+        session_id,
+        entities=body.entities,
+    )
 
     return {"session_id": session_id, "fhir_report": fhir_report}

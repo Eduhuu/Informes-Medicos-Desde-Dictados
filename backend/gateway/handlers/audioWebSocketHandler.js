@@ -16,6 +16,11 @@ const {
     generateFhirReport,
 } = require('../services/asrTranscribeClient');
 const { addChunk, flushSession, clearSession } = require('../services/batchAudioBuffer');
+const {
+    appendFromTranscription,
+    getEntities,
+    clearSessionEntities,
+} = require('../services/sessionEntitiesStore');
 
 function toBuffer(message) {
     if (Buffer.isBuffer(message)) {
@@ -59,6 +64,7 @@ function attachAudioWebSocketHandlers(ws) {
                 if (metadata.type === WS_MESSAGE_TYPE_SESSION_END) {
                     pendingMetadata = null;
 
+                    // Si el modo de procesamiento es batch, se maneja el final de la sesión
                     if (processingMode === PROCESSING_MODE_BATCH) {
                         await _handleBatchSessionEnd(ws, metadata);
                         return;
@@ -95,29 +101,35 @@ function attachAudioWebSocketHandlers(ws) {
                             });
                         })
                         .finally(() => {
-                            generateFhirReport(metadata.sessionId)
+                            const sessionId = metadata.sessionId;
+                            const accumulatedEntities = getEntities(sessionId);
+
+                            generateFhirReport(sessionId, accumulatedEntities)
                                 .then((result) => {
                                     sendJson(ws, {
                                         type: WS_RESPONSE_TYPE_FHIR_REPORT,
-                                        sessionId: metadata.sessionId,
+                                        sessionId,
                                         fhirReport: result.fhir_report,
                                     });
                                 })
                                 .catch((err) => {
                                     if (err.statusCode === 503) {
                                         console.log(
-                                            `Generación de reporte FHIR deshabilitada (sesión=${metadata.sessionId})`,
+                                            `Generación de reporte FHIR deshabilitada (sesión=${sessionId})`,
                                         );
                                         return;
                                     }
                                     console.error(
-                                        `Error al generar el reporte FHIR (sesión=${metadata.sessionId}):`,
+                                        `Error al generar el reporte FHIR (sesión=${sessionId}):`,
                                         err,
                                     );
                                     sendJson(ws, {
                                         type: WS_RESPONSE_TYPE_ERROR,
                                         message: `Error al generar el reporte FHIR: ${err.message ?? err}`,
                                     });
+                                })
+                                .finally(() => {
+                                    clearSessionEntities(sessionId);
                                 });
                         });
 
@@ -162,6 +174,7 @@ function attachAudioWebSocketHandlers(ws) {
             );
 
             const transcription = await transcribeAudioChunk(audioBuffer, metadata);
+            appendFromTranscription(metadata.sessionId, transcription);
 
             sendJson(ws, {
                 type: WS_RESPONSE_TYPE_TRANSCRIPTION,
@@ -202,6 +215,7 @@ async function _handleBatchSessionEnd(ws, sessionEndMetadata) {
 
     try {
         const transcription = await transcribeAudioChunk(audioBuffer, firstMetadata, { batch: true });
+        appendFromTranscription(sessionId, transcription);
 
         sendJson(ws, {
             type: WS_RESPONSE_TYPE_TRANSCRIPTION,
@@ -211,6 +225,7 @@ async function _handleBatchSessionEnd(ws, sessionEndMetadata) {
         });
     } catch (error) {
         clearSession(sessionId);
+        clearSessionEntities(sessionId);
         throw error;
     }
 }

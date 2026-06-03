@@ -3,7 +3,9 @@ const {
     ASR_GENERATE_REPORT_PATH,
     ASR_GENERATE_FHIR_REPORT_PATH,
     ASR_BATCH_TIMEOUT_MS,
+    CONTENT_TYPE_JSON,
     CONTENT_TYPE_OCTET_STREAM,
+    FHIR_REQUEST_BODY_KEY_ENTITIES,
     DEFAULT_ASR_SERVICE_URL,
     ENV_ASR_SERVICE_URL,
     HEADER_SEQUENCE,
@@ -105,9 +107,20 @@ async function generateReport(sessionId) {
     return _doFetch(url, { method: 'POST' });
 }
 
-async function generateFhirReport(sessionId) {
+async function generateFhirReport(sessionId, entities = []) {
     const url = `${resolveAsrBaseUrl()}${ASR_GENERATE_FHIR_REPORT_PATH}/${sessionId}`;
-    return _doFetch(url, { method: 'POST' });
+    const fetchOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': CONTENT_TYPE_JSON,
+        },
+    };
+
+    fetchOptions.body = JSON.stringify({
+        [FHIR_REQUEST_BODY_KEY_ENTITIES]: entities,
+    });
+
+    return _doFetch(url, fetchOptions);
 }
 
 module.exports = {

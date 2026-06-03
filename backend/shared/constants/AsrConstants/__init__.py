@@ -21,6 +21,7 @@ from .asr_constants import (
     PROVIDER_MOCK,
     PROVIDER_WHISPER,
     SUPPORTED_PROVIDERS,
+    TRANSCRIBE_RESPONSE_KEY_ENTITIES,
 )
 
 __all__ = [
@@ -46,4 +47,5 @@ __all__ = [
     "PROVIDER_MOCK",
     "PROVIDER_WHISPER",
     "SUPPORTED_PROVIDERS",
+    "TRANSCRIBE_RESPONSE_KEY_ENTITIES",
 ]
