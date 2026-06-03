@@ -20,7 +20,7 @@ asr:
 
 pln_medical:
   task: token-classification
-  model: rigonsallauka/spanish_medical_ner
+  model: HUMADEX/spanish_medical_ner
   aggregation_strategy: max
 
 pln_farmacos:

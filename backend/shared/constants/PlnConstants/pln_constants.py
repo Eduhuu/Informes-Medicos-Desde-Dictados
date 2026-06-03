@@ -35,3 +35,14 @@ DEFAULT_FARMACOS_AGGREGATION_STRATEGY = "simple"
 
 # Thread pool for parallel PLN execution
 PLN_EXECUTOR_MAX_WORKERS = 2
+
+# NER entity dict field keys (HuggingFace pipeline output)
+NER_KEY_ENTITY_GROUP = "entity_group"
+NER_KEY_WORD = "word"
+NER_KEY_START = "start"
+NER_KEY_END = "end"
+NER_KEY_SCORE = "score"
+
+# Maximum character gap between two consecutive entities to still consider them
+# part of the same multi-token concept (e.g. "diabetes mellitus tipo 2")
+NER_GROUP_SPACE_TOLERANCE = 1

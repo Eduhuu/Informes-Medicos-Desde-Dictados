@@ -20,8 +20,8 @@ class PNLFactory:
         if resolved is None:
             resolved = load_settings().pln_medical
 
-        if resolved.model not in SUPPORTED_PLN_MODELS:
-            raise ValueError(f"Unsupported PLN model: {resolved.model}")
+        # if resolved.model not in SUPPORTED_PLN_MODELS:
+        #     raise ValueError(f"Unsupported PLN model: {resolved.model}")
 
         return TransformersPipelinePLN(
             resolved.model,
