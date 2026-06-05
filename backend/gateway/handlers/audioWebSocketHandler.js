@@ -55,6 +55,7 @@ function resolveProcessingMode() {
 function attachAudioWebSocketHandlers(ws) {
     const processingMode = resolveProcessingMode();
     let pendingMetadata = null;
+    const pendingTranscriptions = new Set();
 
     ws.on('message', async (message) => {
         try {
@@ -68,6 +69,13 @@ function attachAudioWebSocketHandlers(ws) {
                     if (processingMode === PROCESSING_MODE_BATCH) {
                         await _handleBatchSessionEnd(ws, metadata);
                         return;
+                    }
+
+                    if (pendingTranscriptions.size > 0) {
+                        console.log(
+                            `Esperando ${pendingTranscriptions.size} transcripciones pendientes antes de generar informes (sesión=${metadata.sessionId})`,
+                        );
+                        await Promise.allSettled(pendingTranscriptions);
                     }
 
                     sendJson(ws, {
@@ -173,15 +181,31 @@ function attachAudioWebSocketHandlers(ws) {
                 `Fragmento recibido (sesión=${metadata.sessionId}, secuencia=${metadata.sequence}, bytes=${audioBuffer.length})`,
             );
 
-            const transcription = await transcribeAudioChunk(audioBuffer, metadata);
-            appendFromTranscription(metadata.sessionId, transcription);
+            const transcriptionPromise = transcribeAudioChunk(audioBuffer, metadata)
+                .then((transcription) => {
+                    appendFromTranscription(metadata.sessionId, transcription);
+                    sendJson(ws, {
+                        type: WS_RESPONSE_TYPE_TRANSCRIPTION,
+                        sessionId: metadata.sessionId,
+                        sequence: metadata.sequence,
+                        ...transcription,
+                    });
+                })
+                .catch((error) => {
+                    console.error(
+                        `Error al transcribir fragmento de audio (sesión=${metadata.sessionId}, secuencia=${metadata.sequence}):`,
+                        error,
+                    );
+                    sendJson(ws, {
+                        type: WS_RESPONSE_TYPE_ERROR,
+                        message: error.message ?? 'Error al procesar el fragmento de audio',
+                    });
+                })
+                .finally(() => {
+                    pendingTranscriptions.delete(transcriptionPromise);
+                });
 
-            sendJson(ws, {
-                type: WS_RESPONSE_TYPE_TRANSCRIPTION,
-                sessionId: metadata.sessionId,
-                sequence: metadata.sequence,
-                ...transcription,
-            });
+            pendingTranscriptions.add(transcriptionPromise);
         } catch (error) {
             pendingMetadata = null;
             console.error('Error al procesar mensaje WebSocket:', error);
