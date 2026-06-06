@@ -65,3 +65,21 @@ MSG_LLM_GENERATION_ERROR = "Error al generar el reporte médico: {error}"
 # FHIR report generation messages (Spanish)
 MSG_FHIR_UNAVAILABLE = "Generador de reporte FHIR no disponible"
 MSG_FHIR_DISABLED = "La generación de reporte FHIR está deshabilitada en la configuración"
+
+# FHIR ConceptMap $translate messages (Spanish)
+MSG_CONCEPT_MAP_UNAVAILABLE = "Cliente de ConceptMap FHIR no disponible"
+MSG_CONCEPT_MAP_LOOKUP_FAILED = "No se pudo traducir el concepto SNOMED '{concept_id}' a ICD-10"
+LOG_CONCEPT_MAP_RESULT = "ConceptMap ICD-10: concepto {concept_id} → {matches}"
+LOG_CONCEPT_MAP_NO_MATCH = "ConceptMap ICD-10: sin correspondencia para el concepto {concept_id}"
+REPORT_TIMING_CONCEPT_MAP = "  Traducción ConceptMap (ICD-10): {duration_s} s"
+
+# CIE-10 section labels in the session report (Spanish)
+REPORT_SECTION_CIE10 = "CIE-10 (ConceptMap)"
+REPORT_CIE10_ENTITY_HEADER = "  [{index}] Entidad: {word}"
+REPORT_CIE10_NOT_APPLICABLE = "No aplica (sin entidades NER)."
+REPORT_CIE10_DISABLED = "Traducción CIE-10 deshabilitada en configuración."
+REPORT_CIE10_NO_SNOMED = "      Sin concepto SNOMED; traducción no realizada."
+REPORT_CIE10_NO_MATCH = "      Sin correspondencia CIE-10."
+REPORT_CIE10_ERROR = "      Error en traducción CIE-10: {error}"
+REPORT_CIE10_MATCH_LINE = "      [{idx}] {code} | sistema: {system} | equivalencia: {equivalence} | término: {display}"
+REPORT_CIE10_SOURCE_LINE = "      Fuente: {source}"

@@ -96,6 +96,31 @@ from shared.constants.FhirReportConstants import (
     ENV_FHIR_REPORT_ENABLED,
 )
 
+from shared.constants.FhirConceptMapConstants import (
+    CONFIG_KEY_FHIR_CONCEPT_MAP,
+    CONFIG_KEY_FHIR_CONCEPT_MAP_BASE_URL,
+    CONFIG_KEY_FHIR_CONCEPT_MAP_ENABLED,
+    CONFIG_KEY_FHIR_CONCEPT_MAP_FALLBACK_URL,
+    CONFIG_KEY_FHIR_CONCEPT_MAP_LANGUAGE,
+    CONFIG_KEY_FHIR_CONCEPT_MAP_TIMEOUT_SECONDS,
+    CONFIG_KEY_FHIR_CONCEPT_MAP_URL,
+    CONFIG_KEY_FHIR_VALUESET_EXPAND_URL,
+    DEFAULT_FHIR_CONCEPT_MAP_BASE_URL,
+    DEFAULT_FHIR_CONCEPT_MAP_ENABLED,
+    DEFAULT_FHIR_CONCEPT_MAP_FALLBACK_URL,
+    DEFAULT_FHIR_CONCEPT_MAP_LANGUAGE,
+    DEFAULT_FHIR_CONCEPT_MAP_TIMEOUT_SECONDS,
+    DEFAULT_FHIR_CONCEPT_MAP_URL,
+    DEFAULT_FHIR_VALUESET_EXPAND_URL,
+    ENV_FHIR_CONCEPT_MAP_BASE_URL,
+    ENV_FHIR_CONCEPT_MAP_ENABLED,
+    ENV_FHIR_CONCEPT_MAP_FALLBACK_URL,
+    ENV_FHIR_CONCEPT_MAP_LANGUAGE,
+    ENV_FHIR_CONCEPT_MAP_TIMEOUT_SECONDS,
+    ENV_FHIR_CONCEPT_MAP_URL,
+    ENV_FHIR_VALUESET_EXPAND_URL,
+)
+
 @dataclass(frozen=True)
 class AsrSettings:
     provider: str
@@ -145,6 +170,17 @@ class FhirReportSettings:
 
 
 @dataclass(frozen=True)
+class FhirConceptMapSettings:
+    enabled: bool
+    base_url: str
+    concept_map_url: str
+    concept_map_fallback_url: str
+    value_set_expand_url: str
+    timeout_seconds: float
+    language: str
+
+
+@dataclass(frozen=True)
 class Settings:
     asr: AsrSettings
     pln_medical: PlnSettings
@@ -153,6 +189,7 @@ class Settings:
     reports: ReportSettings
     llm: LlmSettings
     fhir_report: FhirReportSettings
+    fhir_concept_map: FhirConceptMapSettings
 
 def _build_pln_settings(
     section: dict[str, Any],
@@ -275,6 +312,67 @@ def _default_fhir_report_settings_from_env() -> FhirReportSettings:
             os.getenv(ENV_FHIR_REPORT_ENABLED),
             DEFAULT_FHIR_REPORT_ENABLED,
         ),
+    )
+
+
+def _build_fhir_concept_map_settings(
+    section: dict[str, Any],
+) -> FhirConceptMapSettings:
+    return FhirConceptMapSettings(
+        enabled=_parse_bool(
+            section.get(CONFIG_KEY_FHIR_CONCEPT_MAP_ENABLED),
+            DEFAULT_FHIR_CONCEPT_MAP_ENABLED,
+        ),
+        base_url=str(
+            section.get(CONFIG_KEY_FHIR_CONCEPT_MAP_BASE_URL, DEFAULT_FHIR_CONCEPT_MAP_BASE_URL),
+        ),
+        concept_map_url=str(
+            section.get(CONFIG_KEY_FHIR_CONCEPT_MAP_URL, DEFAULT_FHIR_CONCEPT_MAP_URL),
+        ),
+        concept_map_fallback_url=str(
+            section.get(
+                CONFIG_KEY_FHIR_CONCEPT_MAP_FALLBACK_URL,
+                DEFAULT_FHIR_CONCEPT_MAP_FALLBACK_URL,
+            ),
+        ),
+        value_set_expand_url=str(
+            section.get(CONFIG_KEY_FHIR_VALUESET_EXPAND_URL, DEFAULT_FHIR_VALUESET_EXPAND_URL),
+        ),
+        timeout_seconds=float(
+            section.get(
+                CONFIG_KEY_FHIR_CONCEPT_MAP_TIMEOUT_SECONDS,
+                DEFAULT_FHIR_CONCEPT_MAP_TIMEOUT_SECONDS,
+            ),
+        ),
+        language=str(
+            section.get(CONFIG_KEY_FHIR_CONCEPT_MAP_LANGUAGE, DEFAULT_FHIR_CONCEPT_MAP_LANGUAGE),
+        ),
+    )
+
+
+def _default_fhir_concept_map_settings_from_env() -> FhirConceptMapSettings:
+    return FhirConceptMapSettings(
+        enabled=_parse_bool(
+            os.getenv(ENV_FHIR_CONCEPT_MAP_ENABLED),
+            DEFAULT_FHIR_CONCEPT_MAP_ENABLED,
+        ),
+        base_url=os.getenv(ENV_FHIR_CONCEPT_MAP_BASE_URL, DEFAULT_FHIR_CONCEPT_MAP_BASE_URL),
+        concept_map_url=os.getenv(ENV_FHIR_CONCEPT_MAP_URL, DEFAULT_FHIR_CONCEPT_MAP_URL),
+        concept_map_fallback_url=os.getenv(
+            ENV_FHIR_CONCEPT_MAP_FALLBACK_URL,
+            DEFAULT_FHIR_CONCEPT_MAP_FALLBACK_URL,
+        ),
+        value_set_expand_url=os.getenv(
+            ENV_FHIR_VALUESET_EXPAND_URL,
+            DEFAULT_FHIR_VALUESET_EXPAND_URL,
+        ),
+        timeout_seconds=float(
+            os.getenv(
+                ENV_FHIR_CONCEPT_MAP_TIMEOUT_SECONDS,
+                str(DEFAULT_FHIR_CONCEPT_MAP_TIMEOUT_SECONDS),
+            ),
+        ),
+        language=os.getenv(ENV_FHIR_CONCEPT_MAP_LANGUAGE, DEFAULT_FHIR_CONCEPT_MAP_LANGUAGE),
     )
 
 
@@ -402,6 +500,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
             reports=_default_report_settings_from_env(),
             llm=_default_llm_settings_from_env(),
             fhir_report=_default_fhir_report_settings_from_env(),
+            fhir_concept_map=_default_fhir_concept_map_settings_from_env(),
         )
     with path.open(encoding="utf-8") as config_file:
         raw: dict[str, Any] = yaml.safe_load(config_file) or {}
@@ -414,6 +513,7 @@ def load_settings(config_path: Path | None = None) -> Settings:
     reports_section = raw.get(CONFIG_KEY_REPORTS, {})
     llm_section = raw.get(CONFIG_KEY_LLM, {})
     fhir_report_section = raw.get(CONFIG_KEY_FHIR_REPORT, {})
+    fhir_concept_map_section = raw.get(CONFIG_KEY_FHIR_CONCEPT_MAP, {})
     return Settings(
         asr=AsrSettings(
             provider=str(asr_section.get(CONFIG_KEY_PROVIDER, os.getenv("ASR_PROVIDER", PROVIDER_MOCK))),
@@ -440,4 +540,5 @@ def load_settings(config_path: Path | None = None) -> Settings:
         reports=_build_report_settings(reports_section),
         llm=_build_llm_settings(llm_section),
         fhir_report=_build_fhir_report_settings(fhir_report_section),
+        fhir_concept_map=_build_fhir_concept_map_settings(fhir_concept_map_section),
     )

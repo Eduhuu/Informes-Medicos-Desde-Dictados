@@ -2,11 +2,21 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from app.constants.messages import (
+    REPORT_CIE10_DISABLED,
+    REPORT_CIE10_ENTITY_HEADER,
+    REPORT_CIE10_ERROR,
+    REPORT_CIE10_MATCH_LINE,
+    REPORT_CIE10_NOT_APPLICABLE,
+    REPORT_CIE10_NO_MATCH,
+    REPORT_CIE10_NO_SNOMED,
+    REPORT_CIE10_SOURCE_LINE,
+    REPORT_SECTION_CIE10,
     REPORT_LABEL_TIMESTAMP_MS,
     REPORT_LABEL_TIMESTAMP_UNKNOWN,
     REPORT_NER_ENTITY_LINE,
     REPORT_SECTION_TIMINGS,
     REPORT_TIMING_ASR,
+    REPORT_TIMING_CONCEPT_MAP,
     REPORT_TIMING_NER,
     REPORT_TIMING_SNOMED,
     REPORT_TIMING_TOTAL,
@@ -152,6 +162,13 @@ class SessionReportWriter:
             ],
         )
 
+        if timings.concept_map_ms > 0:
+            lines.append(
+                REPORT_TIMING_CONCEPT_MAP.format(
+                    duration_s=self._format_duration_seconds(timings.concept_map_ms),
+                ),
+            )
+
         lines.extend(["", REPORT_SECTION_TRANSCRIPTION, REPORT_SUBSECTION_SEPARATOR])
         if transcription_text.strip():
             lines.append(transcription_text.strip())
@@ -189,12 +206,61 @@ class SessionReportWriter:
         else:
             lines.append(REPORT_SNOMED_NOT_APPLICABLE)
 
+        lines.extend(["", REPORT_SECTION_CIE10, REPORT_SUBSECTION_SEPARATOR])
+        if enriched_entities:
+            any_concept_map = any(e.concept_map is not None for e in enriched_entities)
+            if any_concept_map:
+                for index, entity in enumerate(enriched_entities, start=1):
+                    lines.extend(
+                        self._format_cie10_lines(index=index, entity=entity),
+                    )
+            else:
+                lines.append(REPORT_CIE10_DISABLED)
+        else:
+            lines.append(REPORT_CIE10_NOT_APPLICABLE)
+
         lines.append("")
         return "\n".join(lines) + "\n"
 
     def _format_duration_seconds(self, duration_ms: float) -> str:
         duration_s = duration_ms / MILLISECONDS_PER_SECOND
         return f"{duration_s:.{REPORT_TIMING_DECIMAL_PLACES}f}"
+
+    def _format_cie10_lines(
+        self,
+        *,
+        index: int,
+        entity: EnrichedEntity,
+    ) -> list[str]:
+        lines = [REPORT_CIE10_ENTITY_HEADER.format(index=index, word=entity.word)]
+
+        cm = entity.concept_map
+        if cm is None:
+            lines.append(REPORT_CIE10_DISABLED)
+            return lines
+
+        if cm.source:
+            lines.append(REPORT_CIE10_SOURCE_LINE.format(source=cm.source))
+
+        if cm.error:
+            lines.append(REPORT_CIE10_ERROR.format(error=cm.error))
+            return lines
+
+        if not cm.matches:
+            lines.append(REPORT_CIE10_NO_MATCH)
+            return lines
+
+        for idx, match in enumerate(cm.matches, start=1):
+            lines.append(
+                REPORT_CIE10_MATCH_LINE.format(
+                    idx=idx,
+                    code=match.code,
+                    system=match.system,
+                    equivalence=match.equivalence,
+                    display=match.display,
+                ),
+            )
+        return lines
 
     def _format_snomed_lines(
         self,

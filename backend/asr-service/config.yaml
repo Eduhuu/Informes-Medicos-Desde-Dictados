@@ -65,3 +65,16 @@ llm:
 
 fhir_report:
   enabled: true
+
+# Traducción SNOMED CT → ICD-10 via cadena de fallback (FHIR)
+# Paso 1: ConceptMap $translate con mapa primario   (6011000124106)
+# Paso 2: ConceptMap $translate con mapa de reserva (447562003)
+# Paso 3: ValueSet $expand con el término de la entidad como filtro
+fhir_concept_map:
+  enabled: true
+  base_url: http://localhost:8080/fhir
+  concept_map_url: "http://snomed.info/sct?fhir_cm=6011000124106"
+  concept_map_fallback_url: "http://snomed.info/sct?fhir_cm=447562003"
+  value_set_expand_url: "http://snomed.info/sct/449081005?fhir_vs"
+  language: es
+  timeout_seconds: 10

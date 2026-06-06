@@ -108,18 +108,29 @@ def _build_narrative(summary: str) -> Narrative:
 
 
 def _build_codeable_concept(entity: ParsedSessionEntity) -> CodeableConcept:
+    codings: list[Coding] = []
+
     if entity.has_snomed_concept:
-        display = entity.snomed_preferred_term or entity.word.strip()
-        return CodeableConcept(
-            text=entity.word.strip(),
-            coding=[
-                Coding(
-                    system=FHIR_SNOMED_SYSTEM,
-                    code=entity.snomed_concept_id,
-                    display=display,
-                )
-            ],
+        codings.append(
+            Coding(
+                system=FHIR_SNOMED_SYSTEM,
+                code=entity.snomed_concept_id,
+                display=entity.snomed_preferred_term or entity.word.strip(),
+            )
         )
+
+    if entity.has_icd10_coding:
+        codings.append(
+            Coding(
+                system=entity.icd10_system,
+                code=entity.icd10_code,
+                display=entity.icd10_display or None,
+            )
+        )
+
+    if codings:
+        return CodeableConcept(text=entity.word.strip(), coding=codings)
+
     return CodeableConcept(text=entity.word.strip())
 
 
