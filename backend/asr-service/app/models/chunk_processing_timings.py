@@ -9,3 +9,4 @@ class ChunkProcessingTimings:
     ner_ms: float
     snomed_ms: float
     total_ms: float
+    concept_map_ms: float = 0.0

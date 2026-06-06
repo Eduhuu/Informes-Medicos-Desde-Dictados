@@ -10,6 +10,7 @@ def entities_from_api_payload(entities: list[dict[str, Any]]) -> list[ParsedSess
     for index, raw in enumerate(entities, start=1):
         pln_source = str(raw.get("pln_source", ""))
         snomed_fields = _snomed_fields_from_api(raw.get("snomed") or {})
+        icd10_fields = _icd10_fields_from_api(raw.get("concept_map") or {})
         parsed.append(
             ParsedSessionEntity(
                 index=index,
@@ -20,6 +21,7 @@ def entities_from_api_payload(entities: list[dict[str, Any]]) -> list[ParsedSess
                 start=int(raw.get("start", 0)),
                 end=int(raw.get("end", 0)),
                 **snomed_fields,
+                **icd10_fields,
             ),
         )
     return parsed
@@ -43,4 +45,26 @@ def _snomed_fields_from_api(snomed: dict[str, Any]) -> dict[str, Any]:
         "snomed_preferred_lang": str(pt.get("lang", "")) or None,
         "snomed_fsn": str(fsn.get("term", "")) or None,
         "snomed_active": bool(concept.get("active")) if "active" in concept else None,
+    }
+
+
+def _icd10_fields_from_api(concept_map: dict[str, Any]) -> dict[str, Any]:
+    if not concept_map.get("result"):
+        return {}
+
+    matches: list[dict[str, Any]] = concept_map.get("matches") or []
+    if not matches:
+        return {}
+
+    first = matches[0]
+    code = str(first.get("code", "")) or None
+    system = str(first.get("system", "")) or None
+    if not code or not system:
+        return {}
+
+    return {
+        "icd10_code": code,
+        "icd10_display": str(first.get("display", "")) or None,
+        "icd10_system": system,
+        "icd10_source": str(concept_map.get("source", "")) or None,
     }

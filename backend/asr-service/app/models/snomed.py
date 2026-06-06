@@ -1,5 +1,10 @@
+from __future__ import annotations
+
 from dataclasses import asdict, dataclass, field
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
+
+if TYPE_CHECKING:
+    from app.models.concept_map import ConceptMapTranslation
 
 
 @dataclass
@@ -101,6 +106,7 @@ class EnrichedEntity:
     end: int
     pln_source: str
     snomed: SnomedSearchResult
+    concept_map: Optional[ConceptMapTranslation] = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -111,6 +117,7 @@ class EnrichedEntity:
             "end": self.end,
             "pln_source": self.pln_source,
             "snomed": self.snomed.to_dict(),
+            "concept_map": self.concept_map.to_dict() if self.concept_map is not None else None,
         }
 
     @classmethod

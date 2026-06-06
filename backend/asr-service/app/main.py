@@ -16,6 +16,7 @@ from app.factory.fhir_report_factory import FhirReportFactory
 from app.factory.llm_factory import LlmFactory
 from app.factory.pln_factory import PNLFactory
 from app.factory.snomed_factory import SnomedFactory
+from app.services.fhir_concept_map_client import FhirConceptMapClient
 from app.services.pln_orchestrator import PlnOrchestrator
 from app.services.session_report import SessionReportWriter
 from shared.constants.PlnConstants import PLN_EXECUTOR_MAX_WORKERS
@@ -41,6 +42,15 @@ async def lifespan(app: FastAPI):
     )
     llm_report_generator = LlmFactory.create(settings.llm, settings.reports.directory)
     fhir_report_generator = FhirReportFactory.create(settings.fhir_report, settings.reports.directory)
+    fhir_concept_map_client = FhirConceptMapClient(
+        enabled=settings.fhir_concept_map.enabled,
+        base_url=settings.fhir_concept_map.base_url,
+        concept_map_url=settings.fhir_concept_map.concept_map_url,
+        concept_map_fallback_url=settings.fhir_concept_map.concept_map_fallback_url,
+        value_set_expand_url=settings.fhir_concept_map.value_set_expand_url,
+        timeout_seconds=settings.fhir_concept_map.timeout_seconds,
+        language=settings.fhir_concept_map.language,
+    )
 
 
     app.state.asr_settings = settings.asr
@@ -50,6 +60,7 @@ async def lifespan(app: FastAPI):
     app.state.report_settings = settings.reports
     app.state.llm_settings = settings.llm
     app.state.fhir_report_settings = settings.fhir_report
+    app.state.fhir_concept_map_settings = settings.fhir_concept_map
 
     app.state.asr_provider = provider
     app.state.pln_orchestrator = pln_orchestrator
@@ -58,6 +69,7 @@ async def lifespan(app: FastAPI):
     app.state.session_report_writer = session_report_writer
     app.state.llm_report_generator = llm_report_generator
     app.state.fhir_report_generator = fhir_report_generator
+    app.state.fhir_concept_map_client = fhir_concept_map_client
 
     yield
 
@@ -68,6 +80,7 @@ async def lifespan(app: FastAPI):
     app.state.report_settings = None
     app.state.llm_settings = None
     app.state.fhir_report_settings = None
+    app.state.fhir_concept_map_settings = None
 
     app.state.asr_provider = None
     app.state.pln_orchestrator = None
@@ -77,6 +90,7 @@ async def lifespan(app: FastAPI):
     app.state.session_report_writer = None
     app.state.llm_report_generator = None
     app.state.fhir_report_generator = None
+    app.state.fhir_concept_map_client = None
 
 
 app = FastAPI(

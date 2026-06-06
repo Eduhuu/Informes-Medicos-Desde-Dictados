@@ -19,7 +19,15 @@ class ParsedSessionEntity:
     snomed_active: bool | None = None
     snomed_error: str | None = None
     snomed_no_match: bool = False
+    icd10_code: str | None = None
+    icd10_display: str | None = None
+    icd10_system: str | None = None
+    icd10_source: str | None = None
 
     @property
     def has_snomed_concept(self) -> bool:
         return self.snomed_concept_id is not None and not self.snomed_no_match
+
+    @property
+    def has_icd10_coding(self) -> bool:
+        return self.icd10_code is not None and self.icd10_system is not None

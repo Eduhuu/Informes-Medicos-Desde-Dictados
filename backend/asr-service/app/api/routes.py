@@ -5,6 +5,7 @@ from fastapi import APIRouter, Header, HTTPException, Request, status
 from pydantic import BaseModel, Field
 
 from app.constants.messages import (
+    MSG_CONCEPT_MAP_UNAVAILABLE,
     MSG_FHIR_DISABLED,
     MSG_FHIR_UNAVAILABLE,
     MSG_HEALTH_OK,
@@ -19,8 +20,10 @@ from app.constants.messages import (
 )
 from app.models.audio_chunk import AudioChunk
 from app.models.chunk_processing_timings import ChunkProcessingTimings
+from app.models.snomed import EnrichedEntity
 from app.providers.base import ASRProvider
 from app.services.entity_enrichment import enrich_entities
+from app.services.fhir_concept_map_client import FhirConceptMapClient
 from app.services.fhir_report_generator import FhirReportGenerator
 from app.services.llm_report_generator import LlmReportGenerator
 from app.services.pln_orchestrator import PlnOrchestrator
@@ -116,6 +119,35 @@ def _get_fhir_report_generator(request: Request) -> FhirReportGenerator:
             detail=MSG_FHIR_UNAVAILABLE,
         )
     return generator
+
+
+def _get_concept_map_client(request: Request) -> FhirConceptMapClient:
+    client = getattr(request.app.state, "fhir_concept_map_client", None)
+    if client is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_CONCEPT_MAP_UNAVAILABLE,
+        )
+    return client
+
+
+async def _translate_entities(
+    entities: list[EnrichedEntity],
+    client: FhirConceptMapClient,
+) -> list[EnrichedEntity]:
+    """Translate each entity through the three-step fallback chain:
+    primary ConceptMap → fallback ConceptMap → ValueSet $expand.
+    """
+    translated: list[EnrichedEntity] = []
+    for entity in entities:
+        concept_id = entity.snomed.items[0].conceptId if entity.snomed.items else None
+        translation = await client.translate(
+            concept_id=concept_id or "",
+            term=entity.word,
+        )
+        entity.concept_map = translation
+        translated.append(entity)
+    return translated
 
 
 def _parse_sequence(raw_sequence: str | None) -> int:
@@ -274,11 +306,18 @@ async def transcribe(
     enriched_entities = enrich_entities(grouped_entities, snomed_client)
     snomed_ms = (time.perf_counter() - snomed_started_at) * 1000
 
+    concept_map_client = _get_concept_map_client(request)
+    concept_map_ms = 0.0
+    if concept_map_client.enabled:
+        concept_map_started_at = time.perf_counter()
+        enriched_entities = await _translate_entities(enriched_entities, concept_map_client)
+        concept_map_ms = (time.perf_counter() - concept_map_started_at) * 1000
     total_ms = (time.perf_counter() - chunk_started_at) * 1000
     timings = ChunkProcessingTimings(
         asr_ms=asr_ms,
         ner_ms=ner_ms,
         snomed_ms=snomed_ms,
+        concept_map_ms=concept_map_ms,
         total_ms=total_ms,
     )
 
