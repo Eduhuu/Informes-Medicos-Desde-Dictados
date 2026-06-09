@@ -83,3 +83,10 @@ REPORT_CIE10_NO_MATCH = "      Sin correspondencia CIE-10."
 REPORT_CIE10_ERROR = "      Error en traducción CIE-10: {error}"
 REPORT_CIE10_MATCH_LINE = "      [{idx}] {code} | sistema: {system} | equivalencia: {equivalence} | término: {display}"
 REPORT_CIE10_SOURCE_LINE = "      Fuente: {source}"
+
+# PLN test endpoint messages (Spanish)
+MSG_PLN_TEST_TEXT_EMPTY = "El campo 'text' no puede estar vacío"
+MSG_PLN_TEST_PLN_UNAVAILABLE = "Módulo PLN no disponible"
+MSG_PLN_TEST_METRICS_LABEL_PRECISION = "Precisión"
+MSG_PLN_TEST_METRICS_LABEL_RECALL = "Exhaustividad"
+MSG_PLN_TEST_METRICS_LABEL_F1 = "F1-Score"
