@@ -21,3 +21,19 @@ export const UI_ERROR_MICROPHONE = 'No se pudo acceder al micrófono';
 export const UI_ERROR_GENERIC = 'Ha ocurrido un error inesperado';
 export const UI_MS_SUFFIX = 'ms';
 export const UI_SECONDS_SUFFIX = 's';
+
+export const UI_MODE_MICROPHONE = 'Micrófono';
+export const UI_MODE_FILE = 'Archivo';
+
+export const UI_SELECT_FILE = 'Seleccionar audio WAV';
+export const UI_SEND_FILE = 'Enviar';
+export const UI_REMOVE_FILE = 'Eliminar';
+
+export const UI_FILE_STATUS_IDLE = 'Pendiente';
+export const UI_FILE_STATUS_SENDING = 'Enviando…';
+export const UI_FILE_STATUS_SENT = 'Enviado';
+export const UI_FILE_STATUS_ERROR = 'Error';
+
+export const UI_FILE_INVALID_FORMAT =
+  'El archivo debe ser WAV 16 kHz, mono, 16 bits.\nConvierte con: ffmpeg -i entrada.wav -ar 16000 -ac 1 -sample_fmt s16 salida.wav';
+export const UI_FILE_LIST_EMPTY = 'No hay archivos cargados. Pulsa "Seleccionar audio WAV" para añadir uno.';

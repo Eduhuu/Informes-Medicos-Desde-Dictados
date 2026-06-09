@@ -53,12 +53,14 @@ from shared.constants.ReportConstants import (
 
 
 class SessionReportWriter:
-    """Appends one section per /transcribe call to a text file per session."""
+    """Buffers one section per /transcribe call in memory and writes them
+    ordered by sequence when flush_session() is called."""
 
     def __init__(self, reports_dir: Path, *, enabled: bool = True) -> None:
         self._reports_dir = reports_dir
         self._enabled = enabled
         self._locks: dict[str, threading.Lock] = {}
+        self._pending: dict[str, dict[int, str]] = {}
         if enabled:
             reports_dir.mkdir(parents=True, exist_ok=True)
 
@@ -80,23 +82,50 @@ class SessionReportWriter:
         if not self._enabled:
             return
 
-        ensure_session_reports_dir(self._reports_dir, session_id)
-        report_path = control_report_path(self._reports_dir, session_id)
         block = self._format_call_block(
-            session_id=session_id,
             sequence=sequence,
             timestamp_ms=timestamp_ms,
             transcription_text=transcription_text,
             enriched_entities=enriched_entities,
             timings=timings,
             warning=warning,
-            is_new_file=not report_path.exists(),
         )
 
         lock = self._lock_for(session_id)
         with lock:
-            with report_path.open("a", encoding="utf-8") as report_file:
-                report_file.write(block)
+            if session_id not in self._pending:
+                self._pending[session_id] = {}
+            self._pending[session_id][sequence] = block
+
+    def flush_session(self, session_id: str) -> None:
+        """Write buffered blocks to disk in sequence order, then clear the buffer."""
+        if not self._enabled:
+            return
+
+        lock = self._lock_for(session_id)
+        with lock:
+            blocks = self._pending.pop(session_id, {})
+            if not blocks:
+                return
+
+            ensure_session_reports_dir(self._reports_dir, session_id)
+            report_path = control_report_path(self._reports_dir, session_id)
+
+            started_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+            header = "\n".join([
+                REPORT_SECTION_SEPARATOR,
+                REPORT_SESSION_HEADER.format(session_id=session_id),
+                REPORT_SESSION_STARTED.format(timestamp=started_at),
+                REPORT_SECTION_SEPARATOR,
+                "",
+            ]) + "\n"
+
+            with report_path.open("w", encoding="utf-8") as report_file:
+                report_file.write(header)
+                for seq in sorted(blocks):
+                    report_file.write(blocks[seq])
+
+            self._locks.pop(session_id, None)
 
     def _lock_for(self, session_id: str) -> threading.Lock:
         if session_id not in self._locks:
@@ -106,28 +135,14 @@ class SessionReportWriter:
     def _format_call_block(
         self,
         *,
-        session_id: str,
         sequence: int,
         timestamp_ms: int | None,
         transcription_text: str,
         enriched_entities: list[EnrichedEntity],
         timings: ChunkProcessingTimings,
         warning: str | None,
-        is_new_file: bool,
     ) -> str:
         lines: list[str] = []
-
-        if is_new_file:
-            started_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-            lines.extend(
-                [
-                    REPORT_SECTION_SEPARATOR,
-                    REPORT_SESSION_HEADER.format(session_id=session_id),
-                    REPORT_SESSION_STARTED.format(timestamp=started_at),
-                    REPORT_SECTION_SEPARATOR,
-                    "",
-                ],
-            )
 
         lines.extend(
             [
