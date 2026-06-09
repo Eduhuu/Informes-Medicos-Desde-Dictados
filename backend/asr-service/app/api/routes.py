@@ -15,6 +15,7 @@ from app.constants.messages import (
     MSG_LLM_REPORT_NOT_FOUND,
     MSG_LLM_UNAVAILABLE,
     MSG_MISSING_AUDIO,
+    MSG_PLN_TEST_PLN_UNAVAILABLE,
     MSG_SERVICE_READY,
     MSG_TRANSCRIPTION_EMPTY,
 )
@@ -59,6 +60,38 @@ class GenerateFhirReportRequest(BaseModel):
     )
 
     model_config = {"populate_by_name": True}
+
+
+class PlnTestRequest(BaseModel):
+    text: str = Field(..., min_length=1)
+    expected_entities: list[str] | None = Field(
+        default=None,
+        description="Lista opcional de entidades clínicas esperadas. Si se proporciona, se calculan métricas de evaluación.",
+    )
+
+
+class PlnTestEntityResult(BaseModel):
+    word: str
+    entity_group: str
+    score: float
+    start: int
+    end: int
+    pln_source: str
+
+
+class PlnTestMetrics(BaseModel):
+    precision: float = Field(..., description="Precisión: entidades detectadas que son correctas")
+    recall: float = Field(..., description="Exhaustividad: entidades esperadas que fueron detectadas")
+    f1_score: float = Field(..., description="Media armónica entre precisión y exhaustividad")
+    true_positives: int
+    false_positives: int
+    false_negatives: int
+
+
+class PlnTestResponse(BaseModel):
+    text: str
+    entities: list[PlnTestEntityResult]
+    metrics: PlnTestMetrics | None = None
 
 
 def _get_provider(request: Request) -> ASRProvider:
@@ -205,6 +238,59 @@ def group_entities(ner_entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     grouped.append(current)
     return grouped
+
+
+def _normalize(term: str) -> str:
+    """Lowercase and strip whitespace for case-insensitive entity matching."""
+    return term.strip().lower()
+
+
+def _compute_pln_metrics(
+    detected: list[PlnTestEntityResult],
+    expected_entities: list[str],
+) -> PlnTestMetrics:
+    detected_words = {_normalize(e.word) for e in detected}
+    expected_words = {_normalize(w) for w in expected_entities}
+
+    true_positives = len(detected_words & expected_words)
+    false_positives = len(detected_words - expected_words)
+    false_negatives = len(expected_words - detected_words)
+
+    precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0.0
+    recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0.0
+    f1_score = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+
+    return PlnTestMetrics(
+        precision=round(precision, 4),
+        recall=round(recall, 4),
+        f1_score=round(f1_score, 4),
+        true_positives=true_positives,
+        false_positives=false_positives,
+        false_negatives=false_negatives,
+    )
+
+
+@router.post("/pln-test", response_model=PlnTestResponse)
+async def pln_test(body: PlnTestRequest, request: Request) -> PlnTestResponse:
+    pln_orchestrator = getattr(request.app.state, "pln_orchestrator", None)
+    if pln_orchestrator is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_PLN_TEST_PLN_UNAVAILABLE,
+        )
+    ner_entities = await pln_orchestrator.process_text(body.text)
+    grouped = group_entities(ner_entities)
+    entity_results = [PlnTestEntityResult(**e) for e in grouped]
+
+    metrics: PlnTestMetrics | None = None
+    if body.expected_entities is not None:
+        metrics = _compute_pln_metrics(entity_results, body.expected_entities)
+
+    return PlnTestResponse(
+        text=body.text,
+        entities=entity_results,
+        metrics=metrics,
+    )
 
 
 @router.get("/")
