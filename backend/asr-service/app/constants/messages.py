@@ -90,3 +90,7 @@ MSG_PLN_TEST_PLN_UNAVAILABLE = "Módulo PLN no disponible"
 MSG_PLN_TEST_METRICS_LABEL_PRECISION = "Precisión"
 MSG_PLN_TEST_METRICS_LABEL_RECALL = "Exhaustividad"
 MSG_PLN_TEST_METRICS_LABEL_F1 = "F1-Score"
+
+# Coding lookup endpoint messages (Spanish)
+MSG_CODING_LOOKUP_SNOMED_UNAVAILABLE = "Cliente SNOMED no disponible"
+MSG_CODING_LOOKUP_SNOMED_DISABLED = "La búsqueda SNOMED está deshabilitada en la configuración"

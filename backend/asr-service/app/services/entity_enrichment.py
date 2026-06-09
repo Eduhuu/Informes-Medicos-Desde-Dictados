@@ -2,6 +2,33 @@ from typing import Any
 
 from app.models.snomed import EnrichedEntity
 from app.snomed.base import SnomedClient
+from shared.constants.CodingLookupConstants import (
+    DEFAULT_CODING_LOOKUP_END,
+    DEFAULT_CODING_LOOKUP_ENTITY_GROUP,
+    DEFAULT_CODING_LOOKUP_PLN_SOURCE,
+    DEFAULT_CODING_LOOKUP_SCORE,
+    DEFAULT_CODING_LOOKUP_START,
+)
+
+
+def build_ner_entity_dict(
+    word: str,
+    *,
+    entity_group: str = DEFAULT_CODING_LOOKUP_ENTITY_GROUP,
+    score: float = DEFAULT_CODING_LOOKUP_SCORE,
+    start: int = DEFAULT_CODING_LOOKUP_START,
+    end: int = DEFAULT_CODING_LOOKUP_END,
+    pln_source: str = DEFAULT_CODING_LOOKUP_PLN_SOURCE,
+) -> dict[str, Any]:
+    """Build a minimal NER entity dict suitable for SNOMED enrichment."""
+    return {
+        "word": word,
+        "entity_group": entity_group,
+        "score": score,
+        "start": start,
+        "end": end,
+        "pln_source": pln_source,
+    }
 
 
 def normalize_ner_entity(ner_entity: dict[str, Any]) -> dict[str, Any]:
