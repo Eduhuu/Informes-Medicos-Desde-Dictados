@@ -344,6 +344,13 @@ async def transcribe(
     return response
 
 
+@router.post("/finalize-session/{session_id}")
+async def finalize_session(session_id: str, request: Request) -> dict[str, str]:
+    writer = _get_session_report_writer(request)
+    writer.flush_session(session_id)
+    return {"session_id": session_id}
+
+
 @router.post("/generate-report/{session_id}")
 async def generate_report(session_id: str, request: Request) -> dict[str, str]:
     generator = _get_llm_report_generator(request)

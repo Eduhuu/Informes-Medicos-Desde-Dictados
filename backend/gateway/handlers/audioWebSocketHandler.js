@@ -12,6 +12,7 @@ const {
 } = require('../../shared/constants/GatewayConstants/gatewayConstants');
 const {
     transcribeAudioChunk,
+    finalizeSession,
     generateReport,
     generateFhirReport,
 } = require('../services/asrTranscribeClient');
@@ -77,6 +78,13 @@ function attachAudioWebSocketHandlers(ws) {
                         );
                         await Promise.allSettled(pendingTranscriptions);
                     }
+
+                    await finalizeSession(metadata.sessionId).catch((err) => {
+                        console.error(
+                            `Error al finalizar sesión (sesión=${metadata.sessionId}):`,
+                            err,
+                        );
+                    });
 
                     sendJson(ws, {
                         type: WS_RESPONSE_TYPE_SESSION_END,

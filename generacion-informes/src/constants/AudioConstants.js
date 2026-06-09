@@ -14,3 +14,5 @@ export const VAD_STATE_SILENCE = 'silence';
 export const VAD_STATE_SPEECH = 'speech';
 
 export const AUDIO_EVENT_ON_DATA = 'onAudioData';
+
+export const AUDIO_FILE_FRAME_DURATION_MS = VAD_WINDOW_MS;

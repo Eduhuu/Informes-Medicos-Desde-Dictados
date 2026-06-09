@@ -1,5 +1,6 @@
 const {
     ASR_TRANSCRIBE_PATH,
+    ASR_FINALIZE_SESSION_PATH,
     ASR_GENERATE_REPORT_PATH,
     ASR_GENERATE_FHIR_REPORT_PATH,
     ASR_BATCH_TIMEOUT_MS,
@@ -102,6 +103,11 @@ async function transcribeAudioChunk(audioBuffer, metadata, options = {}) {
     return _doFetch(url, fetchOptions);
 }
 
+async function finalizeSession(sessionId) {
+    const url = `${resolveAsrBaseUrl()}${ASR_FINALIZE_SESSION_PATH}/${sessionId}`;
+    return _doFetch(url, { method: 'POST' });
+}
+
 async function generateReport(sessionId) {
     const url = `${resolveAsrBaseUrl()}${ASR_GENERATE_REPORT_PATH}/${sessionId}`;
     return _doFetch(url, { method: 'POST' });
@@ -125,6 +131,7 @@ async function generateFhirReport(sessionId, entities = []) {
 
 module.exports = {
     transcribeAudioChunk,
+    finalizeSession,
     generateReport,
     generateFhirReport,
 };

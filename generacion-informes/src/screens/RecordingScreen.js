@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -24,6 +24,7 @@ import {
   UI_RECORDING_ACTIVE,
   UI_RECORDING_IDLE,
   UI_SECONDS_SUFFIX,
+  UI_SELECT_FILE,
   UI_SESSION_DURATION,
   UI_SILENCE,
   UI_START_RECORDING,
@@ -34,7 +35,10 @@ import {
   UI_WS_DISCONNECTED,
   UI_WS_ERROR,
 } from '../constants/UiStrings';
+import { AudioFileList } from '../components/AudioFileList';
+import { ModeSelector, SCREEN_MODE_FILE, SCREEN_MODE_MICROPHONE } from '../components/ModeSelector';
 import { useAudioCaptureSession } from '../hooks/useAudioCaptureSession';
+import { useAudioFileSession } from '../hooks/useAudioFileSession';
 
 function formatDuration(seconds) {
   const minutes = Math.floor(seconds / 60);
@@ -78,7 +82,7 @@ function PermissionStatus({ status }) {
   return <Text style={styles.permissionText}>{label}</Text>;
 }
 
-export default function RecordingScreen() {
+function MicrophoneSection() {
   const {
     permissionStatus,
     isRecording,
@@ -112,10 +116,7 @@ export default function RecordingScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
-      <Text style={styles.title}>{UI_TITLE}</Text>
-
+    <>
       <View style={styles.card}>
         <Text style={styles.sectionLabel}>{recordingLabel}</Text>
         <ConnectionBadge state={connectionState} />
@@ -176,6 +177,60 @@ export default function RecordingScreen() {
           {isRecording ? UI_STOP_RECORDING : UI_START_RECORDING}
         </Text>
       </Pressable>
+    </>
+  );
+}
+
+function FileSection() {
+  const {
+    loadedFiles,
+    connectionState,
+    isSending,
+    globalError,
+    pickFile,
+    sendFile,
+    removeFile,
+  } = useAudioFileSession();
+
+  return (
+    <>
+      <View style={styles.card}>
+        <ConnectionBadge state={connectionState} />
+      </View>
+
+      {globalError ? (
+        <Text style={styles.errorText}>{globalError}</Text>
+      ) : null}
+
+      <AudioFileList
+        files={loadedFiles}
+        onSend={sendFile}
+        onRemove={removeFile}
+        isSending={isSending}
+      />
+
+      <Pressable
+        style={[styles.primaryButton, styles.startButton, styles.selectFileButton]}
+        onPress={pickFile}
+        disabled={isSending}
+      >
+        <Text style={styles.primaryButtonText}>{UI_SELECT_FILE}</Text>
+      </Pressable>
+    </>
+  );
+}
+
+export default function RecordingScreen() {
+  const [mode, setMode] = useState(SCREEN_MODE_MICROPHONE);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="dark" />
+      <Text style={styles.title}>{UI_TITLE}</Text>
+
+      <ModeSelector mode={mode} onModeChange={setMode} />
+
+      {mode === SCREEN_MODE_MICROPHONE ? <MicrophoneSection /> : <FileSection />}
     </SafeAreaView>
   );
 }
@@ -265,6 +320,9 @@ const styles = StyleSheet.create({
   },
   stopButton: {
     backgroundColor: '#DC2626',
+  },
+  selectFileButton: {
+    marginTop: 0,
   },
   primaryButtonText: {
     color: '#FFFFFF',
