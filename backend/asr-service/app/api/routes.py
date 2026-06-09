@@ -5,6 +5,8 @@ from fastapi import APIRouter, Header, HTTPException, Request, status
 from pydantic import BaseModel, Field
 
 from app.constants.messages import (
+    MSG_CODING_LOOKUP_SNOMED_DISABLED,
+    MSG_CODING_LOOKUP_SNOMED_UNAVAILABLE,
     MSG_CONCEPT_MAP_UNAVAILABLE,
     MSG_FHIR_DISABLED,
     MSG_FHIR_UNAVAILABLE,
@@ -23,7 +25,7 @@ from app.models.audio_chunk import AudioChunk
 from app.models.chunk_processing_timings import ChunkProcessingTimings
 from app.models.snomed import EnrichedEntity
 from app.providers.base import ASRProvider
-from app.services.entity_enrichment import enrich_entities
+from app.services.entity_enrichment import build_ner_entity_dict, enrich_entities
 from app.services.fhir_concept_map_client import FhirConceptMapClient
 from app.services.fhir_report_generator import FhirReportGenerator
 from app.services.llm_report_generator import LlmReportGenerator
@@ -39,6 +41,14 @@ from shared.constants.AsrConstants import (
     HEADER_SESSION_ID,
     HEADER_TIMESTAMP,
     TRANSCRIBE_RESPONSE_KEY_ENTITIES,
+)
+from shared.constants.CodingLookupConstants import (
+    DEFAULT_CODING_LOOKUP_END,
+    DEFAULT_CODING_LOOKUP_ENTITY_GROUP,
+    DEFAULT_CODING_LOOKUP_PLN_SOURCE,
+    DEFAULT_CODING_LOOKUP_SCORE,
+    DEFAULT_CODING_LOOKUP_START,
+    REQUEST_BODY_KEY_ENTITIES,
 )
 from shared.constants.FhirReportConstants import FHIR_REQUEST_BODY_KEY_ENTITIES
 from shared.constants.PlnConstants import (
@@ -94,6 +104,29 @@ class PlnTestResponse(BaseModel):
     metrics: PlnTestMetrics | None = None
 
 
+class CodingLookupEntityInput(BaseModel):
+    word: str = Field(..., min_length=1)
+    entity_group: str = Field(default=DEFAULT_CODING_LOOKUP_ENTITY_GROUP)
+    score: float = Field(default=DEFAULT_CODING_LOOKUP_SCORE)
+    start: int = Field(default=DEFAULT_CODING_LOOKUP_START)
+    end: int = Field(default=DEFAULT_CODING_LOOKUP_END)
+    pln_source: str = Field(default=DEFAULT_CODING_LOOKUP_PLN_SOURCE)
+
+
+class CodingLookupRequest(BaseModel):
+    entities: list[CodingLookupEntityInput] = Field(
+        ...,
+        min_length=1,
+        alias=REQUEST_BODY_KEY_ENTITIES,
+    )
+
+    model_config = {"populate_by_name": True}
+
+
+class CodingLookupResponse(BaseModel):
+    entities: list[dict[str, Any]]
+
+
 def _get_provider(request: Request) -> ASRProvider:
     provider = getattr(request.app.state, "asr_provider", None)
     if provider is None:
@@ -130,6 +163,22 @@ def _get_snomed_client(request: Request) -> SnomedClient:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=MSG_HEALTH_UNAVAILABLE,
+        )
+    return client
+
+
+def _get_snomed_client_for_coding(request: Request) -> SnomedClient:
+    snomed_settings = getattr(request.app.state, "snomed_settings", None)
+    if snomed_settings is not None and not snomed_settings.enabled:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_CODING_LOOKUP_SNOMED_DISABLED,
+        )
+    client = getattr(request.app.state, "snomed_client", None)
+    if client is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=MSG_CODING_LOOKUP_SNOMED_UNAVAILABLE,
         )
     return client
 
@@ -290,6 +339,31 @@ async def pln_test(body: PlnTestRequest, request: Request) -> PlnTestResponse:
         text=body.text,
         entities=entity_results,
         metrics=metrics,
+    )
+
+
+@router.post("/coding-lookup", response_model=CodingLookupResponse)
+async def coding_lookup(body: CodingLookupRequest, request: Request) -> CodingLookupResponse:
+    snomed_client = _get_snomed_client_for_coding(request)
+    ner_entities = [
+        build_ner_entity_dict(
+            entity.word,
+            entity_group=entity.entity_group,
+            score=entity.score,
+            start=entity.start,
+            end=entity.end,
+            pln_source=entity.pln_source,
+        )
+        for entity in body.entities
+    ]
+    enriched_entities = enrich_entities(ner_entities, snomed_client)
+
+    concept_map_client = getattr(request.app.state, "fhir_concept_map_client", None)
+    if concept_map_client is not None and concept_map_client.enabled:
+        enriched_entities = await _translate_entities(enriched_entities, concept_map_client)
+
+    return CodingLookupResponse(
+        entities=[entity.to_dict() for entity in enriched_entities],
     )
 
 
