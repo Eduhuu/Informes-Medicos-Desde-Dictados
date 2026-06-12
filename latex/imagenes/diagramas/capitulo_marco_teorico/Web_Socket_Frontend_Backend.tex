@@ -1,0 +1,80 @@
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        font=\sffamily,
+        box/.style={draw, thick, minimum width=4.5cm, minimum height=7cm, align=center},
+        arrow/.style={-{Stealth[scale=1.2]}, thick},
+        biarrow/.style={{Stealth[scale=1.2]}-{Stealth[scale=1.2]}, thick},
+        lbl/.style={align=center, font=\small, text width=5.8cm} 
+    ]
+
+    \node[box] (mobileBox) at (0,0) {};
+    
+    % Título Superior
+    \node[align=center, font=\large\bfseries, anchor=north] at (0,3.2) {Dispositivo Móvil\\(\englishText{Smartphone})};
+    
+    % Icono de Smartphone
+    \begin{scope}[shift={(0,0)}]
+        \draw[thick, rounded corners=6pt] (-0.5,-0.8) rectangle (0.5,0.8);
+        \draw[thick, rounded corners=2pt] (-0.4,-0.6) rectangle (0.4,0.6);
+        % Botón de inicio / Línea inferior
+        \draw[thick] (-0.15,-0.7) -- (0.15,-0.7);
+        % Icono interior (Estilo App Store)
+        \draw[thick] (-0.2,-0.2) -- (0,-0.5) -- (0.2,-0.2);
+        \draw[thick] (-0.25,-0.25) -- (0.25,-0.25);
+        \node[font=\tiny\bfseries] at (0,0.1) {A};
+    \end{scope}
+
+    \node[box] (serverBox) at (11,0) {};
+    
+    % Título Superior
+    \node[align=center, font=\large\bfseries, anchor=north] at (11,3.2) {Servidor \englishText{Backend}};
+    
+    % Icono de Servidor (Rack) - Ajustado el shift para la nueva posición
+    \begin{scope}[shift={(10.4,-0.4)}]
+        \foreach \y in {0, 0.3, 0.6, 0.9} {
+            \draw[thick, rounded corners=1pt, fill=white] (0,\y) rectangle (1.2,\y+0.2);
+            \fill (0.15,\y+0.1) circle (1.2pt);
+            \fill (0.3,\y+0.1) circle (1.2pt);
+            \draw (0.45,\y+0.1) -- (1.05,\y+0.1);
+        }
+        % Icono de Nube superpuesto
+        \node[cloud, draw, thick, fill=white, cloud puffs=8, cloud puff arc=120, minimum width=1.1cm, minimum height=0.7cm] at (1.1,0.2) {};
+    \end{scope}
+    
+    
+    % Coordenadas de los bordes internos recalculadas para X=11
+    \coordinate (L1) at (2.25, 2.3);
+    \coordinate (R1) at (8.75, 2.3);
+    
+    \coordinate (L2) at (2.25, 0.8);
+    \coordinate (R2) at (8.75, 0.8);
+    
+    \coordinate (L3) at (2.25, -0.7);
+    \coordinate (R3) at (8.75, -0.7);
+    
+    \coordinate (L4) at (2.25, -2.2);
+    \coordinate (R4) at (8.75, -2.2);
+
+    % Flecha 1: Petición Inicial
+    \draw[arrow] (L1) -- (R1) node[lbl, midway, above] {Petición de Conexión WSS (Inicial)};
+
+    % Flecha 2: Intercambio de Datos
+    \draw[biarrow] (L2) -- (R2) 
+        node[lbl, midway, above] {Intercambio de Datos}
+        node[lbl, midway, below] {Bidireccional (\englishText{WSS})};
+
+    % Flecha 3: Handshake (Derecha a Izquierda)
+    \draw[arrow] (R3) -- (L3) 
+        node[lbl, midway, above] {Mensaje de Confirmación}
+        node[lbl, midway, below] {(\englishText{Handshake})};
+
+    % Flecha 4: Canal Cifrado
+    \draw[biarrow] (L4) -- (R4) 
+        node[lbl, midway, above] {Canal \englishText{WSS} Cifrado (\englishText{SSL/TLS})}
+        node[lbl, midway, below] {Transmisión Segura};
+
+    \end{tikzpicture}
+    \caption{Diagrama de arquitectura y flujo de conexión \englishText{WSS}.}
+    \label{fig:diagrama_wss}
+\end{figure}
