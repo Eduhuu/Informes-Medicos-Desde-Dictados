@@ -1,0 +1,72 @@
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        font=\sffamily,
+        % Caja central con padding generoso usando inner sep
+        box/.style={
+            draw, 
+            thick, 
+            align=center, 
+            inner xsep=20pt, 
+            inner ysep=30pt,
+            minimum height=4.5cm
+        },
+        arrow/.style={-{Stealth[scale=1.2]}, thick},
+        lbl/.style={align=center, font=\large\bfseries}
+    ]
+
+    % =========================================================================
+    % 1. BLOQUE CENTRAL (Posición fija en el origen)
+    % =========================================================================
+    \node[box] (plnBox) at (0,0) {
+        \Large\bfseries Procesamiento de Lenguaje\\
+        \Large\bfseries Natural (PLN) y NER
+    };
+
+    % =========================================================================
+    % 2. BLOQUE IZQUIERDO (Texto de Entrada) - Desplazado a la izquierda x=-5.5
+    % =========================================================================
+    \node[align=center, text width=4.5cm] (inputGroup) at (-5.5, 0) {
+        % Icono de documento dibujado nativamente
+        \begin{tikzpicture}
+            \draw[thick, rounded corners=2pt] (-0.4, -0.5) rectangle (0.4, 0.6);
+            \draw[thick] (-0.2, 0.3)  -- (0.2, 0.3);
+            \draw[thick] (-0.2, 0.1)  -- (0.2, 0.1);
+            \draw[thick] (-0.2, -0.1) -- (0.2, -0.1);
+            \draw[thick] (-0.2, -0.3) -- (0.0, -0.3);
+        \end{tikzpicture} \\[10pt]
+        % Frase de entrada
+        \large Hoy, María visitó la tienda de Apple en Madrid para comprar un iPhone.
+    };
+    
+    % Título del bloque izquierdo (Situado arriba del grupo)
+    \node[lbl] (inputTitle) at (-5.5, 2.8) {Texto de Entrada};
+
+
+    % =========================================================================
+    % 3. BLOQUE DERECHO (Resultado de NER) - Desplazado a la derecha x=5.8
+    % =========================================================================
+    \node[align=left, text width=6.5cm] (outputTxt) at (5.8, 0) {
+        \large [María]\textbf{\color{blue!80!black}{Persona}} visitó la tienda 
+        de [Apple]\textbf{\color{orange!80!black}{Organización}} en 
+        [Madrid]\textbf{\color{green!50!black}{Ubicación}} para 
+        comprar un [iPhone]\textbf{\color{red!70!black}{Producto}}.
+    };
+    
+    % Título del bloque derecho (Alineado perfectamente con el izquierdo)
+    \node[lbl] (outputTitle) at (5.8, 2.8) {Resultado de NER};
+
+
+    % =========================================================================
+    % 4. CONEXIONES ENLAZADAS A LOS BORDES DE LA CAJA (AUTOMÁTICAS)
+    % =========================================================================
+    % Flecha desde el extremo derecho del grupo de entrada hasta el borde izquierdo de la caja
+    \draw[arrow] (inputGroup.east) -- (plnBox.west);
+    
+    % Flecha desde el borde derecho de la caja hasta el extremo izquierdo del texto procesado
+    \draw[arrow] (plnBox.east) -- (outputTxt.west);
+
+    \end{tikzpicture}
+    \caption{Diagrama funcional corregido para el proceso de NER.}
+    \label{fig:diagrama_ner_corregido}
+\end{figure}

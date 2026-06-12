@@ -1,0 +1,252 @@
+\chapter{Marco Teorico y Referencial}\label{chapter:marco_teorico_y_referencial}
+
+\section{Estado del Arte}
+
+Históricamente, para la generación de informes médicos el uso de lápiz y papel fue la norma.
+Aunque la digitalización inicial buscaba reducir la carga administrativa, 
+la transcripción manual de datos se convirtió en un nuevo obstáculo para los profesionales de la salud,
+limitando la agilidad de los sistemas modernos.
+
+\subsection{\englishText{Automatic Speech Recognition} (\englishText{ASR})}
+Con la llegada de los modelos de reconocimiento automático de voz (\englishText{ASR}) se ha abierto un nuevo 
+camino para la generación de informes médicos. Estos modelos son capaces de transcribir
+el habla en texto, pero estos presentaron fallas importantes:
+
+\boldparagraph{Falta de especialización}{
+    dificultad para entender terminología médica técnica.
+}
+
+\boldparagraph{Alta tasa de error}{
+    los sistemas básicos llegaban a tener altos porcentajes de errores.
+}
+
+\boldparagraph{Carga de revisión}{
+    debido a estos errores, los médicos debían dedicar mucho tiempo a revisiones manuales para garantizar 
+    la seguridad del paciente.
+}
+
+\subsection{Automatización con \englishText{ASR} y Modelos de Lenguaje (\englishText{LLM})}
+
+El estado actual de la técnica se enfoca en la integracion de \englishText{ASR} y Modelos de Lenguaje (\englishText{LLM}),
+logrando automatizar de forma \englishText{end-to-end} la generación de informes médicos como se 
+hace mencion en estos trabajos recientes:   
+\citeText{adedeji2024soundhealthcareimprovingmedical, li2024searchingbestpracticesmedical} ambos
+haciendo uso del modelo de \englishText{Whisper} de \englishText{OpenAI} y de diversas herramientas y tecnicas para mejorar la transcripcion de los audios, 
+logrando asi reducir la tasa de error de palabra (\englishText{WER}) y la carga de revisiones manuales.
+Por otro lado,\citeText{10912421} propone utilizar realizar \englishText{fine-tuning} del modelo 
+\englishText{Whisper} para el mejoramiento del de la tasa de error de palabra (\englishText{WER}) y la utilizacion 
+de servicos de terceros para convertir los conceptos médicos extraídos a vocabularios 
+médicos estándar (\englishText{CIE-10-ES} y \englishText{SNOMED CT})
+
+A pesar de los avances presentados por \citeText{adedeji2024soundhealthcareimprovingmedical, li2024searchingbestpracticesmedical} y \citeText{10912421}, 
+se observa una limitación: la dependencia casi exclusiva de la capacidad generativa intrínseca del \englishText{LLM} para estructurar el informe clínico
+final a partir de la transcripción cruda. Si bien la reducción del \englishText{WER} mediante técnicas de \englishText{fine-tuning} mejora la fidelidad
+del texto, la síntesis del informe sigue estando sujeta a la interpretación del modelo, lo que incrementa el riesgo de omisiones o alucinaciones en
+datos clínicos críticos.
+
+Para mitigar esta vulnerabilidad, se propone introducir una capa intermedia basada en Procesamiento
+del Lenguaje Natural (\englishText{PLN}) especializado que implementa el Reconocimiento de Entidades Nombradas (\englishText{NER})
+para identificar de forma explícita los conceptos médicos presentes en el discurso. 
+
+Una vez extraídas, estas entidades no solo se mapean a vocabularios estándar de interoperabilidad (\englishText{CIE-10-ES} y \englishText{SNOMED CT}), 
+sino que se utilizan de forma activa como llaves de consulta para extraer información clínica estructurada adicional.
+Al alimentar al \englishText{LLM} no solo con el audio transcrito, sino con un contexto enriquecido de metadatos clínicos normalizados y verificados,
+se reduce la incertidumbre del modelo generativo. Esto permite mayor nivel de detalle de informes clínicos generados,
+precisión diagnóstica y rigurosidad técnica.
+
+\section{Marco Teorico}
+
+% Dentro de este trabajo fin de master se tomaran en cuenta los siguientes conceptos teoricos:
+
+\subsection{Aplicacion web}
+
+Una aplicación web es un sistema de software (sistema distribuido del tipo cliente-servidor) basado
+en tecnologías y estándares del Consorcio \englishText{World Wide Web} (\englishText{W3C}, por sus siglas en inglés) 
+que proporciona recursos web especíﬁcos, como contenido y servicios, a través de la interfaz
+de usuario provista por el navegador web.
+
+\subsection{Aplicacion Movil}
+
+Una aplicación móvil es un software diseñado para ejecutarse en dispositivos móviles, 
+tales como smartphones y tabletas. Estas aplicaciones se desarrollan para aprovechar las capacidades especíﬁcas de los dispositivos móviles, 
+como la cámara, el \englishText{GPS}, el acelerómetro y la pantalla táctil.
+
+Dentro del contexto de este trabajo fin de master, la aplicación móvil desemepñará el rol de cliente grabando 
+el audio del dictado médico.
+
+\subsection{Aplicación \englishText{Backend}}
+El \englishText{backend} representa la capa de lógica de negocio, procesamiento de datos 
+e integración de servicios en una arquitectura cliente-servidor. A diferencia de la aplicación móvil
+(\englishText{frontend}), el \englishText{backend} opera en el entorno del servidor y se encarga de 
+gestionar la persistencia de datos, la autenticación, la autorización y la orquestación de los servicios,
+entre otros. 
+En el contexto de este sistema, actúa como el núcleo central que recibe el audio de la 
+aplicación móvil, coordina los pipelines de procesamiento lingüístico y estructuración, 
+y crea los informes clínicos en formato estructurado.
+
+
+\subsection{\englishText{SSL/TLS}}
+Los protocolos \englishText{Secure Sockets Layer} (\englishText{SSL}) y su sucesor evolutivo, 
+\englishText{Transport Layer Security} (\englishText{TLS}), son protocolos criptográficos diseñados para garantizar
+la seguridad, confidencialidad e integridad de la información transmitida a través de una red informática. 
+
+\englishText{TLS} opera en la capa de transporte del modelo \englishText{TCP/IP}, situándose entre la aplicación 
+(\englishText{HTTP} o \englishText{WebSocket}) y el protocolo de red. De acuerdo con \citeText{rfc8446}, su funcionamiento se basa en dos
+fases principales: el emparejamiento criptográfico inicial (\englishText{handshake}), donde el cliente y el servidor autentican sus 
+identidades mediante certificados digitales y negocian los algoritmos de cifrado, y la posterior fase de 
+transferencia de datos protegida por dicha negociación.
+
+\subsection{\englishText{WebSocket}}
+\englishText{WebSocket} es un protocolo de comunicación bidireccional sobre la capa de transporte
+\englishText{TCP} que permite el intercambio de datos en tiempo real entre un cliente y un servidor
+\citeText{rfc6455}. 
+A diferencia del modelo tradicional de petición-respuesta de \englishText{HTTP}, el protocolo establece un apretón de manos
+(\englishText{handshake}) inicial para actualizar la conexión, permitiendo que ambas partes envíen mensajes
+de forma continua de datos básico y sin la sobrecarga de renegociar la sesión en cada intercambio.
+
+En el contexto de este sistema, la aplicación móvil inicia la comunicación con el servidor \englishText{backend}
+mediante un \textit{handshake} \englishText{HTTP}. Si la negociación es exitosa, el protocolo se actualiza a \englishText{WebSocket} seguro
+(\englishText{WSS}), estableciendo un canal cifrado mediante \englishText{SSL/TLS} sobre el cual circulan los mensajes en tiempo real 
+necesarios para el flujo de audio.
+
+\input{imagenes/diagramas/capitulo_marco_teorico/Web_Socket_Frontend_Backend}
+
+
+\subsection{\englishText{Gateway}}
+El \englishText{gateway} o puerta de enlace es un dispositivo o software que actúa como interfaz de conexión entre 
+sistemas o redes que utilizan distintos protocolos de comunicación. En nuestra implementación, esta pasarela
+funciona como intermediario entre la aplicación móvil y el \englishText{backend} a través del protocolo
+\englishText{WSS}. Su función principal es recibir los audios enviados por la aplicación móvil, 
+transformarlos y transmitirlos al \englishText{backend} para su posterior procesamiento.
+
+
+\subsection{Reconocimiento Automático de Voz (\englishText{ASR})}
+% El Reconocimiento Automático de Voz (\englishText{Automatic Speech Recognition} o \englishText{ASR})
+% es una disciplina de la inteligencia artificial cuyo objetivo es la conversión de una señal acústica
+% de habla humana en un texto equivalente legible por una máquina. 
+% De forma matemática, el proceso se modela como la búsqueda de la secuencia de palabras 
+% $\hat{W}$ que maximiza la probabilidad condicionada dada una secuencia de observaciones acústicas $X$ \citeText{jm3}:
+
+% $$\hat{W} = \arg\max_{W} P(W|X)$$
+
+% Los sistemas modernos de \englishText{ASR} han migrado de arquitecturas tradicionales basadas en 
+% Modelos Ocultos de Márikov (\englishText{HMM}) hacia redes neuronales profundas del tipo \englishText{end-to-end}
+% (E2E), como las arquitecturas basadas en \englishText{Transformers}. 
+% Estos sistemas procesan el audio mediante representaciones espectrográficas (frecuencia y tiempo) y 
+% utilizan mecanismos de autoatención (\englishText{self-attention}) para capturar de manera simultánea 
+% las dependencias acústicas y las relaciones semánticas del lenguaje natural, permitiendo procesar el 
+% contexto global del dictado clínico.
+
+El Reconocimiento Automático de Voz (\englishText{Automatic Speech Recognition} o \englishText{ASR}) es 
+una disciplina de la inteligencia artificial cuyo objetivo es la conversión de una señal acústica de habla
+humana en un texto equivalente legible.
+
+Desde una perspectiva funcional, un sistema de \englishText{ASR} moderno actúa como un modelo de caja negra que opera en tres etapas fundamentales \citeText{jm3}:
+\begin{itemize}
+    \item \textbf{Entrada:} El sistema recibe una señal de audio (el habla humana), la cual se transforma internamente en representaciones basadas en frecuencia y tiempo.
+    \item \textbf{Procesamiento:} El modelo analiza de forma simultánea tanto las características acústicas del sonido como las relaciones semánticas del lenguaje, evaluando probabilísticamente qué secuencias de palabras tienen mayor sentido dentro del contexto.
+    \item \textbf{Salida:} Produce como resultado final una transcripción y estructurada del dictado.
+\end{itemize}
+
+Para nuestra implementación, se utilizarán como parte fundamental del procesamiento de audios para poder convertirlo
+en texto plano.
+
+\input{imagenes/diagramas/capitulo_marco_teorico/ASR}
+
+\subsection{Procesamiento del Lenguaje Natural (\englishText{PLN})}
+El Procesamiento del Lenguaje Natural (\englishText{Natural Language Processing} o \englishText{PLN}) 
+es una ramade la ciencia de la computación, la lingüística y la inteligencia artificial orientada 
+al desarrollo de metodologías algorítmicas que permiten a los ordenadores comprender, 
+interpretar y manipular el lenguaje humano de forma automatizada \citeText{jm3}.
+
+El \englishText{PLN} abarca tareas complejas que van desde el análisis morfosintáctico elemental 
+(como la tokenización y el etiquetado gramatical) hasta la comprensión del lenguaje natural 
+(\englishText{NLU}), la gestión del conocimiento semántico y el reconocimiento de entidades nombradas (\englishText{NER}). 
+Este último permite extraer de forma automática identificar entidades en categorias previamente definidas.
+
+\subsection{Reconocimiento de Entidades Nombradas (\englishText{NER})}
+El Reconocimiento de Entidades Nombradas (\englishText{Named Entity Recognition} o \englishText{NER}) 
+constituye una subtarea fundamental del \englishText{PLN} cuyo propósito es localizar y clasificar 
+elementos de texto no estructurado en categorías semánticas previamente definidas \citeText{jm3}.
+
+Los modelos \englishText{NER} se pueden entrenar para especializarse en un dominio específico, que en nuestro caso es 
+el dominio médico, se entrenan para escanear las transcripciones médicas e identificar y categorizar 
+entidades médicas de interés como patologías, procedimientos quirúrgicos, fármacos, anatomía y variables fisiológicas. 
+Las arquitecturas contemporáneas de \englishText{NER} emplean modelos basados en representaciones de 
+codificadores lingüísticos profundos (como variantes de \englishText{BERT} o \englishText{RoBERTa}) 
+adaptadas al sector biomédico, los cuales analizan el contexto izquierdo y derecho de cada palabra
+para clasificar los límites de una entidad médica con alta precisión.
+
+\input{imagenes/diagramas/capitulo_marco_teorico/PLN_NER}
+
+\subsection{Modelo de Lenguaje de Gran Escala (\englishText{LLM})}
+
+Un Modelo de Lenguaje de Gran Escala (\englishText{Large Language Model} o \englishText{LLM}) es un sistema 
+de inteligencia artificial basado en redes neuronales profundas que ha sido entrenado mediante aprendizaje 
+auto-supervisado sobre corpus de texto masivos. Su arquitectura subyacente se fundamenta en el mecanismo 
+de \englishText{Transformer} \citeText{vaswani2017attention}, lo que les permite capturar dependencias lingüísticas
+de largo alcance y demostrar capacidades emergentes complejas como el razonamiento en contexto, la 
+traducción de estilos narrativos y la comprensión de instrucciones estructuradas \citeText{wei2022emergent}.
+
+En el contexto de esta aplicación, el \englishText{LLM} no se utiliza como una fuente primaria de diagnóstico, 
+sino como el redactor de la información extraída. Su propósito fundamental es actuar como un transformador
+de formato: toma la transcripción literal del audio médico, las entidades médicas extraídas 
+junto a los detalles extraidos de los vocabularios estándar de interoperabilidad (\englishText{SNOMED CT} y 
+\englishText{CIE-10-ES}) para generar un informe clínico y coherente.
+
+
+
+\subsection{Vocabularios Estándar de Interoperabilidad (\englishText{CIE-10-ES} y \englishText{SNOMED CT})}
+La interoperabilidad semántica en los sistemas de información sanitaria digital exige el empleo de terminologías
+de referencia y clasificaciones normalizadas a nivel internacional. En este sistema se consideran dos estándares
+fundamentales:
+
+\boldparagraph{SNOMED CT}{
+    La \englishText{Systematized Nomenclature of Medicine - Clinical Terms} es la terminología clínica integral
+    y polijerárquica más semánticamente rica del mundo. Organizada mediante conceptos, descripciones y relaciones
+    lógicas, permite codificar con granularidad cualquier juicio clínico, hallazgo, estructura anatómica
+    o procedimiento. Facilita que diferentes sistemas informáticos interpreten con exactitud inequívoca el 
+    significado de los términos registrados por el personal clínico.
+}
+
+\boldparagraph{CIE-10-ES}{
+    Es la Clasificación Internacional de Enfermedades, 10.ª revisión, correspondiente a la Modificación
+    Clínica adoptada de manera oficial para la codificación diagnóstica y de procedimientos en el Sistema
+    Nacional de Salud de España. A diferencia de \englishText{SNOMED CT} (que es una terminología analítica), 
+    la \englishText{CIE-10-ES} es un sistema de clasificación cerrado y estadístico, esencial para la gestión
+    epidemiológica, la facturación sanitaria, la indexación de historias clínicas y la auditoría médica
+    institucional.
+}
+
+Ambos forman parte del sistema que se quiere desarrollar desempeñando el rol de proveedores y validadores
+de información clínica. Donde al identificar una entidad médica, se puede: buscar esta entidad, validar su existencia
+y obtener su información detallada y obtener un identificador único para su uso de caracter nacional e internacional,
+\englishText{SNOMED CT} y \englishText{CIE-10-ES}.
+
+
+\section{Marco Conceptual}
+
+El diseño conceptual de este sistema se fundamenta en la transición de un flujo de información puramente secuencial y probabilístico hacia un modelo híbrido de conocimiento guiado. El objetivo principal es mitigar el riesgo inherente de alucinación semántica de los modelos generativos mediante la validación y el enriquecimiento ontológico previo.
+
+\subsection{Flujo Arquitectónico de Datos y Conocimiento}
+Como se ilustra en la Figura \ref{fig:diagrama_conceptual}, el ciclo de vida del dato clínico sigue un pipeline lineal y determinista en sus fases tempranas, transformándose en un proceso de enriquecimiento contextual antes de la intervención del modelo generativo:
+
+\begin{enumerate}
+    \item \textbf{Captura e Ingesta (Audio):} La voz del profesional de la salud es transmitida en tiempo real desde la aplicación móvil hacia el backend mediante el protocolo \englishText{WebSocket}.
+    \item \textbf{Transcodificación Acústica (ASR):} El modelo \englishText{Whisper} procesa la señal de audio cruda y genera una transcripción textual textual (\englishText{raw text}), la cual posee un alto riesgo de contener errores de sintaxis médica o ruido conversacional.
+    \item \textbf{Extracción Semántica (PLN/NER):} El texto plano es procesado por un pipeline de PLN especializado, aislando exclusivamente las entidades clínicas de interés (síntomas, diagnósticos, fármacos) y descartando conectores lingüísticos irrelevantes.
+    \item \textbf{Normalización y Envejecimiento Óntico (SNOMED CT / CIE-10-ES):} Las entidades extraídas son mapeadas a códigos únicos de los vocabularios estándar. Este paso actúa como un validador de veracidad clínica; si un concepto no se puede normalizar o validar contra la ontología, se marca para revisión, eliminando la ambigüedad lingüística.
+    \item \textbf{Inyección de Contexto y Síntesis (LLM):} El \englishText{LLM} no recibe la transcripción cruda a ciegas. En su lugar, se le alimenta con un \englishText{prompt} estructurado que contiene: la transcripción original más los metadatos estructurados y verificados de las ontologías. El modelo actúa estrictamente como un formateador avanzado, generando el informe clínico final con alta fidelidad y nulo margen de alucinación.
+\end{enumerate}
+
+% NOTA: Recuerda definir este label en tu entorno de figura TikZ, Mermaid o Gráfico externo
+% \label{fig:diagrama_conceptual}
+
+\subsection{Definición de Informe Enriquecido}
+Dentro del marco de esta investigación, se define formalmente un \textbf{Informe Enriquecido} como el artefacto clínico textual resultante que supera cualitativa y cuantitativamente a una transcripción médica estándar. Mientras que una transcripción tradicional es un reflejo literal (y potencialmente erróneo) del discurso hablado, el \textit{Informe Enriquecido} se caracteriza por poseer las siguientes propiedades operacionales:
+
+\begin{itemize}
+    \item \textbf{Estructuración Formal:} La información se organiza bajo estándares clínicos reconocidos (por ejemplo, el formato SOAP: Subjetivo, Objetivo, Análisis, Plan).
+    \item \textbf{Metadatos Semánticos Incrustados:} Cada diagnóstico, síntoma o procedimiento clave del texto está indexado inequívocamente a sus correspondientes códigos \englishText{SNOMED CT} y \englishText{CIE-10-ES}.
+    \item \textbf{Densidad Informativa Optimizada:} Se elimina el lenguaje coloquial, las vacilaciones del habla y las redundancias, manteniendo una alta rigurosidad técnica y precisión diagnóstica.
+\end{itemize}
