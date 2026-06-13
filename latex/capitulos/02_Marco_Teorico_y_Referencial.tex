@@ -121,21 +121,6 @@ transformarlos y transmitirlos al \englishText{backend} para su posterior proces
 
 
 \subsection{Reconocimiento Automático de Voz (\englishText{ASR})}
-% El Reconocimiento Automático de Voz (\englishText{Automatic Speech Recognition} o \englishText{ASR})
-% es una disciplina de la inteligencia artificial cuyo objetivo es la conversión de una señal acústica
-% de habla humana en un texto equivalente legible por una máquina. 
-% De forma matemática, el proceso se modela como la búsqueda de la secuencia de palabras 
-% $\hat{W}$ que maximiza la probabilidad condicionada dada una secuencia de observaciones acústicas $X$ \citeText{jm3}:
-
-% $$\hat{W} = \arg\max_{W} P(W|X)$$
-
-% Los sistemas modernos de \englishText{ASR} han migrado de arquitecturas tradicionales basadas en 
-% Modelos Ocultos de Márikov (\englishText{HMM}) hacia redes neuronales profundas del tipo \englishText{end-to-end}
-% (E2E), como las arquitecturas basadas en \englishText{Transformers}. 
-% Estos sistemas procesan el audio mediante representaciones espectrográficas (frecuencia y tiempo) y 
-% utilizan mecanismos de autoatención (\englishText{self-attention}) para capturar de manera simultánea 
-% las dependencias acústicas y las relaciones semánticas del lenguaje natural, permitiendo procesar el 
-% contexto global del dictado clínico.
 
 El Reconocimiento Automático de Voz (\englishText{Automatic Speech Recognition} o \englishText{ASR}) es 
 una disciplina de la inteligencia artificial cuyo objetivo es la conversión de una señal acústica de habla
@@ -189,17 +174,15 @@ de largo alcance y demostrar capacidades emergentes complejas como el razonamien
 traducción de estilos narrativos y la comprensión de instrucciones estructuradas \citeText{wei2022emergent}.
 
 En el contexto de esta aplicación, el \englishText{LLM} no se utiliza como una fuente primaria de diagnóstico, 
-sino como el redactor de la información extraída. Su propósito fundamental es actuar como un transformador
-de formato: toma la transcripción literal del audio médico, las entidades médicas extraídas 
+sino como el redactor de la información extraída. Su propósito fundamental es actuar como un transformador:
+toma la transcripción literal del audio médico, las entidades médicas extraídas 
 junto a los detalles extraidos de los vocabularios estándar de interoperabilidad (\englishText{SNOMED CT} y 
 \englishText{CIE-10-ES}) para generar un informe clínico y coherente.
 
 
-
-\subsection{Vocabularios Estándar de Interoperabilidad (\englishText{CIE-10-ES} y \englishText{SNOMED CT})}
-La interoperabilidad semántica en los sistemas de información sanitaria digital exige el empleo de terminologías
-de referencia y clasificaciones normalizadas a nivel internacional. En este sistema se consideran dos estándares
-fundamentales:
+\subsection{Estándares de Interoperabilidad (\englishText{SNOMED CT} y \englishText{CIE-10-ES})}
+La interoperabilidad semántica en los sistemas de información sanitaria digital exige clasificaciones
+normalizadas a nivel internacional. En este sistema se consideran dos estándares fundamentales:
 
 \boldparagraph{SNOMED CT}{
     La \englishText{Systematized Nomenclature of Medicine - Clinical Terms} es la terminología clínica integral
@@ -218,35 +201,137 @@ fundamentales:
     institucional.
 }
 
-Ambos forman parte del sistema que se quiere desarrollar desempeñando el rol de proveedores y validadores
-de información clínica. Donde al identificar una entidad médica, se puede: buscar esta entidad, validar su existencia
-y obtener su información detallada y obtener un identificador único para su uso de caracter nacional e internacional,
-\englishText{SNOMED CT} y \englishText{CIE-10-ES}.
+Ambos forman parte del sistema a desarrollar, donde se desempeñan como proveedores y validadores de información clínica.
+Al identificar una entidad médica, el sistema permite validar su existencia, obtener su información detallada
+y obtener un identificador único. Esto garantiza su interoperabilidad internacional mediante los identificadores
+de \englishText{SNOMED CT}, así como su integración con los sistemas nacionales de historias
+clínicas electrónicas (\englishText{HCE}), gracias a los identificadores de \englishText{CIE-10-ES}.
 
+\nota{No se si colocar referencias de las webs de ellos para justificar el contenido}
+
+\subsection{\englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources})}
+
+\englishText{HL7 FHIR} es un estándar para el intercambio de datos en el sector salud, 
+diseñado para facilitar la transferencia electrónica de información clínica de manera ágil y segura. Basado
+en arquitecturas web modernas y APIs de tipo REST, este estándar estructura la información mediante un conjunto
+de componentes modulares denominados recursos y sus respectivas relaciones lógicas. Esto permite que diversos
+sistemas de información sanitaria interactúen e integren sus datos con una alta eficiencia y 
+precisión semántica.
+
+\nota{No se si colocar referencias de las webs de ellos para justificar el contenido}
 
 \section{Marco Conceptual}
 
-El diseño conceptual de este sistema se fundamenta en la transición de un flujo de información puramente secuencial y probabilístico hacia un modelo híbrido de conocimiento guiado. El objetivo principal es mitigar el riesgo inherente de alucinación semántica de los modelos generativos mediante la validación y el enriquecimiento ontológico previo.
+El diseño conceptual de este sistema se fundamenta en la transición de un flujo de 
+información puramente secuencial y probabilístico hacia un modelo híbrido de conocimiento guiado. 
+El objetivo principal es mitigar el riesgo inherente de alucinación de los modelos 
+generativos mediante la validación y el enriquecimiento previo.
+
+\input{imagenes/diagramas/capitulo_marco_teorico/Diagrama App}
 
 \subsection{Flujo Arquitectónico de Datos y Conocimiento}
-Como se ilustra en la Figura \ref{fig:diagrama_conceptual}, el ciclo de vida del dato clínico sigue un pipeline lineal y determinista en sus fases tempranas, transformándose en un proceso de enriquecimiento contextual antes de la intervención del modelo generativo:
+Como se ilustra en la Figura \ref{fig:diagrama_arquitectura_horizontal}, el ciclo de 
+vida del dato clínico sigue un \englishText{pipeline} lineal en sus fases tempranas, 
+transformándose en un proceso de enriquecimiento contextual antes de la intervención
+del modelo generativo:
 
 \begin{enumerate}
-    \item \textbf{Captura e Ingesta (Audio):} La voz del profesional de la salud es transmitida en tiempo real desde la aplicación móvil hacia el backend mediante el protocolo \englishText{WebSocket}.
-    \item \textbf{Transcodificación Acústica (ASR):} El modelo \englishText{Whisper} procesa la señal de audio cruda y genera una transcripción textual textual (\englishText{raw text}), la cual posee un alto riesgo de contener errores de sintaxis médica o ruido conversacional.
-    \item \textbf{Extracción Semántica (PLN/NER):} El texto plano es procesado por un pipeline de PLN especializado, aislando exclusivamente las entidades clínicas de interés (síntomas, diagnósticos, fármacos) y descartando conectores lingüísticos irrelevantes.
-    \item \textbf{Normalización y Envejecimiento Óntico (SNOMED CT / CIE-10-ES):} Las entidades extraídas son mapeadas a códigos únicos de los vocabularios estándar. Este paso actúa como un validador de veracidad clínica; si un concepto no se puede normalizar o validar contra la ontología, se marca para revisión, eliminando la ambigüedad lingüística.
-    \item \textbf{Inyección de Contexto y Síntesis (LLM):} El \englishText{LLM} no recibe la transcripción cruda a ciegas. En su lugar, se le alimenta con un \englishText{prompt} estructurado que contiene: la transcripción original más los metadatos estructurados y verificados de las ontologías. El modelo actúa estrictamente como un formateador avanzado, generando el informe clínico final con alta fidelidad y nulo margen de alucinación.
+    \item \textbf{App móvil:} La aplicacion móvil captura el audio del profesional de la salud y lo envía 
+    mediante el protocolo \englishText{WebSocket} al \englishText{gateway}.
+    \item \textbf{\englishText{Gateway}:} El \englishText{gateway} orquesta las sesiones cliente, 
+    capturando cada fragmento de audio por sesión que mantenga con la aplicación móvil. Luego por cada fragmento recibido 
+    lo envía al modulo de \englishText{ASR} mediante una peticion \englishText{POST HTTP}, guardando la en memoria la
+    transcripción, entidades y datos obtenidos de cada entidad. Finalmente cuando la sesión finaliza, se envia una mediante una peticion
+    \englishText{HTTP POST} al modulo de Generación de Informes Médicos, generando el informe clínico y el \englishText{JSON}
+    de \englishText{FHIR}.
+    \item \textbf{Procesamiento Lingüístico:} Este módulo recibe la peticion del \englishText{gateway} y procesa la
+    transcripción, para extraer las entidades médicas nombradas partiendo de cada fragmento de audio. 
+    
+    \textbf{Modulo de \englishText{ASR}:} Primera etapa del procesamiento, donde se recibe un fragmento de audio y
+    se genera una transcripción utilizando el modelo de \englishText{ASR}.
+        
+    \textbf{Modulo de \englishText{PLN}:} Segunda etapa del procesamiento, donde se procesa la transcripción y se
+    extraen las entidades medicas utilizando modelos \englishText{NER} especializados en terminología médica
+    en español.
+    
+    \item \textbf{Normalización Clínica (\englishText{SNOMED CT} / \englishText{CIE-10-ES}):} 
+    Las entidades extraídas son mapeadas a códigos únicos de los vocabularios estándar y se extre informacion medica relevante,
+    para su posterior uso en el modelo generativo.
+    
+    \textbf{Modulo de \englishText{SNOMED CT}:} Tercera etapa del procesamiento, donde se hace la consulta
+    a la base de datos de \englishText{SNOMED CT} para obtener la información relevante de la entidad junto
+    a un identificador único.
+    
+    \textbf{Modulo de \englishText{CIE-10-ES}:} Ultima etapa del \englishText{pipeline} de procesamiento, donde
+    se \englishText{mappean} los códigos unicos de \englishText{SNOMED CT} a códigos unicos de \englishText{CIE-10-ES} para obtener
+    un identificador único que represente el concepto médico a nivel nacional administrativo.
+    junto a un identificador único.
+     
+    \item \textbf{Generación de Informes Médicos:} Este módulo recibe la peticion del \englishText{gateway} junto a
+    los datos extraidos en las etapas anteriores y genera dos artefactos: 
+    
+    \textbf{Informe médico enriquecido:} Este artefacto a generar es un informe clínico enriquecido
+    con la información extraida de las entidades medicas y la transcripción del audio médico. 
+    Este informe es redactado por un \englishText{LLM} y es uno de los resultados finales de la sesión.
+
+    \textbf{JSON de \englishText{FHIR}:}
+    Este artefacto a generar es un \englishText{JSON} que cumple con el estandar \englishText{FHIR} que representa el informe clínico en formato
+    estandarizado. Este \englishText{JSON} es generado por la aplicación backend y es uno de los resultados finales de la sesión.
+    del informe clínico.
 \end{enumerate}
 
 % NOTA: Recuerda definir este label en tu entorno de figura TikZ, Mermaid o Gráfico externo
 % \label{fig:diagrama_conceptual}
 
-\subsection{Definición de Informe Enriquecido}
-Dentro del marco de esta investigación, se define formalmente un \textbf{Informe Enriquecido} como el artefacto clínico textual resultante que supera cualitativa y cuantitativamente a una transcripción médica estándar. Mientras que una transcripción tradicional es un reflejo literal (y potencialmente erróneo) del discurso hablado, el \textit{Informe Enriquecido} se caracteriza por poseer las siguientes propiedades operacionales:
+% \subsection{Proceso de Generación del Informe Resultante}
+% Al finalizar la sesión clínica, el módulo de generación de informes consolida los resultados
+% acumulados de cada fragmento de audio en un \textbf{reporte de control} intermedio
+% (\texttt{Reporte.txt}). Este artefacto no es el informe entregable al profesional, sino el
+% documento estructurado que sintetiza, por cada llamada al \englishText{pipeline}, cuatro capas
+% de información complementarias:
+
+% \begin{enumerate}
+%     \item \textbf{Transcripción (\englishText{ASR}):} Texto literal reconocido en el fragmento de audio.
+%     \item \textbf{Entidades clínicas (\englishText{NER}):} Términos médicos detectados, con su etiqueta
+%     semántica, el modelo \englishText{PLN} de origen, el nivel de confianza y su posición en el texto.
+%     \item \textbf{Normalización \englishText{SNOMED CT}:} Para cada entidad, el \textit{conceptId},
+%     el término preferido, la \englishText{FSN} y el estado de activación del concepto recuperado
+%     desde Snowstorm.
+%     \item \textbf{Correspondencia \englishText{CIE-10-ES}:} Cuando está habilitada, los códigos
+%     administrativos obtenidos mediante \englishText{ConceptMap} a partir de los identificadores
+%     \englishText{SNOMED CT}.
+% \end{enumerate}
+
+% La generación del informe médico definitivo (\texttt{Informe.txt}) no opera sobre la transcripción
+% aislada. El modelo generativo (\englishText{LLM}, desplegado vía Ollama) recibe dos insumos
+% coordinados: un \textbf{prompt de sistema estricto}, configurado con reglas de seguridad clínica
+% (prohibición de inventar datos, filtrado de mapeos \englishText{SNOMED CT} incoherentes, tono
+% formal y estructura fija del documento), y el reporte de control completo como mensaje de usuario.
+% De este modo, el \englishText{LLM} dispone simultáneamente del discurso original y del
+% conocimiento clínico previamente extraído, validado y codificado, lo que reduce la dependencia
+% exclusiva del texto hablado y mitiga el riesgo de alucinación semántica.
+
+\subsection{Definición de Informe Resultante}
+Dentro del marco de esta investigación, se define formalmente un \textbf{Informe Resultante}
+como el artefacto clínico textual generado por el \englishText{LLM} a partir del reporte de
+control enriquecido, que supera cualitativa y cuantitativamente a una transcripción médica
+estándar. Mientras que una transcripción tradicional es un reflejo literal (y potencialmente
+erróneo) del discurso hablado, el \textit{Informe Resultante} se caracteriza por poseer las
+siguientes propiedades operacionales:
 
 \begin{itemize}
-    \item \textbf{Estructuración Formal:} La información se organiza bajo estándares clínicos reconocidos (por ejemplo, el formato SOAP: Subjetivo, Objetivo, Análisis, Plan).
-    \item \textbf{Metadatos Semánticos Incrustados:} Cada diagnóstico, síntoma o procedimiento clave del texto está indexado inequívocamente a sus correspondientes códigos \englishText{SNOMED CT} y \englishText{CIE-10-ES}.
-    \item \textbf{Densidad Informativa Optimizada:} Se elimina el lenguaje coloquial, las vacilaciones del habla y las redundancias, manteniendo una alta rigurosidad técnica y precisión diagnóstica.
+    \item \textbf{Estructuración Formal:} La información se reorganiza bajo una plantilla clínica
+    fija (motivo de consulta, plan diagnóstico y terapéutico, impresión diagnóstica), definida
+    explícitamente en el prompt de sistema.
+    \item \textbf{Metadatos Semánticos Incrustados:} El informe incorpora un anexo de codificación
+    clínica donde cada entidad válida queda indexada a su \textit{conceptId} y término preferido
+    de \englishText{SNOMED CT}, apoyándose en los datos ya resueltos por el \englishText{pipeline}
+    y no en una reinterpretación libre del modelo.
+    \item \textbf{Densidad Informativa Optimizada:} Se elimina el lenguaje coloquial, las vacilaciones
+    del habla y las redundancias, manteniendo una alta rigurosidad técnica y precisión diagnóstica,
+    sin añadir contenido clínico ausente en la transcripción ni en las entidades normalizadas.
 \end{itemize}
+
+Este reporte de control enriquecido es un artefacto intermedio que se utiliza para generar el informe resultante.
+El cual se genera apartir de los datos obtenidos de las entidades medicas y la transcripción del audio médico y se
+guarda en memoria para su posterior uso en el modelo generativo.
