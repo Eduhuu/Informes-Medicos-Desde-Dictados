@@ -1,0 +1,171 @@
+\begin{landscape}
+\begin{figure}[htbp]
+    \centering
+    \shorthandoff{<>}
+    \resizebox{\linewidth}{!}{%
+    \begin{tikzpicture}[
+        font=\sffamily,
+        >=Stealth,
+        box/.style={
+            draw,
+            rectangle,
+            fill=blue!8,
+            draw=blue!60!black,
+            line width=0.8pt,
+            minimum width=2cm,
+            minimum height=0.95cm,
+            align=center,
+            rounded corners=3pt,
+            font=\scriptsize\bfseries
+        },
+        lifeline/.style={draw, dashed, color=gray!70, line width=0.6pt},
+        msg/.style={font=\tiny, midway, align=center, fill=white, inner sep=1pt},
+        note/.style={font=\tiny, align=left, fill=white, inner sep=1pt},
+        call/.style={-{Stealth[length=2mm]}, line width=0.7pt, color=black!80},
+        resp/.style={{Stealth[length=2mm]}-, dashed, line width=0.7pt, color=black!70}
+    ]
+
+        % --- Participantes ---
+        \node[box] (M) at (0,0) {App móvil\\\mdseries (M)};
+        \node[box] (G) at (2.3,0) {Gateway\\\mdseries (G :8000)};
+        \node[box] (A) at (4.8,0) {ASR Service\\\mdseries (A :8001)};
+        \node[box] (W) at (7.2,0) {Whisper\\\mdseries (W)};
+        \node[box] (P) at (9.3,0) {PLN/NER\\\mdseries (P)};
+        \node[box] (S) at (11.4,0) {SNOMED\\\mdseries + CIE-10 (S)};
+        \node[box] (L) at (13.5,0) {LLM\\\mdseries (Ollama) (L)};
+        \node[box] (F) at (15.6,0) {FHIR Gen\\\mdseries (F)};
+
+        % --- Líneas de vida ---
+        \pgfmathsetmacro{\lifelineDepth}{-18.8}
+        \foreach \n in {M,G,A,W,P,S,L,F} {
+            \draw[lifeline] (\n.south) -- (\n.center |- 0,\lifelineDepth);
+        }
+        \node[box, font=\tiny\bfseries] (M bot) at (M.center |- 0,\lifelineDepth) {App móvil};
+        \node[box, font=\tiny\bfseries] (G bot) at (G.center |- 0,\lifelineDepth) {Gateway};
+        \node[box, font=\tiny\bfseries] (A bot) at (A.center |- 0,\lifelineDepth) {ASR Service};
+        \node[box, font=\tiny\bfseries] (W bot) at (W.center |- 0,\lifelineDepth) {Whisper};
+        \node[box, font=\tiny\bfseries] (P bot) at (P.center |- 0,\lifelineDepth) {PLN/NER};
+        \node[box, font=\tiny\bfseries] (S bot) at (S.center |- 0,\lifelineDepth) {SNOMED};
+        \node[box, font=\tiny\bfseries] (L bot) at (L.center |- 0,\lifelineDepth) {LLM};
+        \node[box, font=\tiny\bfseries] (F bot) at (F.center |- 0,\lifelineDepth) {FHIR Gen};
+
+        % --- Conexión inicial ---
+        \draw[call] ($(M.south)+(0,-0.35)$) -- ($(G.south)+(0,-0.35)$)
+            node[msg, above] {WSS connect /audio};
+
+        % --- Bucle por fragmento ---
+        \coordinate (loopNW) at (-0.5,-0.75);
+        \coordinate (loopSE) at (16.2,-9.1);
+
+        \draw[call] ($(M.south)+(0,-1.0)$) -- ($(G.south)+(0,-1.0)$)
+            node[msg] {JSON metadata (audio\_chunk)};
+        \draw[call] ($(M.south)+(0,-1.55)$) -- ($(G.south)+(0,-1.55)$)
+            node[msg] {Binario PCM (audio)};
+
+        \draw[call] ($(G.south)+(0,-2.1)$) -- ($(A.south)+(0,-2.1)$)
+            node[msg] {POST /transcribe\\(octet-stream + headers)};
+        \draw[call] ($(A.south)+(0,-2.65)$) -- ($(W.south)+(0,-2.65)$)
+            node[msg] {Transcripción};
+        \draw[resp] ($(W.south)+(0,-3.15)$) -- ($(A.south)+(0,-3.15)$)
+            node[msg] {Texto};
+
+        \draw[call] ($(A.south)+(0,-3.65)$) -- ($(P.south)+(0,-3.65)$)
+            node[msg] {NER (pln\_medical + pln\_farmacos)};
+        \draw[resp] ($(P.south)+(0,-4.15)$) -- ($(A.south)+(0,-4.15)$)
+            node[msg] {Entidades};
+
+        \draw[call] ($(A.south)+(0,-4.65)$) -- ($(S.south)+(0,-4.65)$)
+            node[msg] {Enriquecimiento SNOMED + CIE-10};
+        \draw[resp] ($(S.south)+(0,-5.15)$) -- ($(A.south)+(0,-5.15)$)
+            node[msg] {Entidades enriquecidas};
+
+        \draw[call]
+            ($(A.south)+(0,-5.55)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(A.south)+(0,-5.9)$)
+            node[note, right, xshift=0.15cm] {Buffer en memoria\\(SessionReportWriter)};
+
+        \draw[resp] ($(G.south)+(0,-6.45)$) -- ($(A.south)+(0,-6.45)$)
+            node[msg] {JSON (text, entities, ...)};
+
+        \draw[call]
+            ($(G.south)+(0,-6.85)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(G.south)+(0,-7.2)$)
+            node[note, right, xshift=0.15cm] {Acumula entities en\\sessionEntitiesStore};
+
+        \draw[resp] ($(M.south)+(0,-7.75)$) -- ($(G.south)+(0,-7.75)$)
+            node[msg] {WS transcription (por fragmento)};
+
+        \begin{scope}[on background layer]
+            \node[
+                draw=orange!80!black,
+                fill=orange!8,
+                fill opacity=0.25,
+                rectangle,
+                rounded corners=3pt,
+                fit={(loopNW) (loopSE)},
+                inner sep=6pt
+            ] (loopBox) {};
+            \node[
+                fill=orange!20,
+                draw=orange!80!black,
+                font=\tiny\bfseries,
+                text=orange!60!black,
+                rounded corners=2pt,
+                anchor=north west,
+                inner sep=2pt
+            ] at (loopBox.north west) {LOOP: Por cada fragmento de voz};
+        \end{scope}
+
+        % --- Cierre de sesión ---
+        \draw[call] ($(M.south)+(0,-8.55)$) -- ($(G.south)+(0,-8.55)$)
+            node[msg] {JSON session\_end};
+
+        \draw[call]
+            ($(G.south)+(0,-8.95)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(G.south)+(0,-9.3)$)
+            node[note, right, xshift=0.15cm] {Espera transcripciones\\pendientes};
+
+        \draw[call] ($(G.south)+(0,-9.8)$) -- ($(A.south)+(0,-9.8)$)
+            node[msg] {POST /finalize-session/[id]};
+
+        \draw[call]
+            ($(A.south)+(0,-10.2)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(A.south)+(0,-10.55)$)
+            node[note, right, xshift=0.15cm] {Escribe Reporte.txt\\en disco};
+
+        \draw[resp] ($(M.south)+(0,-11.05)$) -- ($(G.south)+(0,-11.05)$)
+            node[msg] {WS session\_end};
+
+        % --- Informe LLM ---
+        \draw[call] ($(G.south)+(0,-11.55)$) -- ($(A.south)+(0,-11.55)$)
+            node[msg] {POST /generate-report/[id]};
+        \draw[call] ($(A.south)+(0,-12.05)$) -- ($(L.south)+(0,-12.05)$)
+            node[msg] {Lee Reporte.txt, genera informe};
+        \draw[resp] ($(L.south)+(0,-12.55)$) -- ($(A.south)+(0,-12.55)$)
+            node[msg] {Informe.txt};
+
+        \draw[resp] ($(G.south)+(0,-13.05)$) -- ($(A.south)+(0,-13.05)$)
+            node[msg] {JSON report};
+        \draw[resp] ($(M.south)+(0,-13.55)$) -- ($(G.south)+(0,-13.55)$)
+            node[msg] {WS llm\_report};
+
+        % --- Informe FHIR ---
+        \draw[call] ($(G.south)+(0,-14.05)$) -- ($(A.south)+(0,-14.05)$)
+            node[msg] {POST /generate-fhir-report/[id] + entities};
+        \draw[call] ($(A.south)+(0,-14.55)$) -- ($(F.south)+(0,-14.55)$)
+            node[msg] {Construye Bundle FHIR};
+        \draw[resp] ($(F.south)+(0,-15.05)$) -- ($(A.south)+(0,-15.05)$)
+            node[msg] {Fhir\_Reporte.json};
+
+        \draw[resp] ($(G.south)+(0,-15.55)$) -- ($(A.south)+(0,-15.55)$)
+            node[msg] {JSON fhir\_report};
+        \draw[resp] ($(M.south)+(0,-16.05)$) -- ($(G.south)+(0,-16.05)$)
+            node[msg] {WS fhir\_report};
+
+        \draw[call]
+            ($(G.south)+(0,-16.45)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(G.south)+(0,-16.8)$)
+            node[note, right, xshift=0.15cm] {Limpia entities\\en memoria};
+
+    \end{tikzpicture}%
+    }
+    \shorthandon{<>}
+    \caption{Diagrama de secuencia del flujo de procesamiento de voz, \englishText{PLN}, \englishText{LLM} y \englishText{FHIR}.}
+    \label{fig:diagrama_conceptual}
+\end{figure}
+\end{landscape}

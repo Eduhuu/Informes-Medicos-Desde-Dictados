@@ -12,7 +12,7 @@
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta, shapes.symbols, babel}
+\usetikzlibrary{arrows.meta, shapes.symbols, babel, positioning, calc, backgrounds, fit}
 \usepackage{afterpage}
 \usepackage{longtable}
 \usepackage{colortbl,longtable}
@@ -58,9 +58,14 @@
 \makeatother
 
 \usepackage[pdfborder={000}]{hyperref}
+
+% Color principal del documento (citas, enlaces y \colorPrincipal{...})
+\definecolor{colorPrincipal}{named}{blue}
+
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,
+    linkcolor=colorPrincipal,
+    citecolor=colorPrincipal,
 }
 
 \hypersetup{
@@ -82,7 +87,23 @@ pdfkeywords = {\palabrasClave}
 
 \newcommand{\boldparagraph}[2]{\textbf{#1}: #2}
 \newcommand{\englishText}[1]{\textit{#1}}
-\newcommand{\citeText}[1]{~\cite{#1}}	
+\newcommand{\citeText}[1]{~\cite{#1}}
+\newcommand{\colorPrincipal}[1]{\textcolor{colorPrincipal}{#1}}
+
+\definecolor{notaBackground}{RGB}{245, 248, 255}
+\newcommand{\nota}[2][]{%
+  \par\medskip\noindent
+  \fcolorbox{colorPrincipal}{notaBackground}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule}
+      \small
+      \ifthenelse{\isempty{#1}}%
+        {\textbf{Nota:}~}%
+        {\textbf{#1:}~}%
+      #2
+    \end{minipage}%
+  }%
+  \par\medskip
+}
 
 
 \pagestyle{fancy}
