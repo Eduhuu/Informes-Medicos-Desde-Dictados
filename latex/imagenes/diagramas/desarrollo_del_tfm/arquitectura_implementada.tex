@@ -1,0 +1,124 @@
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        font=\sffamily\small,
+        >=stealth, 
+        node distance=1.2cm and 0.8cm,
+        % Estilos de los bloques
+        layer/.style={draw=gray!40, dashed, fill=gray!2, rectangle, rounded corners, inner sep=12pt},
+        box/.style={draw=blue!70!black, fill=blue!5, rectangle, rounded corners, minimum width=6.5cm, minimum height=1cm, align=center, line width=0.8pt},
+        innerbox/.style={draw=teal!70!black, fill=teal!5, rectangle, rounded corners, minimum width=5.8cm, minimum height=0.7cm, align=center},
+        dockerbox/.style={draw=orange!80!black, fill=orange!5, rectangle, rounded corners, minimum width=3.4cm, minimum height=1.1cm, align=center, line width=0.8pt},
+        artifactbox/.style={draw=green!60!black, fill=green!5, rectangle, rounded corners, minimum width=3.6cm, minimum height=1.1cm, align=center, line width=0.8pt},
+        % Estilos de las líneas
+        flow/.style={->, line width=0.9pt, draw=black!80},
+        biFlow/.style={<->, line width=0.9pt, draw=black!80},
+        lbl/.style={font=\sffamily\scriptsize, align=center}
+    ]
+    
+        % ==========================================
+        % CAPA CLIENTE (ARRIBA)
+        % ==========================================
+        \node[box] (cliente) {
+            \textbf{Capa Cliente (App Móvil - React Native / Expo)} \\ 
+            \texttt{PcmAudioCaptureService} $\rightarrow$ \texttt{VoiceActivityDetector}
+        };
+    
+        % ==========================================
+        % CAPA DE ACCESO / GATEWAY (CENTRO-SUPERIOR)
+        % ==========================================
+        \node[box, below=1.5cm of cliente] (gateway) {
+            \textbf{Capa de Acceso (Gateway Node.js)} \\ 
+            \texttt{audioWebSocketHandler.js} / \texttt{sessionEntitiesStore.js}
+        };
+    
+        % ==========================================
+        % CAPA DE PROCESAMIENTO / FASTAPI (CENTRO)
+        % ==========================================
+        \node[box, below=1.5cm of gateway, fill=teal!10] (fastapi) {
+            \textbf{Capa de Procesamiento (Servicio ASR / PLN)} \\
+            FastAPI --- \texttt{app/main.py}
+        };
+        
+        % Sub-componentes secuenciales del Pipeline
+        \node[innerbox, below=0.4cm of fastapi] (whisper) {\textbf{1. Módulo ASR} (\texttt{FastWhisperProvider})};
+        \node[innerbox, below=0.3cm of whisper] (ner) {\textbf{2. Módulo PLN / NER} (\texttt{PlnOrchestrator})};
+        \node[innerbox, below=0.3cm of ner] (snomed_cli) {\textbf{3. Módulo SNOMED} (\texttt{SnowstormClient})};
+        \node[innerbox, below=0.3cm of snomed_cli] (cie10_cli) {\textbf{4. Módulo CIE-10-ES} (\texttt{FhirConceptMapClient})};
+        \node[innerbox, below=0.3cm of cie10_cli] (control) {\textbf{5. Control y Buffer} (\texttt{SessionReportWriter})};
+        % \node[innerbox, below=0.3cm of control] (llm_cli) {\textbf{6. Módulo LLM} (\texttt{LlmReportGenerator})};
+        % \node[innerbox, below=0.3cm of llm_cli] (fhir_cli) {\textbf{7. Módulo FHIR} (\texttt{FhirReportGenerator})};
+    
+        % Contenedor de la Capa FastAPI
+        \begin{scope}[on background layer]
+            \node[layer, fit=(fastapi) (whisper) (control), inner sep=10pt] (fastapi_group) {};
+        \end{scope}
+    
+        
+        \node[dockerbox, below left=1.0cm of control] (snowstorm) {
+            \textbf{Docker SNOMED} \\ Puerto 8080 \\ Snowstorm REST
+        };
+    
+        % Lado Derecho: Almacenamiento / Salidas
+        \node[artifactbox, below right=1.0cm of control] (reports) {
+            \textbf{Artefactos Generados} \\ 
+            % \texttt{/reports/<session\_id>/} \\
+            $\bullet$ \texttt{Reporte.txt} \\ 
+            $\bullet$ \texttt{Informe.txt} \\ 
+            $\bullet$ \texttt{Fhir\_Reporte.json}
+        };
+
+        \node[dockerbox, above=0.9cm of reports] (ollama) {
+            \textbf{Módulo Servicio LLM} \\ Puerto 11434 \\ \texttt{llama3.1:8b}
+        };
+
+        \node[dockerbox, above=0.9cm of ollama] (fhir) {
+            \textbf{Módulo Servicio FHIR} \\ Puerto 8001 \\ FastAPI
+        };
+    
+        % ==========================================
+        % CONEXIONES Y FLUJOS
+        % ==========================================
+        
+        % Cliente <-> Gateway
+        \draw[biFlow] (cliente) -- node[lbl, right] {
+            \textbf{WebSocket (wss://)} \\ 
+            Audio PCM (16kHz, 16-bit, mono) \\ 
+            Metadata JSON + Evento \texttt{session\_end}
+        } (gateway);
+        
+        % Gateway <-> FastAPI
+        \draw[biFlow] (gateway) -- node[lbl, right] {
+            \textbf{HTTP REST / JSON} \\ 
+            \texttt{POST /transcribe} (Por fragmento) \\ 
+            \texttt{POST /finalize-session/\{id\}} (Cierre)
+        } (fastapi);
+    
+        % Conexiones internas del pipeline interno
+        \draw[flow] (fastapi) -- (whisper);
+        \draw[flow] (whisper) -- (ner);
+        \draw[flow] (ner) -- (snomed_cli);
+        \draw[flow] (snomed_cli) -- (cie10_cli);
+        \draw[flow] (cie10_cli) -- (control);
+        % \draw[flow] (control) -- (llm_cli);
+        % \draw[flow] (llm_cli) -- (fhir_cli);
+    
+        \draw[flow] (control.west) -- ++(-1.4,0) |- node[lbl, yshift=-2cm, xshift=-1.5cm] {Por cada fragmento se\\  guarda la información \\  en memoria} (gateway.west) ;
+
+        \draw[biFlow] (snomed_cli.west) -- ++(-2.55,0) |- node[lbl, yshift=2cm, xshift=-1cm] {
+            Consulta \\ SNOMED CT
+        } (snowstorm.north) ;
+
+
+        % % Guardado/Persistencia desde el bloque de control e hilos de cierre hacia disco externo
+        % \draw[flow] (fhir_cli.east) -- ++(1.4,0) |- node[lbl, yshift=1.2cm, xshift=-1.0cm] {Volcado y \\ persistencia} (reports.west);
+        \draw[flow] (gateway.east) -- ++(1.5,0) |- node[lbl, yshift=1cm, xshift=2.0cm] {
+            Invocación al finalizar sesión \\ \texttt{/generate-report} y \\ \texttt{/generate-fhir-report}
+        } (fhir.north);
+
+        \draw[flow] (fhir.south) -- (ollama.north);
+        \draw[flow] (ollama.south) -- (reports.north);
+    
+    \end{tikzpicture}
+    \caption{Diagrama vertical de la arquitectura y flujo del sistema desde el dispositivo móvil hasta los repositorios de datos locales.}\label{fig:arquitectura_sistema_vertical}
+    \end{figure}

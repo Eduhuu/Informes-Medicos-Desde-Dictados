@@ -1,31 +1,43 @@
-\chapter{Ejemplo de anexo: Planificación y gestión del proyecto (opcional)}
+\chapter{Planificación y gestión del proyecto}\label{appendix:gestion}
 
-El Apéndice \thechapter\  puede incluirse como recomendación si se ha realizado un proyecto de tipo práctico práctico de desarrollo del software.
+Este apéndice documenta la metodología de trabajo, las herramientas empleadas y la planificación
+temporal del desarrollo del sistema descrito en el Capítulo~\ref{chapter:desarrollo}.
 
-De forma general se puede incluir la especificación requerimientos del proyecto, la información sobre stakeholders del proyecto, la justificación (interés, oportunidad, coste/beneficio…), etc.
+\section{Metodología y ciclo de vida}\label{section:gestion_metodologia}
 
-En cuanto a la planificación: se indicarán las diferentes tareas a desarrollar durante el proyecto ordenadas cronológicamente.
+El proyecto siguió un enfoque ágil inspirado en \englishText{Scrum}, organizando el trabajo en siete
+iteraciones funcionales alineadas con las etapas del \englishText{pipeline} de procesamiento clínico
+(Tabla~\ref{tab:iteraciones_pipeline} del Capítulo~\ref{chapter:desarrollo}). Cada iteración
+produjo un incremento verificable antes de abordar la siguiente etapa, reduciendo el riesgo de
+integración y permitiendo ajustar la arquitectura de forma incremental.
 
-En cuanto a la descripción: breve definición de las tareas indicando su relación con los requisitos del proyecto, método de trabajo, tecnologías a utilizar para desarrollar cada tarea, posibles obstáculos y riesgos.
+\section{Herramientas y plataformas}\label{section:gestion_herramientas}
 
-En cuanto a la validación: qué método se utilizará para validar el proyecto (si se trata de desarrollo de software, indicando métricas referidas a "code coverage", etc., pruebas unitarias, etc.).
+\begin{itemize}
+    \item \textbf{Desarrollo:} Visual Studio Code / Cursor, Git.
+    \item \textbf{Cliente móvil:} React Native, Expo, \texttt{expo-audio}.
+    \item \textbf{\englishText{Gateway}:} Node.js, Express, \texttt{ws}.
+    \item \textbf{Servicio \englishText{ASR}:} Python~3, FastAPI, Uvicorn, \englishText{faster-whisper},
+    \englishText{Hugging Face Transformers}.
+    \item \textbf{Terminología:} Docker Compose, Elasticsearch, Snowstorm.
+    \item \textbf{Generación:} Ollama (\texttt{llama3.1:8b}).
+    \item \textbf{Documentación:} \LaTeX, TikZ.
+\end{itemize}
 
-En cuanto al estudio de costes y sostenibilidad: se indicarán las horas de programador necesarias para llevarlo a cabo, gasto en recursos, bibliografía, tiempos de conexión, etc. 
+\section{Planificación. Diagrama de Gantt}\label{section:gestion_gantt}
 
-En cuanto a la temporización, lo suyo es un Diagrama de Gantt donde quede claro el tiempo invertido en la realización de cada una de las tareas y su secuenciación/entrelazamiento a los largo de los meses de relización del proyecto.
+La Tabla~\ref{tab:gantt_pipeline} presenta la secuenciación temporal de las iteraciones de
+desarrollo. Las duraciones son orientativas y reflejan el orden de dependencias entre etapas:
+cada iteración requiere la estabilización de la anterior.
 
-Finalmente se acabará justificando la sostenibilidad de los productos software generados en cuanto a costes de prueba y mantenimiento del software.
+\input{tablas/anexo1/diagrama_gantt.tex}
 
-Una posible estructuración  de la gestión y planificación del proyecto podría ser en las siguientes subsecciones:
+\section{Sostenibilidad y mantenimiento}\label{section:gestion_sostenibilidad}
 
-\section{Metodología/Ciclo de vida} 
 
-\section{Herramientas y plataformas utilizadas para el desarrollo del proyecto}
-
-\section{Costes del proyecto}
-
-\section{Gestión del proyecto. Planificación temporal. Diagrama de Gantt}
-
-\section{Texto añadido}
-
-\lipsum[1-15]
+La arquitectura modular basada en el patron de diseño \englishText{Factory} y configuración externa (\texttt{config.yaml}) facilita
+el mantenimiento evolutivo: la sustitución de modelos \englishText{ASR}, \englishText{PLN} o
+\englishText{LLM} no requiere reescribir la capa de orquestación. Los costes de despliegue se
+limitan al hardware local (CPU/GPU para inferencia, almacenamiento para Snowstorm) y al tiempo de
+configuración de los servicios Docker y Ollama, sin dependencia de APIs de pago por uso para el
+procesamiento de datos clínicos.

@@ -1,36 +1,378 @@
 \chapter{Desarrollo del TFM}\label{chapter:desarrollo}
 
-En esta parte describir el trabajo desarrollado, y utilizar las secciones que creas conveniente para explicarlo.
+En este capítulo se describe la materialización del diseño conceptual presentado en el
+Capítulo~\ref{chapter:marco_teorico_y_referencial}. Se expone la metodología de desarrollo adoptada,
+la arquitectura del sistema, así como los flujos de implementación que transforman un dictado médico
+en un informe clínico enriquecido y su representación \englishText{JSON FHIR}.
 
-\section{Metodología}
-Se habla un poco de las metodologias de software y que existen las agiles
-\subsection{Metodología desarrollo}
-Se comenta de la metodologia agil que se utilizo, y como se utilizo para desarrollar el sistema.
+\section{Metodología de desarrollo}\label{section:metodologia_desarrollo}
 
-\section{Arquitectura}
-Hableare de la arquitectura del sistema, como estan organizados y que componentes se disenaron tanto para: aplicacion movil, 
-websocket, backend, gateway, docker de snomed, docker de ollama. 
-\subsection{Arquitectura para la seguridad}
-Como utilizando la arquitectura se garantiza la privacidad y la seguridad de los datos.
-\subsection{Arquitectura del sistema}\
-    Descripcion de cada uno de los elementos y como interactuan entre si. Se puede ver como "cajas" cuales son los inputs que recibe, 
-    el procesamiento que realiza y responsabilidades que tienen y los outputs que genera. 
-    Usar un UML general para explicar mas facil (investigar cual queda mejor para este caso)
-    \subsection{Aplicacion Movil}
-    \subsection{Web Socket}
-    \subsection{Gateway}
-    \subsection{Backend}
-        \subsection{ASR Service}
-        \subsection{PLN Service}
-        \subsection{SNOMED Service}
-        \subsection{CIE-10-ES Service}
-        \subsection{Reporte de control enriquecido}
-        \subsection{LLM Service}
-        \subsection{FHIR Service}
-        
-        
-\section{Implementación}
-Como se implemento. No se si es necesario colocar como se implemento exactamente (nombre de clases, funciones, llamados, api, etc)
-Lo que tengo pensado es hacer diagramas de secuencia, para cada uno de estos elementos: Aplicacion movil, gateway, backend (ASR Service, PLN Service, LLM Service, SNOMED Service CIE-10-ES).
+El desarrollo de sistemas de información sanitarios puede abordarse mediante enfoques ágiles
+que priorizan la entrega incremental, la adaptación al cambio y la validación temprana. 
+Dado el carácter exploratorio y evolutivo de este trabajo fin de máster, se adoptó un enfoque
+ágil inspirado en \englishText{Scrum}, organizando el trabajo en incrementos funcionales
+verificables alineados con las etapas del \englishText{pipeline} de procesamiento.
+
+\subsection{Enfoque ágil e iteraciones del \englishText{pipeline}}\label{subsection:iteraciones_pipeline}
+
+Cada iteración del proyecto produjo un entregable comprobable que extendía las capacidades del
+sistema anterior, permitiendo detectar errores de integración de forma temprana y ajustar la
+arquitectura sin bloquear el avance global. La Tabla~\ref{tab:iteraciones_pipeline} resume las
+siete iteraciones principales y su correspondencia con los componentes implementados.
+
+\input{tablas/capitulo_desarrollo_del_tfm/tabla_iteraciones_metodologia_pipeline.tex}
+
+Los principios ágiles quedan reflejados en decisiones de ingeniería concretas:
+
+\boldparagraph{Modularidad y extensibilidad}{
+    se utilizo el patron de diseño \englishText{Factory} y \englishText{Strategy} para la selección y
+    creacion de los componentes del sistema por cada etapa, lo que permite: la abstraccion de la creacion
+    de cada elemento y la sustitucion de los mismos sin alterar el contrato de la API y el flujo de ejecucion.
+}
+
+\boldparagraph{Validación continua}{
+    por cada iteración se verifico el funcionamiento de cada componente del sistema mediante la creación
+    de endpoints de prueba que permiten verificar cada etapa de forma independiente, los cuales se utiliza
+    para la evaluación cuantitativa del Capítulo~\ref{chapter:evaluacion}.
+}
+
+\subsection{Herramientas y artefactos de gestión}\label{subsection:herramientas_gestion}
+
+El desarrollo se apoyó en un conjunto de tecnologías y herramientas:
+
+\begin{itemize}
+    \item \textbf{Cliente móvil:} React Native~0.83 y Expo~55 (\texttt{generacion-informes/}).
+    \item \textbf{\englishText{Gateway}:} Node.js, Express~5 y la librería \texttt{ws}
+    (\texttt{backend/gateway/}).
+    \item \textbf{Servicio de procesamiento:} Python, FastAPI y Uvicorn
+    (\texttt{backend/asr-service/}).
+    \item \textbf{Modelos de IA locales:} \englishText{faster-whisper}, \englishText{Hugging Face
+    Transformers} y Ollama (\texttt{llama3.1:8b}).
+    \item \textbf{Terminología clínica:} Snowstorm desplegado con Docker Compose
+    (\texttt{snomed/docker-compose.yml}).
+    \item \textbf{Control de versiones:} Git.
+\end{itemize}
+
+La planificación temporal del proyecto, incluyendo el diagrama de Gantt con la secuenciación de las
+iteraciones anteriores, se detalla en el Apéndice~\ref{appendix:gestion}.
+
+\section{Arquitectura del sistema}\label{section:arquitectura_sistema}
+
+\subsection{Vista general y despliegue}\label{subsection:vista_general}
+
+La arquitectura implementada sigue un modelo cliente--\englishText{gateway}--servicio en tres capas
+desacopladas, como se resume en la Tabla~\ref{tab:componentes_sistema}.
+
+% \input{tablas/capitulo_desarrollo_del_tfm/componentes_sistema_despliegue.tex}
+\input{imagenes/diagramas/desarrollo_del_tfm/arquitectura_implementada.tex}
+
+\boldparagraph{Capa cliente}{
+    la aplicación móvil captura audio en formato PCM a 16\,kHz, mono y 16\,bits, lo segmenta
+    mediante detección de actividad de voz (\englishText{Voice Activity Detection}, VAD) y lo
+    transmite al \englishText{gateway} mediante \englishText{WebSocket}.
+}
+
+\boldparagraph{Capa de acceso}{
+    el \englishText{gateway} actúa como intermediario de protocolo: traduce los mensajes
+    \englishText{WebSocket} del cliente en peticiones HTTP al servicio \englishText{ASR}, acumula
+    el texto transcrito junto a las entidades clínicas de la sesión y la informacion populada 
+    por el servicio de normalizacion terminologica y traduccion de codigos \englishText{SNOMED CT} y \englishText{CIE-10-ES},
+    y dispara la generación de informes al finalizar el dictado.
+}
+
+\boldparagraph{Capa de procesamiento}{
+    el servicio \englishText{ASR} concentra los módulos lógicos de transcripción, \englishText{PLN},
+    normalización terminológica, reporte de control, generación \englishText{LLM} y salida
+    \englishText{FHIR}. A diferencia del marco conceptual del Capítulo~\ref{chapter:marco_teorico_y_referencial},
+    estos módulos constituyen componentes internos de un único proceso FastAPI y no microservicios
+    desplegables de forma independiente. Aunque no se implementaron como microservicios, se considero
+    la posibilidad de hacerlo en una futura version del sistema.
+}
+
+Esta implementación, \textbf{no almacena transcripciones completas} en memoria únicamente
+acumula las entidades clínicas enriquecidas (\texttt{sessionEntitiesStore.js}). 
+La transcripción y el reporte de control se almacenan temporalmente en el
+\englishText{Gateway} mediante \texttt{SessionReportWriter}, para luego ser enviado
+al servico de Generación de Informes Médicos. 
+De igual manera, este reporte de control se puede almacener de como un fichero \texttt{Reporte.txt}
+al finalizar la sesión para poder depurar errores en caso de ser necesario.
+
+
+\subsection{Arquitectura de seguridad y privacidad}\label{subsection:seguridad_privacidad}
+
+La protección de datos clínicos constituye un requisito transversal del sistema, alineado con el
+marco normativo español (RGPD y LOPDGDD) y con el principio de privacidad por diseño descrito en la
+Introducción. La Tabla~\ref{tab:medidas_seguridad} muestra las medidas previstas en el diseño.
+
+\vspace{1cm}
+
+\input{tablas/capitulo_desarrollo_del_tfm/medidas_seguridad.tex}
+
+La arquitectura prioriza el procesamiento local, es decir, los modelos de voz, \englishText{NER}
+y lenguaje se ejecutan en entorno local, evitando la exfiltración de dictados médicos hacia servicios de terceros.
+
+\subsection{Aplicación móvil}\label{subsection:app_movil}
+
+La aplicación móvil, desarrollada con React Native y Expo en el directorio \texttt{generacion-informes/},
+cumple el rol de cliente de captura de dictados médicos.
+
+\boldparagraph{Entradas}{
+    señal de audio del micrófono del dispositivo o ficheros de audio pregrabados en formato PCM/WAV.
+}
+
+\boldparagraph{Procesamiento}{
+    el servicio de captura PCM (\texttt{PcmAudioCaptureService}) produce fragmentos de audio que el
+    detector de actividad de voz (\texttt{VoiceActivityDetector}) segmenta según los umbrales
+    definidos en \texttt{AudioConstants.js}. Por cada fragmento, el cliente \englishText{WebSocket}
+    (\texttt{AudioStreamWebSocketClient.js}) envía un par de mensajes: primero un objeto JSON con
+    metadatos (\texttt{type}, \texttt{sessionId}, \texttt{sequence}, \texttt{timestamp},
+    \texttt{sampleRate}) y, a continuación, los bytes PCM en binario. Al finalizar el dictado, envía
+    un mensaje \texttt{session\_end}.
+}
+
+\boldparagraph{Salidas}{
+    flujo continuo de fragmentos hacia el \englishText{gateway} y notificación de cierre de sesión.
+}
+
+\subsection{\englishText{Gateway} y protocolo \englishText{WebSocket}}\label{subsection:gateway}
+
+El \englishText{gateway} (\texttt{backend/gateway/}) constituye el punto de entrada del sistema en el
+puerto~8000, exponiendo el endpoint \texttt{/audio} para conexiones \englishText{WebSocket}.
+
+\boldparagraph{Entradas}{
+    mensajes \englishText{WebSocket} de tipo \texttt{audio\_chunk} (metadatos JSON + binario PCM) y
+    \texttt{session\_end} (cierre de sesión).
+}
+
+\boldparagraph{Procesamiento}{
+    el manejador \texttt{audioWebSocketHandler.js} diferencia entre mensajes JSON de mensajes binarios
+    inspeccionando el primer byte del buffer. Por cada fragmento, reenvía el audio al servicio
+    \englishText{ASR} mediante \texttt{POST /transcribe} con las cabeceras \texttt{X-Session-Id},
+    \texttt{X-Sequence} y \texttt{X-Timestamp}. La informacion devueltas se acumulan en
+    \texttt{sessionEntitiesStore.js}. Al recibir \texttt{session\_end}, espera las transcripciones
+    pendientes, invoca \texttt{POST /finalize-session/\{id\}}, \texttt{POST /generate-report/\{id\}}
+    y \texttt{POST /generate-fhir-report/\{id\}} con la informacion acumulada, y finalmente limpia
+    la memoria.
+}
+
+\boldparagraph{Salidas}{
+    respuestas \englishText{WebSocket} de por cada fragmento,
+    \texttt{session\_end}, \texttt{llm\_report} y \texttt{fhir\_report}.
+}
+
+\subsection{Servicio \englishText{ASR / PLN}}\label{subsection:asr_service}
+
+El servicio \englishText{ASR} (\texttt{backend/asr-service/}) aloja el núcleo de procesamiento del
+sistema. Sus módulos lógicos se componen en el arranque de la aplicación FastAPI
+(\texttt{app/main.py}) y se ejecutan secuencialmente dentro de \texttt{POST /transcribe} para cada
+fragmento de audio, o de forma diferida al cierre de sesión para la generación de informes finales.
+
+\subsubsection{Módulo \englishText{ASR} / Whisper}\label{subsubsection:modulo_asr}
+
+\boldparagraph{Entradas}{fragmento de audio PCM 16-bit mono 16\,kHz (\texttt{application/octet-stream}).}
+
+\boldparagraph{Procesamiento}{el proveedor \englishText{faster-whisper} (\texttt{FastWhisperProvider})
+    transcribe el audio aplicando un \textit{initial prompt} con terminología médica configurada en
+    \texttt{config.yaml}, esto es, palabras clave que ayudan al modelo a transcribir de forma mas precisa.}
+
+
+\boldparagraph{Salidas}{texto transcrito, segmentos temporales, confianza y latencia en milisegundos.}
+
+\subsubsection{Módulo \englishText{PLN} / \englishText{NER}}\label{subsubsection:modulo_pln}
+
+\boldparagraph{Entradas}{texto transcrito del fragmento actual.}
+
+\boldparagraph{Procesamiento}{el orquestador \texttt{PlnOrchestrator} ejecuta en paralelo dos modelos
+    \englishText{NER}: \texttt{pln\_medical} (\englishText{spanish\_medical\_ner}) para entidades
+    clínicas generales y \texttt{pln\_farmacos} (\englishText{bsc-bio-ehr-es-pharmaconer}) para
+    terminología farmacológica. Si ambos modelos detectan el mismo intervalo de texto, se conserva
+    únicamente la entidad de \texttt{pln\_farmacos} dado que este es mas específico. Finalmente,
+    se fusionan entidades marcadas que sean contiguas y que posean la misma etiqueta.
+    \input{imagenes/diagramas/desarrollo_del_tfm/fusion_entidades_NER.tex}
+}
+
+    \boldparagraph{Salidas}{lista de entidades con etiqueta, texto, posición y origen del modelo.}
+
+\subsubsection{Módulo \englishText{SNOMED}}\label{subsubsection:modulo_snomed}
+
+\boldparagraph{Entradas}{término textual de cada entidad detectada por el \englishText{PLN}.}
+
+\boldparagraph{Procesamiento}{el cliente \texttt{SnowstormClient} consulta la API REST de Snowstorm
+    (\texttt{GET /MAIN/ SNOMEDCT-ES/concepts?term=...}) desplegada en el puerto~8080.}
+
+\boldparagraph{Salidas}{identificador de concepto (\texttt{conceptId}), término preferido
+    y metadatos de la búsqueda asociados a cada entidad.}
+
+\subsubsection{Módulo \englishText{CIE-10-ES}}\label{subsubsection:modulo_cie10}
+
+\boldparagraph{Entradas}{\texttt{conceptId} de \englishText{SNOMED CT} obtenido en la etapa anterior.}
+
+\boldparagraph{Procesamiento}{el cliente \texttt{FhirConceptMapClient} aplica una cadena de
+    busqueda sobre el endpoint \englishText{FHIR} de Snowstorm
+    (\texttt{http://localhost:8080/fhir}): primero \texttt{ConceptMap \$translate} con el mapa
+    primario, después con el mapa de reserva y, en última instancia, \texttt{ValueSet \$expand}
+    filtrando por el término de la entidad.}
+
+\boldparagraph{Salidas}{código \englishText{CIE-10-ES} y descripción asociada cuando la traducción
+    es exitosa.}
+
+\subsubsection{Reporte de control enriquecido}\label{subsubsection:reporte_control}
+
+\boldparagraph{Entradas}{transcripción, entidades \englishText{NER}, conceptos \englishText{SNOMED CT}
+    y códigos \englishText{CIE-10-ES} de cada fragmento.}
+
+\boldparagraph{Procesamiento}{\texttt{SessionReportWriter} bufferiza en memoria la información de
+cada llamada a \texttt{/transcribe}, indexada por número de secuencia, y la envia como respuesta
+al gateway mediante \englishText{WebSocket}. Si es necesario, vuelca el contenido al fichero
+\texttt{Reporte.txt} para poder depurar errores en caso de ser necesario.}
+
+\boldparagraph{Salidas}{información de control enriquecido que constituye la entrada
+verificada para el \englishText{LLM} y reporte de control en texto plano.}
+
+\subsubsection{Módulo Servicio \englishText{LLM}}\label{subsubsection:modulo_llm}
+
+\boldparagraph{Entradas}{reporte enriquecido de control de la sesión.}
+
+\boldparagraph{Procesamiento}{
+    el generador \texttt{LlmReportGenerator} envía el contenido del reporte
+    de control al modelo configurado en \texttt{config.yaml} (por defecto Ollama \texttt{llama3.1:8b}) mediante la API \texttt{/api/chat}, aplicando un
+    \englishText{prompt} de sistema que define la estructura del informe clínico y prohíbe inventar
+    datos no presentes en el reporte.
+}
+
+\boldparagraph{Salidas}{
+    fichero \texttt{Informe.txt} con el informe clínico redactado
+}
+
+\subsubsection{Módulo Servicio \englishText{FHIR}}\label{subsubsection:modulo_fhir}
+
+\boldparagraph{Entradas}{
+    lista del resultado de procesamiento de todos los fragmentos de audio acumuladas por el \englishText{gateway}
+    durante la sesión.
+}
+
+\boldparagraph{Procesamiento}{
+    el generador \texttt{FhirReportGenerator} construye un
+    \englishText{Bundle FHIR} R4B de tipo \texttt{collection}, creando recursos \texttt{Patient} y,
+    por cada entidad válida, \texttt{Condition}, \texttt{MedicationStatement}, \texttt{Procedure} u
+    \texttt{Observation} según la etiqueta \englishText{NER} y los conceptos normalizados.
+}
+
+\boldparagraph{Salidas}{
+    fichero \texttt{Fhir\_Reporte.json} con el \englishText{bundle} estructurado.
+}
+
+\subsection{Servicios externos: Docker \englishText{SNOMED}}\label{subsection:servicios_externos_snomed}
+
+\boldparagraph{Docker \englishText{SNOMED}}{
+    el fichero \texttt{snomed/docker-compose.yml} despliega Elasticsearch~7.17.10 y Snowstorm
+    (\texttt{snomedinternational/snowstorm:latest}) sobre la rama \texttt{MAIN/SNOMEDCT-ES}.
+    Tras el arranque del contenedor, se importaron en Snowstorm los paquetes terminológicos
+    \texttt{SnomedCT International Edition (Dependencia EE SNS)} y
+    \texttt{SnomedCT Spanish Edition (Dependencia EE SNS)}, distribuidos por el
+    Sistema Nacional de Salud.
+    La edición internacional constituye a los elementos básicos del vocabulario
+    mientras que la edición española lo
+    extiende con terminología, descripciones y relaciones adaptadas al ámbito nacional.
+    Sobre este repositorio semántico se ejecutan las consultas de normalización del sistema:
+    la búsqueda de conceptos por término (\texttt{GET /concepts?term=...}) para resolver
+    identificadores únicos (\texttt{conceptId}), así
+    como las operaciones \englishText{FHIR} de traducción hacia \englishText{CIE-10-ES} descritas
+    en la Sección~\ref{subsubsection:modulo_cie10}.
+    Snowstorm expone la API REST de terminología y el endpoint \englishText{FHIR} en el puerto~8080,
+    necesarios para las etapas de normalización clínica.
+}
+
+\subsection{Servicios externos: Servicio LLM}\label{subsection:servicios_externos_ollama}
+
+\boldparagraph{Servicio LLM}{
+    el servicio de inferencia del \englishText{LLM} se ejecuta de forma local en el puerto~11434 mediante
+    un contenedor Docker. Para ello se instalo la imagen \texttt{ollama/ollama:latest} y se configuró
+    el modelo \texttt{llama3.1:8b} y el arranque del demonio \texttt{ollama serve}
+}
+
+\section{Implementación y flujos de ejecución}\label{section:implementacion}
+
+\subsection{Flujo por fragmento de audio}\label{subsection:flujo_fragmento}
+
+La Figura~\ref{fig:diagrama_conceptual} presenta el diagrama de secuencia del flujo completo de
+procesamiento, desde la conexión inicial hasta la generación de los artefactos finales de sesión.
 
 \input{imagenes/diagramas/desarrollo_del_tfm/Diagrama de Flujos App.tex}
+
+Por cada fragmento de voz detectado, el ciclo de procesamiento sigue estos pasos:
+
+\begin{enumerate}
+    \item La aplicación móvil envía el par de mensajes \englishText{WebSocket} (metadatos JSON +
+    binario PCM).
+    \item El \englishText{gateway} reenvía el audio al servicio \englishText{ASR} mediante
+    \texttt{POST /transcribe}.
+    \item El servicio \englishText{ASR} ejecuta el \englishText{pipeline} interno: transcripción
+    Whisper $\rightarrow$ \englishText{NER} $\rightarrow$ consulta \englishText{SNOMED CT}
+    $\rightarrow$ traducción \englishText{CIE-10-ES} $\rightarrow$ bufferización y envio por
+    \texttt{SessionReportWriter}.
+    \item El \englishText{gateway} acumula las la transcripción enriquecida.
+\end{enumerate}
+
+\subsection{Cierre de sesión y generación de artefactos}\label{subsection:cierre_sesion}
+
+Al enviar el mensaje \texttt{session\_end}, el \englishText{gateway} ejecuta la fase de
+finalización:
+
+\begin{enumerate}
+    \item Espera la finalización de todas las transcripciones pendientes.
+    \item Invoca \texttt{POST /finalize-session/\{id\}}.
+    \item Notifica al cliente con un mensaje \texttt{session\_end}.
+    \item Invoca \texttt{POST /generate-report/\{id\}}, que genera \texttt{Informe.txt} mediante
+    Ollama.
+    \item Invoca \texttt{POST /generate-fhir-report/\{id\}} con las entidades acumuladas, que
+    produce \texttt{Fhir Reporte.json}.
+    \item Limpia el almacén de entidades en memoria del \englishText{gateway}.
+\end{enumerate}
+
+\subsection{Patrones de diseño y configuración}\label{subsection:patrones_configuracion}
+
+La Tabla~\ref{tab:endpoints_asr} resume los endpoints HTTP principales del servicio \englishText{ASR},
+definidos en \texttt{app/api/routes.py}.
+
+\input{tablas/capitulo_desarrollo_del_tfm/endpoints_ASR_PLN.tex}
+
+Entre los patrones de diseño aplicados destacan:
+
+\boldparagraph{Patrón \englishText{Factory}}{
+    las factorías en \texttt{app/factory/} instancian los proveedores de \englishText{ASR},
+    \englishText{PLN}, \englishText{SNOMED}, \englishText{LLM} y \englishText{FHIR} según la
+    configuración, permitiendo sustituir implementaciones sin modificar la capa de API.
+}
+
+\boldparagraph{Orquestador de \englishText{PLN}}{
+    \texttt{PlnOrchestrator} coordina la ejecución paralela de los dos modelos \englishText{NER} y
+    aplica la regla de fusión por solapamiento de intervalos.
+}
+
+\boldparagraph{Separación \englishText{gateway}/\englishText{backend}}{
+    el \englishText{gateway} gestiona el protocolo en tiempo real y la orquestación ligera de sesión,
+    mientras que el servicio \englishText{ASR} concentra la carga computacional de los modelos de IA,
+    evitando bloquear el hilo de eventos de Node.js con inferencias pesadas.
+}
+
+Las constantes compartidas entre componentes se centralizan en \texttt{backend/shared/constants/},
+siguiendo una convención de directorios por dominio funcional (\texttt{AsrConstants},
+\texttt{PlnConstants}, \texttt{GatewayConstants}, etc.).
+
+\section{Almacenamiento y artefactos de sesión}\label{section:almacenamiento}
+
+Cada sesión de dictado genera un directorio bajo \texttt{reports/<session\_id>/} con tres artefactos
+diferenciados:
+
+\begin{itemize}
+    \item \textbf{\texttt{Reporte.txt}} --- reporte de control enriquecido que consolida la
+    transcripción acumulada, las entidades \englishText{NER}, los conceptos \englishText{SNOMED CT}
+    y los códigos \englishText{CIE-10-ES} de todos los fragmentos. Constituye la entrada
+    verificada y estructurada para el módulo \englishText{LLM}.
+    \item \textbf{\texttt{Informe.txt}} --- informe clínico redactado por el \englishText{LLM} a
+    partir del reporte de control, conforme a la definición de \textit{Informe Resultante} del
+    Capítulo~\ref{chapter:marco_teorico_y_referencial}.
+    \item \textbf{\texttt{Fhir\_Reporte.json}} --- \englishText{Bundle FHIR} R4B generado de forma
+    independiente del informe \englishText{LLM}, a partir de las entidades deduplicadas de la sesión.
+\end{itemize}.

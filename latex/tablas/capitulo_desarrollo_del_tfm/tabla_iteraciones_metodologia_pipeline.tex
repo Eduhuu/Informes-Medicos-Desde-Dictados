@@ -1,0 +1,19 @@
+
+\begin{table}[htbp]
+    \centering
+    \caption{Iteraciones de desarrollo del \englishText{pipeline} clínico.}
+    \label{tab:iteraciones_pipeline}
+    \begin{tabular}{@{}clp{6.5cm}@{}}
+    \toprule
+    \textbf{Iter.} & \textbf{Entregable} & \textbf{Componentes principales} \\
+    \midrule
+    1 & Captura y envío de audio & Aplicación móvil (\texttt{generacion-informes/}), \englishText{gateway} (\texttt{backend/gateway/}) \\
+    2 & Transcripción \englishText{ASR} por fragmentos & \texttt{fast\_whisper\_provider.py}, \texttt{POST /transcribe} \\
+    3 & \englishText{NER} dual y fusión de entidades & \texttt{pln\_orchestrator.py}, modelos \englishText{Hugging Face} \\
+    4 & Enriquecimiento \englishText{SNOMED CT} y \englishText{CIE-10-ES} & \texttt{snowstorm\_client.py}, \texttt{fhir\_concept\_map\_client.py} \\
+    5 & Reporte de control e informe \englishText{LLM} & \texttt{session\_report.py}, \texttt{llm\_report\_generator.py} \\
+    6 & \englishText{Bundle FHIR} R4B & \texttt{fhir\_report/}, \texttt{fhir\_report\_generator.py} \\
+    7 & Validación \englishText{end-to-end} & \texttt{docs/validacion-pipeline-datos.md}, capítulo de evaluación \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
