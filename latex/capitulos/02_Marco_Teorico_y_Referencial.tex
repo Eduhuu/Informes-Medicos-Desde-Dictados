@@ -239,10 +239,12 @@ del modelo generativo:
     \item \textbf{App móvil:} La aplicacion móvil captura el audio del profesional de la salud y lo envía 
     mediante el protocolo \englishText{WebSocket} al \englishText{gateway}.
     \item \textbf{\englishText{Gateway}:} El \englishText{gateway} orquesta las sesiones cliente, 
-    capturando cada fragmento de audio por sesión que mantenga con la aplicación móvil. Luego por cada fragmento recibido 
-    lo envía al modulo de \englishText{ASR} mediante una peticion \englishText{POST HTTP}, guardando la en memoria la
-    transcripción, entidades y datos obtenidos de cada entidad. Finalmente cuando la sesión finaliza, se envia una mediante una peticion
-    \englishText{HTTP POST} al modulo de Generación de Informes Médicos, generando el informe clínico y el \englishText{JSON}
+    capturando cada fragmento de audio por sesión que mantenga con la aplicación móvil. Por cada fragmento recibido 
+    lo reenvía al módulo de \englishText{ASR} mediante una petición \englishText{POST HTTP} y acumula en memoria
+    las entidades clínicas enriquecidas devueltas por el servicio de procesamiento. La transcripción completa
+    y el reporte de control se gestionan en el servicio \englishText{ASR}, no en el \englishText{gateway}.
+    Cuando la sesión finaliza, el \englishText{gateway} invoca mediante peticiones \englishText{HTTP POST}
+    la finalización del reporte de control, la generación del informe clínico y la construcción del \englishText{JSON}
     de \englishText{FHIR}.
     \item \textbf{Procesamiento Lingüístico:} Este módulo recibe la peticion del \englishText{gateway} y procesa la
     transcripción, para extraer las entidades médicas nombradas partiendo de cada fragmento de audio. 
@@ -280,36 +282,6 @@ del modelo generativo:
     del informe clínico.
 \end{enumerate}
 
-% NOTA: Recuerda definir este label en tu entorno de figura TikZ, Mermaid o Gráfico externo
-% \label{fig:diagrama_conceptual}
-
-% \subsection{Proceso de Generación del Informe Resultante}
-% Al finalizar la sesión clínica, el módulo de generación de informes consolida los resultados
-% acumulados de cada fragmento de audio en un \textbf{reporte de control} intermedio
-% (\texttt{Reporte.txt}). Este artefacto no es el informe entregable al profesional, sino el
-% documento estructurado que sintetiza, por cada llamada al \englishText{pipeline}, cuatro capas
-% de información complementarias:
-
-% \begin{enumerate}
-%     \item \textbf{Transcripción (\englishText{ASR}):} Texto literal reconocido en el fragmento de audio.
-%     \item \textbf{Entidades clínicas (\englishText{NER}):} Términos médicos detectados, con su etiqueta
-%     semántica, el modelo \englishText{PLN} de origen, el nivel de confianza y su posición en el texto.
-%     \item \textbf{Normalización \englishText{SNOMED CT}:} Para cada entidad, el \textit{conceptId},
-%     el término preferido, la \englishText{FSN} y el estado de activación del concepto recuperado
-%     desde Snowstorm.
-%     \item \textbf{Correspondencia \englishText{CIE-10-ES}:} Cuando está habilitada, los códigos
-%     administrativos obtenidos mediante \englishText{ConceptMap} a partir de los identificadores
-%     \englishText{SNOMED CT}.
-% \end{enumerate}
-
-% La generación del informe médico definitivo (\texttt{Informe.txt}) no opera sobre la transcripción
-% aislada. El modelo generativo (\englishText{LLM}, desplegado vía Ollama) recibe dos insumos
-% coordinados: un \textbf{prompt de sistema estricto}, configurado con reglas de seguridad clínica
-% (prohibición de inventar datos, filtrado de mapeos \englishText{SNOMED CT} incoherentes, tono
-% formal y estructura fija del documento), y el reporte de control completo como mensaje de usuario.
-% De este modo, el \englishText{LLM} dispone simultáneamente del discurso original y del
-% conocimiento clínico previamente extraído, validado y codificado, lo que reduce la dependencia
-% exclusiva del texto hablado y mitiga el riesgo de alucinación semántica.
 
 \subsection{Definición de Informe Resultante}
 Dentro del marco de esta investigación, se define formalmente un \textbf{Informe Resultante}

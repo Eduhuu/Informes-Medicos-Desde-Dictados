@@ -1,0 +1,33 @@
+\begin{table}[htbp]
+    \centering
+    \caption{Planificación temporal del desarrollo}
+    \label{tab:gantt_pipeline}
+    \small
+    \begin{tabular}{@{}p{5.5cm}cccccccc@{}}
+    \toprule
+    \textbf{Tarea / Iteración} &
+    \textbf{S.1} & \textbf{S.2} & \textbf{S.3} & \textbf{S.4} &
+    \textbf{S.5} & \textbf{S.6} & \textbf{S.7} & \textbf{S.8} \\
+    \midrule
+    1. Captura y envío de audio (móvil + \englishText{gateway}) &
+    \cellcolor{blue!15} & \cellcolor{blue!15} & & & & & & \\
+    2. Transcripción \englishText{ASR} por fragmentos &
+    & \cellcolor{blue!15} & \cellcolor{blue!15} & & & & & \\
+    3. \englishText{NER} dual y fusión de entidades &
+    & & \cellcolor{blue!15} & \cellcolor{blue!15} & & & & \\
+    4. Enriquecimiento \englishText{SNOMED CT} y \englishText{CIE-10-ES} &
+    & & & \cellcolor{blue!15} & \cellcolor{blue!15} & & & \\
+    5. Reporte de control e informe \englishText{LLM} &
+    & & & & \cellcolor{blue!15} & \cellcolor{blue!15} & & \\
+    6. \englishText{Bundle FHIR} R4B &
+    & & & & & \cellcolor{blue!15} & \cellcolor{blue!15} & \\
+    7. Validación \englishText{end-to-end} y redacción del TFM &
+    & & & & & & \cellcolor{blue!15} & \cellcolor{blue!15} \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+    
+    \nota{}{
+        Las columnas S.1--S.8 representan sprints de desarrollo consecutivos del periodo de desarrollo del trabajo fin de
+        máster. Cada sprint tiene una duracion de 2 semanas. Las celdas sombreadas indican el intervalo de ejecución de cada iteración.
+    }

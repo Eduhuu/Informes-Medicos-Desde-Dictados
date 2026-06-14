@@ -1,0 +1,50 @@
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        scale=0.85, transform shape,
+        font=\sffamily\scriptsize, 
+        entity/.style={align=center, minimum width=1.6cm},
+        arrow/.style={-{Stealth[scale=0.8]}, thick},
+        lbl/.style={align=center, font=\scriptsize\bfseries\color{black!80}}
+    ]
+
+        % ========================================================
+        % SECCIÓN IZQUIERDA: ENTIDADES ORIGINALES
+        % ========================================================
+        % Centrado entre las dos palabras originales (coordenada X = 1.4)
+        \node[lbl] (titleLeft) at (1.4, 1.2) {ENTIDADES ORIGINALES};
+
+        % Palabra: "hipertensión"
+        \node[entity, font=\small\bfseries] (hip) at (0, 0) {Hipertensión};
+        \draw[thick] ([yshift=-2pt]hip.south west) -- ([yshift=-2pt]hip.south east);
+        \node[anchor=north, yshift=-2pt, font=\small\bfseries] at (hip.south) {Problem};
+
+        % Palabra: "Arterial" (Separada un poco más de 'hipertensión')
+        \node[entity, font=\small\bfseries] (art) at (2.8, 0) {Arterial};
+        \draw[thick] ([yshift=-2pt]art.south west) -- ([yshift=-2pt]art.south east);
+        \node[anchor=north, yshift=-2pt, font=\small\bfseries] at (art.south) {Problem};
+
+
+        % ========================================================
+        % SECCIÓN CENTRAL: FLECHA DE PROCESO
+        % ========================================================
+        % Desplazada a la derecha para dejar aire tras "Arterial"
+        \draw[arrow] (4.2, -0.1) -- (6.2, -0.1) 
+            node[midway, above, align=center, font=\scriptsize\bfseries] {PROCESO\\DE UNIÓN};
+
+
+        % ========================================================
+        % SECCIÓN DERECHA: ENTIDAD FUSIONADA
+        % ========================================================
+        % Movido todo el bloque derecho hacia la coordenada X = 9.2 para separarlo de la flecha
+        \node[lbl] (titleRight) at (9.2, 1.2) {ENTIDAD FUSIONADA};
+
+        % Palabra combinada: "hipertensión Arterial"
+        \node[entity, minimum width=3.4cm, font=\small\bfseries] (fusion) at (9.2, 0) {Hipertensión arterial};
+        \draw[thick] ([yshift=-2pt]fusion.south west) -- ([yshift=-2pt]fusion.south east);
+        \node[anchor=north, yshift=-2pt, font=\small\bfseries] at (fusion.south) {Problem};
+
+    \end{tikzpicture}
+    \caption{Proceso de unión automática de entidades NER clínicas contiguas.}
+    \label{fig:union_entidades_ner}
+\end{figure}

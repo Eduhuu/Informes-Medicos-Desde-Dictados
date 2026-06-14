@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+    \centering
+    \caption{Endpoints HTTP del servicio \englishText{ASR / PLN}.}
+    \label{tab:endpoints_asr}
+    \begin{tabular}{@{}llp{7cm}@{}}
+    \toprule
+    \textbf{Endpoint} & \textbf{Método} & \textbf{Función} \\
+    \midrule
+    \texttt{/transcribe} & POST & Ejecuta el \englishText{pipeline} completo por fragmento de audio \\
+    \texttt{/finalize-session/\{id\}} & POST & Persiste el reporte de control enriquecido \\
+    \texttt{/generate-report/\{id\}} & POST & Genera el informe clínico mediante Ollama \\
+    \texttt{/generate-fhir-report/\{id\}} & POST & Genera el \englishText{Bundle FHIR} R4B \\
+    \texttt{/health} & GET & Comprueba el estado del servicio \\
+    \texttt{/pln-test} & POST & Evalúa el módulo \englishText{PLN} con métricas opcionales \\
+    \bottomrule
+    \end{tabular}
+\end{table}

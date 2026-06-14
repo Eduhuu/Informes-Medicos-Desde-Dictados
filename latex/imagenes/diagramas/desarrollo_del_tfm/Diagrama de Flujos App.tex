@@ -125,9 +125,32 @@
         \draw[call] ($(G.south)+(0,-9.8)$) -- ($(A.south)+(0,-9.8)$)
             node[msg] {POST /finalize-session/[id]};
 
+        \begin{scope}[on background layer]
+            \coordinate (optReportsNW) at (4.15,-9.95);
+            \coordinate (optReportsSE) at (7.6,-10.9);
+            \node[
+                draw=blue!70!black,
+                fill=blue!8,
+                fill opacity=0.25,
+                rectangle,
+                rounded corners=3pt,
+                fit={(optReportsNW) (optReportsSE)},
+                inner sep=4pt
+            ] (optReportsBox) {};
+            \node[
+                fill=blue!20,
+                draw=blue!70!black,
+                font=\tiny\bfseries,
+                text=blue!60!black,
+                rounded corners=2pt,
+                anchor=north west,
+                inner sep=2pt
+            ] at (optReportsBox.north west) {opt [\texttt{reports.enabled}]};
+        \end{scope}
+
         \draw[call]
             ($(A.south)+(0,-10.2)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(A.south)+(0,-10.55)$)
-            node[note, right, xshift=0.15cm] {Escribe Reporte.txt\\en disco};
+            node[note, right, xshift=0.15cm] {Escribe \texttt{Reporte.txt}\\en disco};
 
         \draw[resp] ($(M.south)+(0,-11.05)$) -- ($(G.south)+(0,-11.05)$)
             node[msg] {WS session\_end};

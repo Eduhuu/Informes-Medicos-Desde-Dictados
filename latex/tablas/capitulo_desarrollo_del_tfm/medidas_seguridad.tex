@@ -1,0 +1,15 @@
+\begin{table}[htbp]
+    \centering
+    \caption{Medidas de seguridad y privacidad: diseño frente a prototipo.}
+    \label{tab:medidas_seguridad}
+    \begin{tabular}{@{}p{5cm}p{8.5cm}@{}}
+    \toprule
+    \textbf{Medida} & \textbf{Diseño / intención} \\
+    \midrule
+    Procesamiento local & \englishText{Whisper}, \englishText{PLN} y \englishText{Ollama} en máquina local; sin \englishText{APIs} en la nube para datos clínicos \\
+    Canal cifrado \englishText{WSS}/\englishText{TLS} & Canal seguro entre móvil y servidor (Cap.~2) \\
+    Almacenamiento unicamente en memoria & La información de la sesión se almacena unicamente en memoria, a menos que se requiera la depuración de errores \\
+    Reglas anti-alucinación & \englishText{Prompt} de sistema que prohíbe inventar datos clínicos \\
+    \bottomrule
+    \end{tabular}
+\end{table}

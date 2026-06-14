@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+    \centering
+    \caption{Componentes del sistema y su despliegue.}
+    \label{tab:componentes_sistema}
+    \small
+    \begin{tabular}{@{}p{2.8cm}p{4.2cm}p{2.2cm}cp{2.2cm}@{}}
+    \toprule
+    \textbf{Componente} & \textbf{Responsabilidad} & \textbf{Tecnología} & \textbf{Puerto} & \textbf{Ubicación} \\
+    \midrule
+    Aplicación móvil & Captura y envío de audio PCM & React Native / Expo & --- & \texttt{generacion-informes/} \\
+    \englishText{Gateway} & Entrada \englishText{WebSocket}, orquestación de sesión & Node.js / Express & 8000 & \texttt{backend/gateway/} \\
+    Servicio \englishText{ASR / PLN} & \englishText{Pipeline} completo y persistencia de informes & FastAPI / Python & 8001 & \texttt{backend/asr-service/} \\
+    Snowstorm & Terminología \englishText{SNOMED CT-ES} y API \englishText{FHIR} & Docker & 8080 & \texttt{snomed/} \\
+    Ollama & Inferencia del \englishText{LLM} local & Servicio externo & 11434 & Máquina local \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
