@@ -21,8 +21,7 @@ url={https://arxiv.org/abs/2410.03797},
 database={arXiv}
 }
 
-
-
+% Este es el que hizo una aplicacion web para la transcripcion y NER de informes médicos
 @INPROCEEDINGS{10912421,
 author={Roushan, Rakesh and Mishra, Harshit and Yadav, Lucky and Koppula, Sreeja and Tiwari, Nitya and Nataraj, K S},
 booktitle={2024 IEEE Conference on Engineering Informatics (ICEI)},
@@ -35,6 +34,43 @@ keywords={Training;Productivity;Error analysis;Medical services;Manuals;Audio re
 url={https://ieeexplore.ieee.org/abstract/document/10912421},
 database={IEEE Xplore}
 }
+
+@misc{kim2024structuredextractionrealworld,
+      title={Structured Extraction of Real World Medical Knowledge using LLMs for Summarization and Search}, 
+      author={Edward Kim and Manil Shrestha and Richard Foty and Tom DeLay and Vicki Seyfert-Margolis},
+      year={2024},
+      eprint={2412.15256},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2412.15256}, 
+}
+
+@article{wang2018clinical,
+  author     = {Wang, Yanshan and Wang, Liwei and Rastegar-Mojarad, Majid and Moon, Sungrim and Shen, Feichen and Afzal, Nazik and Liu, Sijia and Zeng, Yuqun and Mehrabi, Saeed and Sohn, Sunghwan and Liu, Hongfang},
+  title      = {Clinical information extraction applications: A literature review},
+  journal   = {Journal of Biomedical Informatics},
+  volume    = {77},
+  pages     = {34--49},
+  year      = {2018},
+  month     = {jan},
+  doi       = {10.1016/j.jbi.2017.11.011},
+  pmid      = {29162496},
+  pmcid     = {PMC5771858},
+  publisher = {Elsevier}
+}
+
+@article{lee2020biobert,
+  author    = {Lee, Jinhyuk and Yoon, Wonjin and Kim, Sungdong and Kim, Donghyeon and Kim, Sunkyu0 and So, Chan Ho and Kang, Jaewoo},
+  title     = {BioBERT: a pre-trained biomedical language representation model for biomedical text mining},
+  journal   = {Bioinformatics},
+  volume    = {36},
+  number    = {4},
+  pages     = {1234--1240},
+  year      = {2020},
+  month     = {feb},
+  doi       = {10.1093/bioinformatics/btz682}
+}
+
 
 @misc{rfc6455,
     series =    {Request for Comments},
@@ -87,6 +123,78 @@ database={IEEE Xplore}
   year      = {2017}
 }
 
+@article{kaplan2020scaling,
+  title={Scaling laws for neural language models},
+  author={Kaplan, Jared and McCandlish, Sam and Henighan, Tom and Brown, Tom B and Chess, Benjamin and Child, Rewon and Gray, Scott and Radford, Alec and Wu, Jeffrey and Amodei, Dario},
+  journal={arXiv preprint arXiv:2001.08361},
+  year={2020}
+}
+
+@article{DBLP:journals/corr/abs-2005-14165,
+  author       = {Tom B. Brown and
+                  Benjamin Mann and
+                  Nick Ryder and
+                  Melanie Subbiah and
+                  Jared Kaplan and
+                  Prafulla Dhariwal and
+                  Arvind Neelakantan and
+                  Pranav Shyam and
+                  Girish Sastry and
+                  Amanda Askell and
+                  Sandhini Agarwal and
+                  Ariel Herbert{-}Voss and
+                  Gretchen Krueger and
+                  Tom Henighan and
+                  Rewon Child and
+                  Aditya Ramesh and
+                  Daniel M. Ziegler and
+                  Jeffrey Wu and
+                  Clemens Winter and
+                  Christopher Hesse and
+                  Mark Chen and
+                  Eric Sigler and
+                  Mateusz Litwin and
+                  Scott Gray and
+                  Benjamin Chess and
+                  Jack Clark and
+                  Christopher Berner and
+                  Sam McCandlish and
+                  Alec Radford and
+                  Ilya Sutskever and
+                  Dario Amodei},
+  title        = {Language Models are Few-Shot Learners},
+  journal      = {CoRR},
+  volume       = {abs/2005.14165},
+  year         = {2020},
+  url          = {https://arxiv.org/abs/2005.14165},
+  eprinttype   = {arXiv},
+  eprint       = {2005.14165},
+  timestamp    = {Thu, 25 May 2023 10:38:31 +0200},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-2005-14165.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@article{wei2022chain,
+  author       = {Jason Wei and
+                  Xuezhi Wang and
+                  Dale Schuurmans and
+                  Maarten Bosma and
+                  Ed H. Chi and
+                  Quoc Le and
+                  Denny Zhou},
+  title        = {Chain of Thought Prompting Elicits Reasoning in Large Language Models},
+  journal      = {CoRR},
+  volume       = {abs/2201.11903},
+  year         = {2022},
+  url          = {https://arxiv.org/abs/2201.11903},
+  eprinttype   = {arXiv},
+  eprint       = {2201.11903},
+  timestamp    = {Fri, 22 Apr 2022 16:06:31 +0200},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-2201-11903.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
 @article{wei2022emergent,
   author  = {Wei, Jason and Tay, Yi and Bommasani, Rishi and Raffel, Colin and Zoph, Barret and Xie, Sebastian and Fedus, William and Li, Albert and Zhao, Crosby and Mostafazadeh, Mitra and Zhou, Denny},
   title   = {Emergent Abilities of Large Language Models},
@@ -106,4 +214,97 @@ database={IEEE Xplore}
   pages   = {172--180},
   year    = {2023},
   publisher = {Nature Publishing Group}
+}
+
+% Marco teorico
+
+% ASR
+@article{davis1952audrey,
+  author={Davis, K. H. and Biddulph, R. and Balashek, S.},
+  journal={The Journal of the Acoustical Society of America}, 
+  title={Automatic Recognition of Spoken Digits}, 
+  year={1952},
+  volume={24},
+  number={6},
+  pages={637-642}
+}
+
+@article{rabiner1989hmm,
+  author={Rabiner, Lawrence R.},
+  journal={Proceedings of the IEEE}, 
+  title={A tutorial on hidden Markov models and selected applications in speech recognition}, 
+  year={1989},
+  volume={77},
+  number={2},
+  pages={257-286}
+}
+
+@article{hinton2012dnn,
+  author={Hinton, Geoffrey and Deng, Li and Yu, Dong and Dahl, George E. and Mohamed, Abdel-rahman and Jaitly, Navdeep and Senior, Andrew and Vanhoucke, Vincent and Nguyen, Patrick and Sainath, Tara N. and Kingsbury, Brian},
+  journal={IEEE Signal Processing Magazine}, 
+  title={Deep neural networks for acoustic modeling in speech recognition: The shared views of four research groups}, 
+  year={2012},
+  volume={29},
+  number={6},
+  pages={82-97}
+}
+
+@inproceedings{radford2023whisper,
+  title={Robust speech recognition via large-scale weak supervision},
+  author={Radford, Alec and Kim, Jong Wook Corporate and Xu, Tao and Brockman, Greg and McLeavey, Christine and Sutskever, Ilya},
+  booktitle={International Conference on Machine Learning},
+  pages={28490--28508},
+  year={2023},
+  organization={PMLR}
+}
+
+
+% --- REFERENCIAS DE INSTITUCIONES OFICIALES (Estándares) ---
+
+@misc{snomed2026,
+  author       = {{SNOMED International}},
+  title        = {{SNOMED CT Global Comprehensive Clinical Terminology. International Edition Release}},
+  year         = {2026},
+  url          = {https://www.snomed.org/},
+  note         = {Accedido: Junio de 2026}
+}
+
+@manual{sanidad2026,
+  author       = {{Ministerio de Sanidad}},
+  title        = {{CIE-10-ES: Clasificaciones y normalización estadística (6ª edición)}},
+  organization = {Gobierno de España},
+  year         = {2026},
+  url          = {https://www.sanidad.gob.es/estadEstudios/estadisticas/normalizacion/home.htm},
+  note         = {Unidad Técnica de la CIE-10-ES}
+}
+
+@book{sanidad2024,
+  author       = {{Ministerio de Sanidad}},
+  title        = {{Manual de Codificación CIE-10-ES Diagnósticos y Procedimientos}},
+  publisher    = {Secretaría General Técnica, Ministerio de Sanidad},
+  year         = {2024},
+  address      = {Madrid, España},
+  isbn         = {978-84-340-2953-8}
+}
+
+% --- LITERATURA CIENTÍFICA INDEXADA (Soporte conceptual) ---
+
+@article{coorevits2013,
+  author       = {Coorevits, Pascal and Sundgren, Mats and Klein, Gunnar O. and Bahr, Anders and Claerhout, Dirk and De Moor, Georges},
+  title        = {{Electronic health records: New opportunities for clinical research}},
+  journal      = {Journal of Internal Medicine},
+  volume       = {274},
+  number       = {6},
+  pages        = {547--560},
+  year         = {2013},
+  doi          = {10.1111/joim.12119}
+}
+
+@misc{sanidad2023,
+  author       = {{Ministerio de Sanidad}},
+  title        = {{Políticas de normalización y terminología en la Historia Clínica Electrónica del Sistema Nacional de Salud}},
+  year         = {2023},
+  publisher    = {Secretaría General de Digitalización, Salud Asistencial e Interoperabilidad},
+  url          = {https://www.sanidad.gob.es/areas/saludDigital/interoperabilidadSemantica/politicasNormalizacion/home.htm},
+  note         = {Accedido: Junio de 2026}
 }

@@ -8,51 +8,214 @@ la transcripción manual de datos se convirtió en un nuevo obstáculo para los 
 limitando la agilidad de los sistemas modernos.
 
 \subsection{\englishText{Automatic Speech Recognition} (\englishText{ASR})}
-Con la llegada de los modelos de reconocimiento automático de voz (\englishText{ASR}) se ha abierto un nuevo 
-camino para la generación de informes médicos. Estos modelos son capaces de transcribir
-el habla en texto, pero estos presentaron fallas importantes:
 
-\boldparagraph{Falta de especialización}{
-    dificultad para entender terminología médica técnica.
-}
+El Reconocimiento Automático de Voz (\englishText{ASR}) tiene sus orígenes en la década de 1950, cuando 
+\englishText{Bell Labs} desarrolló \englishText{Audrey}, un sistema capaz de reconocer únicamente dígitos aislados 
+pronunciados por un único hablante. 
+Durante las décadas siguientes, los sistemas \englishText{ASR} permanecieron limitados a vocabularios reducidos y requerían
+que los usuarios enunciasen con claridad introduciendo pausas entre palabras, lo que evidenciaba la complejidad inherente
+del procesamiento del lenguaje natural~\citeText{davis1952audrey}.
 
-\boldparagraph{Alta tasa de error}{
-    los sistemas básicos llegaban a tener altos porcentajes de errores.
-}
+El avance conceptual más significativo de esta etapa llegó en los años setenta con la introducción de los Modelos Ocultos
+de Markov (\englishText{HMM}).
+Estos modelos representaban el habla como una secuencia de estados temporales variables mediante el cálculo de probabilidades
+sobre transiciones entre fonemas, lo que aportó flexibilidad para manejar la variabilidad natural del habla sin pausas. 
+Posteriormente, desde los años noventa hasta finales de la década de 2000, el estándar dominante se consolidó en la
+combinación de \englishText{HMM} con Modelos de Mezcla Gaussiana (\englishText{GMM}), donde los \englishText{HMM} modelaban
+la secuencia fonética y los \englishText{GMM} ajustaban estadísticamente la señal acústica~\citeText{rabiner1989hmm}.
 
-\boldparagraph{Carga de revisión}{
-    debido a estos errores, los médicos debían dedicar mucho tiempo a revisiones manuales para garantizar 
-    la seguridad del paciente.
-}
+La llegada del aprendizaje profundo a principios de la década de 2010 transformó radicalmente este campo. 
+Los sistemas híbridos \englishText{GMM-HMM} fueron progresivamente desplazados por arquitecturas neurales de extremo
+a extremo (\englishText{end-to-end}), entre las que destacaron los modelos basados en \englishText{Connectionist Temporal
+Classification} (\englishText{CTC}), los codificadores-decodificadores con mecanismos de atención y el \englishText{RNN
+-Transducer}~\citeText{hinton2012dnn}. 
+Estas arquitecturas eliminaron la necesidad de alinear explícitamente fonemas o palabras en etapas intermedias, 
+permitiendo el aprendizaje directo de la correspondencia entre la señal acústica y el texto de salida.
 
-\subsection{Automatización con \englishText{ASR} y Modelos de Lenguaje (\englishText{LLM})}
+El hito más relevante para el contexto de este trabajo fue la presentación de \englishText{Whisper} por parte de
+\englishText{OpenAI} en 2022. 
+\englishText{Whisper} es un sistema \englishText{ASR} basado en una arquitectura \englishText{Transformer} de tipo
+\englishText{encoder-decoder}, entrenado sobre 680.000 horas de datos supervisados multilingües y multitarea recopilados
+de la web.
+Esta escala de preentrenamiento le confiere una robustez notable frente a acentos, ruido de fondo y lenguaje
+técnico~\citeText{radford2023whisper}. 
 
-El estado actual de la técnica se enfoca en la integracion de \englishText{ASR} y Modelos de Lenguaje (\englishText{LLM}),
-logrando automatizar de forma \englishText{end-to-end} la generación de informes médicos como se 
-hace mencion en estos trabajos recientes:   
-\citeText{adedeji2024soundhealthcareimprovingmedical, li2024searchingbestpracticesmedical} ambos
-haciendo uso del modelo de \englishText{Whisper} de \englishText{OpenAI} y de diversas herramientas y tecnicas para mejorar la transcripcion de los audios, 
-logrando asi reducir la tasa de error de palabra (\englishText{WER}) y la carga de revisiones manuales.
-Por otro lado,\citeText{10912421} propone utilizar realizar \englishText{fine-tuning} del modelo 
-\englishText{Whisper} para el mejoramiento del de la tasa de error de palabra (\englishText{WER}) y la utilizacion 
-de servicos de terceros para convertir los conceptos médicos extraídos a vocabularios 
-médicos estándar (\englishText{CIE-10-ES} y \englishText{SNOMED CT})
+En la actualidad, esta tecnología se aplica en diversas tareas de transcripción de informes médicos. Por un lado, se
+incorporan \englishText{LLMs} para refinar las transcripciones obtenidas \citeText{adedeji2024soundhealthcareimprovingmedical, li2024searchingbestpracticesmedical}; 
+por otro, se realiza el \englishText{fine-tuning} del modelo \englishText{Whisper} con el fin de reducir la tasa
+de error de palabra (\englishText{WER}) \citeText{10912421}. Asimismo, se emplean \englishText{LLMs} de altas
+prestaciones para identificar entidades clínicas complejas aprovechando los amplios contextos que estos poseen y la gran
+cantidad de informes médicos que han sido generados por ellos para comparar los resultados obtenidos
+\englishText{(Gleaning)}.
+\citeText{kim2024structuredextractionrealworld}.
 
-A pesar de los avances presentados por \citeText{adedeji2024soundhealthcareimprovingmedical, li2024searchingbestpracticesmedical} y \citeText{10912421}, 
-se observa una limitación: la dependencia casi exclusiva de la capacidad generativa intrínseca del \englishText{LLM} para estructurar el informe clínico
-final a partir de la transcripción cruda. Si bien la reducción del \englishText{WER} mediante técnicas de \englishText{fine-tuning} mejora la fidelidad
-del texto, la síntesis del informe sigue estando sujeta a la interpretación del modelo, lo que incrementa el riesgo de omisiones o alucinaciones en
-datos clínicos críticos.
+\subsection{Procesamiento del Lenguaje Natural (\englishText{PLN})}
+El Procesamiento del Lenguaje Natural como disciplina comenzó a consolidarse en los años cincuenta y sesenta
+con sistemas basados en reglas y gramáticas formales. En la etapa anterior, los sistemas de extracción
+de información clínica dependían principalmente de sistemas basados en reglas y coincidencia de diccionarios, con enfoques
+como los Campos Aleatorios Condicionales (\englishText{CRF}) y los Modelos Ocultos de Markov siendo los más utilizados para el
+etiquetado de secuencias. Estas aproximaciones tenían la ventaja de ser interpretables y no requerir grandes cantidades de datos, 
+pero presentaban una limitación fundamental: los sistemas basados en reglas son incapaces de diferenciar
+el contexto de uso de un mismo término, lo que les impide distinguir entre, por ejemplo, el nombre de un médico y
+el nombre de una enfermedad asociada a ese mismo apellido. 
 
-Para mitigar esta vulnerabilidad, se propone introducir una capa intermedia basada en Procesamiento
-del Lenguaje Natural (\englishText{PLN}) especializado que implementa el Reconocimiento de Entidades Nombradas (\englishText{NER})
-para identificar de forma explícita los conceptos médicos presentes en el discurso. 
+La tarea de Reconocimiento de Entidades Nombradas (\englishText{NER}) evolucionó progresivamente hacia enfoques de aprendizaje 
+automático. A los sistemas basados en reglas les sucedieron modelos de aprendizaje supervisado como los \englishText{CRF} y las 
+máquinas de soporte vectorial (\englishText{SVM}), y posteriormente arquitecturas de aprendizaje profundo como las redes 
+convolucionales (\englishText{CNN}), las redes recurrentes (\englishText{RNN}) y sus variantes \englishText{LSTM}.
+\citeText{wang2018clinical}
 
-Una vez extraídas, estas entidades no solo se mapean a vocabularios estándar de interoperabilidad (\englishText{CIE-10-ES} y \englishText{SNOMED CT}), 
-sino que se utilizan de forma activa como llaves de consulta para extraer información clínica estructurada adicional.
-Al alimentar al \englishText{LLM} no solo con el audio transcrito, sino con un contexto enriquecido de metadatos clínicos normalizados y verificados,
-se reduce la incertidumbre del modelo generativo. Esto permite mayor nivel de detalle de informes clínicos generados,
-precisión diagnóstica y rigurosidad técnica.
+El punto de inflexión llegó con la arquitectura \englishText{Transformer} y, en particular, con \englishText{BERT} en 2018. 
+Los modelos basados en \englishText{Transformer} se distinguen por su mecanismo de auto-atención, que procesa eficientemente la 
+importancia relativa de cada palabra en una oración, mejorando la comprensión del contexto y las relaciones 
+dentro del texto, lo que les permitió superar a todos los modelos anteriores en tareas de \englishText{NER}. En el dominio 
+clínico, esto se tradujo en modelos especializados como \englishText{BioBERT} o \englishText{ClinicalBERT}, preentrenados sobre literatura 
+biomédica y notas clínicas \citeText{lee2020biobert}.
+
+El contexto hispanohablante presenta, no obstante, un escenario histórico de recursos limitados, donde las herramientas
+de PLN para el dominio clínico han sido tradicionalmente escasas. Para paliar esta brecha, el Barcelona \englishText{Supercomputing Center (BSC)}, 
+en el marco del Plan de Impulso de las Tecnologías del Lenguaje (\englishText{Plan TL}), ha liderado la creación de la
+infraestructura básica de datos y modelos biomédicos en español. El esfuerzo fundacional más relevante de este
+organismo fue el reto \englishText{PharmaCoNER}, centrado en el reconocimiento de entidades farmacológicas en textos
+clínicos a partir del corpus \englishText{SPACCC (Spanish Clinical Case Corpus)}. Este recurso contiene 1.000 casos
+clínicos en español anotados manualmente para la identificación de sustancias químicas, fármacos y proteínas.
+
+Trabajos posteriores del propio \englishText{BSC} ampliaron este ecosistema mediante campañas de evaluación consecutivas: 
+combinando los conjuntos de datos unificados \englishText{SympTEMIST} (síntomas), \englishText{MedProcNER} (procedimientos), 
+\englishText{DisTEMIST} (enfermedades) y el citado \englishText{PharmaCoNER}, se consolidó el mayor corpus multiclase
+de reconocimiento y vinculación \englishText{(entity linking)} de entidades biomédicas en notas clínicas en español, 
+integrando el mapeo conceptual hacia la ontología de referencia internacional \englishText{SNOMED CT}. 
+Paralelamente, el \englishText{BSC} entrenó los primeros grandes modelos de lenguaje 
+especializados para la medicina en español, destacando la familia de modelos 
+\englishText{RoBERTa-base-biomedical-clinical-es} 
+(entrenados con miles de millones de palabras extraídas de la literatura médica y registros de salud electrónicos) 
+y sus variantes ajustadas para tareas específicas.
+
+Es precisamente sobre este ecosistema de datos y modelos del \englishText{BSC} donde se apoyan las herramientas empleadas en el 
+sistema propuesto en este trabajo. En concreto, el sistema utiliza dos modelos con un linaje tecnológico directo
+con estos esfuerzos: por un lado, \englishText{spanish-medical-ner}, un modelo de la comunidad optimizado para la 
+extracción de entidades clínicas generales (síntomas, procedimientos y enfermedades) que hereda los criterios de 
+anotación de los corpus \englishText{TEMIST} y por otro lado, \englishText{bsc-bio-ehr-es-pharmaconer}, un modelo 
+desarrollado y publicado oficialmente por el \englishText{BSC}, ajustado específicamente sobre el corpus de fármacos y proteínas. 
+
+\subsection{\englishText{Large Language Models (LLM)}}
+
+El concepto de modelado del lenguaje tiene sus raíces en las aproximaciones estadísticas basadas en n-gramas y, 
+posteriormente, en el desarrollo de las redes neuronales recurrentes (\englishText{RNN}) y los modelos de memoria 
+a largo y corto plazo (\englishText{LSTM}) \citeText{wang2018clinical}. Estos sistemas calculaban la probabilidad de 
+aparición de una palabra basándose en el contexto inmediatamente anterior. Sin embargo, su naturaleza intrínsecamente
+secuencial planteaba dos limitaciones fundamentales: la dificultad para procesar y retener dependencias lingüísticas a 
+larga distancia (el problema del desvanecimiento del gradiente) y la imposibilidad de paralelizar el entrenamiento a gran
+escala en unidades de procesamiento gráfico (\englishText{GPU}).
+
+El punto de inflexión absoluto en el estado del arte ocurrió en 2017 con la introducción de la arquitectura
+\englishText{Transformer} por Vaswani et al. \citeText{vaswani2017attention}. Al prescindir por completo de las 
+conexiones recurrentes y basarse exclusivamente en el mecanismo de autoatención (\englishText{self-attention}), 
+esta arquitectura permitió procesar todos los elementos de una secuencia de texto de forma simultánea. 
+El mecanismo de atención otorgó a los modelos la capacidad de ponderar la importancia relativa de cada 
+palabra dentro de un texto sin importar la distancia física entre ellas, sentando las bases operativas para el 
+procesamiento de contextos masivos.
+Tras la consolidación del \englishText{Transformer}, la evolución tecnológica se dividió inicialmente entre modelos 
+basados en el codificador (\englishText{encoder}), orientados a la comprensión del lenguaje (modelos \englishText{BERT}),
+y modelos basados puramente en el decodificador (\englishText{decoder}), especializados en la generación 
+autorregresiva de texto (modelos \englishText{GPT}).
+
+La evolución hacia los denominados Modelos de Lenguaje de Gran Escala (\englishText{LLM}) propiamente dichos vino 
+guiada por la formulación de las leyes de escalado (\englishText{scaling laws}), las cuales demostraron empíricamente 
+que un incremento exponencial en el número de parámetros del modelo, el volumen de los datos de preentrenamiento y el 
+cómputo asignado se traducía en un aumento predecible del rendimiento y en la aparición de capacidades emergentes. 
+El hito que validó esta premisa fue \englishText{GPT-3} en 2020, demostrando la habilidad de ejecutar tareas sin 
+entrenamiento previo mediante el aprendizaje con pocos ejemplos (\englishText{few-shot learning}) \citeText{kaplan2020scaling}, 
+\citeText{DBLP:journals/corr/abs-2005-14165}. 
+
+La fase más reciente de esta evolución se caracteriza por el desarrollo de modelos de razonamiento profundo 
+(\englishText{reasoning models}). 
+Estos sistemas integran cadenas de pensamiento internas (\englishText{Chain-of-Thought}) optimizadas mediante 
+aprendizaje por refuerzo a gran escala durante la fase de inferencia. En lugar de emitir una respuesta inmediata 
+palabra por palabra, el modelo genera un flujo oculto de deliberación lógica, corrección de errores y verificación
+de hipótesis antes de producir la salida final, superando las limitaciones tradicionales en tareas complejas de lógica
+y estructuración formal \citeText{wei2022chain}.
+
+En la actualidad, los \englishText{LLMs} han trascendido su rol original como meros generadores de texto libre para
+consolidarse como núcleos cognitivos y motores de orquestación dentro de arquitecturas de software complejas.
+Su implementación moderna ya no depende exclusivamente de la información estática almacenada en sus parámetros 
+durante el entrenamiento, sino que se articula mediante diversos paradigmas operativos fundamentales:
+\begin{itemize}
+    \item \textbf{Generación Aumentada por Recuperación (\englishText{RAG})} Consiste en desacoplar el conocimiento del modelo de su capacidad de redacción. El sistema consulta dinámicamente bases de datos vectoriales o 
+    repositorios documentales externos para inyectar información verídica y actualizada directamente en el contexto del 
+    \englishText{prompt}, mitigando drásticamente el riesgo de alucinaciones.
+
+    \item \textbf{Uso de Herramientas y Llamadas a Funciones}
+    Los modelos actuales poseen la capacidad de evaluar de forma autónoma cuándo carecen de información
+    para resolver un problema, formular consultas estructuradas hacia \englishText{APIs} externas o
+    ejecutar código en entornos seguros, integrándose con sistemas externos de manera bidireccional.
+
+    \item \textbf{Sistemas Agénticos} Consiste en la configuración de flujos de trabajo donde el 
+    modelo actúa como un agente autónomo capaz de descomponer un objetivo general en subtareas, planificar su 
+    ejecución de manera iterativa, evaluar críticamente sus propios resultados intermedios y corregir su estrategia 
+    sin necesidad de intervención humana constante.
+    
+    \item \textbf{Estructuración Estricta de Datos} Mediante la aplicación de máscaras gramaticales y esquemas de restricción en 
+    tiempo de decodificación, los \englishText{LLMs} se emplean de forma masiva para traducir texto clínico o narrativo 
+    completamente desestructurado hacia formatos de datos estrictos y tipados (como esquemas \englishText{JSON} 
+    o \englishText{XML}). Esta capacidad permite mapear el lenguaje natural directamente hacia bases de datos relacionales 
+    u ontologías sin perder la riqueza semántica de la expresión original.
+\end{itemize}
+
+\subsection{Sistemas integrados: \englishText{ASR}, \englishText{PLN} y \englishText{LLM} 
+aplicados a la documentación clínica}
+
+Las secciones anteriores han trazado la evolución independiente de cada capa tecnológica 
+que interviene en la generación automática de informes clínicos. Sin embargo, el verdadero 
+reto del estado del arte no reside en el rendimiento aislado de cada componente, sino en 
+su integración coherente dentro de un pipeline clínico completo, especialmente en el 
+contexto del español médico.
+
+Los trabajos más representativos en este ámbito convergen en la combinación de 
+\englishText{Whisper} como motor de transcripción con \englishText{LLMs} como redactores 
+del informe final. \citeText{adedeji2024soundhealthcareimprovingmedical} y 
+\citeText{li2024searchingbestpracticesmedical} proponen arquitecturas \englishText{end-to-end} 
+donde el texto transcrito se entrega directamente al \englishText{LLM}, empleando diversas 
+técnicas de preprocesamiento para reducir el \englishText{WER} y aligerar la carga de 
+revisión manual. Por su parte, \citeText{10912421} aborda la especialización del modelo 
+\englishText{ASR} mediante \englishText{fine-tuning} de \englishText{Whisper} sobre datos 
+del dominio médico, e incorpora servicios de terceros para la traducción de conceptos 
+extraídos a vocabularios estándar como \englishText{CIE-10-ES} y \englishText{SNOMED CT}.
+
+No obstante, el análisis de estos trabajos permite identificar una limitación estructural 
+común: la dependencia casi exclusiva de la capacidad generativa intrínseca del 
+\englishText{LLM} para estructurar el informe clínico final a partir de la transcripción 
+cruda. En ninguno de estos sistemas se introduce una capa de comprensión semántica 
+intermedia que valide y enriquezca la información antes de que el modelo generativo la 
+procese. Esta ausencia expone al sistema a tres vulnerabilidades concretas derivadas de 
+las limitaciones caracterizadas en las secciones anteriores:
+
+\begin{itemize}
+    \item \textbf{Alucinación clínica no controlada} Al no disponer de un conjunto 
+    verificado de entidades médicas extraídas, el \englishText{LLM} puede introducir 
+    conceptos diagnósticos o farmacológicos ausentes en el dictado original.
+
+    \item \textbf{Ausencia de normalización terminológica} Sin un paso explícito de 
+    mapeo a \englishText{SNOMED CT} y \englishText{CIE-10-ES}, los informes generados 
+    carecen de los identificadores únicos necesarios para su integración en los sistemas 
+    de Historia Clínica Electrónica (\englishText{HCE}) del Sistema Nacional de Salud.
+
+    \item \textbf{Incompatibilidad con estándares de interoperabilidad} Ninguno de los 
+    trabajos referenciados produce una salida estructurada conforme al estándar 
+    \englishText{HL7 FHIR}, requisito indispensable para el intercambio de información 
+    clínica entre diferentes niveles asistenciales.
+\end{itemize}
+
+Para mitigar estas vulnerabilidades, el sistema propuesto en este trabajo introduce una 
+capa intermedia de comprensión semántica basada en \englishText{NER} clínico especializado 
+en español, apoyado en los modelos y corpus del \englishText{BSC} descritos en la sección 
+anterior. Las entidades extraídas no se limitan a enriquecer el contexto del 
+\englishText{LLM}: se mapean explícitamente a \englishText{SNOMED CT} y 
+\englishText{CIE-10-ES} mediante consultas a una instancia local de 
+\englishText{Snowstorm}, y se utilizan como fuente verificada para la construcción 
+independiente de un informe \englishText{HL7 FHIR}. De este modo, el \englishText{LLM} 
+actúa no como intérprete primario del dictado, sino como redactor de un informe cuyo 
+contenido clínico ya ha sido validado y normalizado en etapas anteriores del pipeline.
 
 \section{Marco Teorico}
 
@@ -140,7 +303,7 @@ en texto plano.
 
 \subsection{Procesamiento del Lenguaje Natural (\englishText{PLN})}
 El Procesamiento del Lenguaje Natural (\englishText{Natural Language Processing} o \englishText{PLN}) 
-es una ramade la ciencia de la computación, la lingüística y la inteligencia artificial orientada 
+es una rama de la ciencia de la computación, la lingüística y la inteligencia artificial orientada 
 al desarrollo de metodologías algorítmicas que permiten a los ordenadores comprender, 
 interpretar y manipular el lenguaje humano de forma automatizada \citeText{jm3}.
 
@@ -179,27 +342,32 @@ toma la transcripción literal del audio médico, las entidades médicas extraí
 junto a los detalles extraidos de los vocabularios estándar de interoperabilidad (\englishText{SNOMED CT} y 
 \englishText{CIE-10-ES}) para generar un informe clínico y coherente.
 
-
 \subsection{Estándares de Interoperabilidad (\englishText{SNOMED CT} y \englishText{CIE-10-ES})}
-La interoperabilidad semántica en los sistemas de información sanitaria digital exige clasificaciones
-normalizadas a nivel internacional. En este sistema se consideran dos estándares fundamentales:
-
-\boldparagraph{SNOMED CT}{
-    La \englishText{Systematized Nomenclature of Medicine - Clinical Terms} es la terminología clínica integral
-    y polijerárquica más semánticamente rica del mundo. Organizada mediante conceptos, descripciones y relaciones
-    lógicas, permite codificar con granularidad cualquier juicio clínico, hallazgo, estructura anatómica
-    o procedimiento. Facilita que diferentes sistemas informáticos interpreten con exactitud inequívoca el 
-    significado de los términos registrados por el personal clínico.
-}
-
-\boldparagraph{CIE-10-ES}{
-    Es la Clasificación Internacional de Enfermedades, 10.ª revisión, correspondiente a la Modificación
-    Clínica adoptada de manera oficial para la codificación diagnóstica y de procedimientos en el Sistema
-    Nacional de Salud de España. A diferencia de \englishText{SNOMED CT} (que es una terminología analítica), 
-    la \englishText{CIE-10-ES} es un sistema de clasificación cerrado y estadístico, esencial para la gestión
-    epidemiológica, la facturación sanitaria, la indexación de historias clínicas y la auditoría médica
-    institucional.
-}
+La interoperabilidad semántica en los sistemas de información sanitaria digital exige el uso de estándares
+y clasificaciones normalizadas a nivel internacional. En el marco de este sistema, se 
+integran dos estándares fundamentales y complementarios, cada uno con un propósito arquitectónico 
+diferenciado:
+\begin{itemize}
+    \item \textbf{SNOMED CT} La \englishText{Systematized Nomenclature of Medicine - Clinical Terms} 
+    es la terminología clínica
+    integral, polijerárquica y con mayor riqueza semántica a nivel global . Estructurada
+    mediante conceptos, descripciones y relaciones lógicas binarias, actúa como una ontología médica
+    basada en lógicas de descripción. Esto permite registrar con máxima granularidad
+    cualquier juicio clínico, hallazgo, estructura anatómica, organismo o procedimiento. Su función principal
+    es dar soporte directo a la captura de datos en el punto de atención (historia clínica electrónica), 
+    garantizando que diferentes sistemas informáticos interpreten con exactitud inequívoca el significado
+    del discurso clínico \cite{snomed2026}.
+    \item \textbf{CIE-10-ES} Es la Clasificación Internacional de Enfermedades, 10.ª revisión, 
+    correspondiente a la Modificación
+    Clínica (MC) y al Sistema de Clasificación de Procedimientos (SCP), adoptada de forma oficial por el 
+    Ministerio de Sanidad como el referente obligatorio para la codificación clínica en el Sistema 
+    Nacional de Salud (SNS) de España. A diferencia de \englishText{SNOMED CT} 
+    (concebida para el registro clínico directo), la \englishText{CIE-10-ES} es un sistema de clasificación
+    cerrado, monoárquico y mutuamente excluyente. Su diseño está optimizado para 
+    la agregación de datos con fines estadísticos, gestión epidemiológica, financiación sanitaria a 
+    través de los Grupos Relacionados por el Diagnóstico (GRD) y auditoría médica institucional 
+    \cite{sanidad2026}.
+\end{itemize}
 
 Ambos forman parte del sistema a desarrollar, donde se desempeñan como proveedores y validadores de información clínica.
 Al identificar una entidad médica, el sistema permite validar su existencia, obtener su información detallada
@@ -207,18 +375,65 @@ y obtener un identificador único. Esto garantiza su interoperabilidad internaci
 de \englishText{SNOMED CT}, así como su integración con los sistemas nacionales de historias
 clínicas electrónicas (\englishText{HCE}), gracias a los identificadores de \englishText{CIE-10-ES}.
 
-\nota{No se si colocar referencias de las webs de ellos para justificar el contenido}
-
 \subsection{\englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources})}
 
 \englishText{HL7 FHIR} es un estándar para el intercambio de datos en el sector salud, 
 diseñado para facilitar la transferencia electrónica de información clínica de manera ágil y segura. Basado
-en arquitecturas web modernas y APIs de tipo REST, este estándar estructura la información mediante un conjunto
-de componentes modulares denominados recursos y sus respectivas relaciones lógicas. Esto permite que diversos
-sistemas de información sanitaria interactúen e integren sus datos con una alta eficiencia y 
-precisión semántica.
+en arquitecturas web modernas y \englishText{APIs} de tipo \englishText{REST}, este estándar estructura la 
+información mediante un conjunto de componentes modulares denominados recursos y sus respectivas relaciones lógicas. 
+Esto permite que diversos sistemas de información sanitaria interactúen e integren sus datos con una alta eficiencia y 
+precisión semántica \cite{sanidad2023}.
 
-\nota{No se si colocar referencias de las webs de ellos para justificar el contenido}
+
+\subsection{Marco Normativo de Protección de Datos en el Ámbito Sanitario}
+
+El desarrollo e implantación de sistemas de software orientados a la gestión, transcripción y estructuración
+de historias clínicas electrónicas exigen el cumplimiento estricto del marco jurídico vigente en materia de
+privacidad y protección de datos. En el contexto de la Unión Europea y el Estado español, la consideración de
+los datos de salud como categorías especiales de datos impone obligaciones técnicas y organizativas rigurosas
+para garantizar la confidencialidad, integridad y disponibilidad de la información médica.
+
+\boldparagraph{Reglamento General de Protección de Datos \englishText{(RGPD)}}{
+    El Reglamento \englishText{(UE) 2016/679} del Parlamento Europeo y del Consejo \englishText{(RGPD)} constituye el marco normativo
+    unificado a nivel europeo para la tutela de los derechos de las personas físicas en lo que respecta al 
+    tratamiento de sus datos personales. De acuerdo con el Artículo 9 del \englishText{RGPD}, los datos relativos a la 
+    salud se clasifican de forma explícita como \textbf{categorías especiales de datos}, prohibiendo con carácter general
+    su tratamiento a menos que concurra una de las excepciones tasadas, entre las que destacan el consentimiento
+    explícito del interesado o que el tratamiento sea necesario para fines de medicina preventiva, diagnóstico
+    médico o prestación de asistencia sanitaria.
+
+    El reglamento introduce principios fundamentales aplicables al diseño arquitectónico de software sanitario, 
+    tales como:
+    \begin{itemize}
+        \item \textbf{Privacidad desde el diseño y por defecto:} Obligación de integrar medidas 
+        técnicas de protección (como la seudonimización o el cifrado de datos en tránsito y en reposo mediante 
+        protocolos \englishText{TLS/WSS}) desde las etapas iniciales del desarrollo del pipeline de datos.
+        \item \textbf{Principio de minimización de datos:} Los sistemas deben capturar, transferir y almacenar 
+        únicamente aquella información estrictamente necesaria para cumplir con la finalidad del servicio.
+        \item \textbf{Principio de integridad y confidencialidad junto a la limitación del almacenamiento:} 
+        Los datos personales y biomédicos deben ser protegidos mediante medidas técnicas óptimas frente a accesos
+        no autorizados, garantizando que su retención no se prolongue más allá de lo estrictamente necesario. La arquitectura 
+        propuesta implementa este principio al canalizar el flujo de voz mediante protocolos seguros \englishText{WSS} y gestionar el procesamiento
+        de los fragmentos de audio y el reporte de control enriquecido exclusivamente en memoria volátil durante la sesión 
+        activa, evitando la persistencia indefinida de archivos de audio crudos en el servidor backend.
+    \end{itemize}
+}
+
+\boldparagraph{Ley Orgánica de Protección de Datos y Garantía de los Derechos Digitales \englishText{(LOPDGDD)}}{
+A nivel nacional, la Ley Orgánica 3/2018 \englishText{(LOPDGDD)} traspone y complementa las disposiciones del \englishText{RGPD} 
+en el ordenamiento jurídico de España. Esta ley adquiere especial relevancia en el ámbito biomédico y asistencial a través 
+de su Disposición Adicional Decimoséptima, la cual regula específicamente el amparo legal para el tratamiento de datos de salud.
+
+La \englishText{LOPDGDD} legitima el tratamiento de datos personales en el sector sanitario sin necesidad de un consentimiento 
+constante y reiterado cuando este se fundamente en la legislación sanitaria aplicable 
+(como la Ley 41/2002 de autonomía del paciente), 
+facilitando la gestión de la historia clínica. Asimismo, establece los requisitos para el acceso a las historias clínicas por
+parte de los profesionales de la salud, determinando que los sistemas informáticos deben implementar mecanismos estrictos
+de control de accesos, auditoría de logs (para registrar de manera inequívoca qué usuario ha accedido o modificado un informe) 
+y la trazabilidad del dato. Por último, la norma introduce los derechos digitales de la ciudadanía, asegurando el derecho
+a la seguridad y neutralidad en el entorno de internet, lo que impacta directamente en el uso de pasarelas (\englishText{gateways})
+y comunicaciones cifradas cliente-servidor a través de la red.
+}
 
 \section{Marco Conceptual}
 
@@ -264,10 +479,9 @@ del modelo generativo:
     a la base de datos de \englishText{SNOMED CT} para obtener la información relevante de la entidad junto
     a un identificador único.
     
-    \textbf{Modulo de \englishText{CIE-10-ES}:} Ultima etapa del \englishText{pipeline} de procesamiento, donde
-    se \englishText{mappean} los códigos unicos de \englishText{SNOMED CT} a códigos unicos de \englishText{CIE-10-ES} para obtener
-    un identificador único que represente el concepto médico a nivel nacional administrativo.
-    junto a un identificador único.
+    \textbf{Modulo de \englishText{CIE-10-ES}:} Última etapa del \englishText{pipeline} de procesamiento, donde
+    se \englishText{mappean} los códigos unicos de \englishText{SNOMED CT} a códigos únicos de \englishText{CIE-10-ES} 
+    represente el concepto médico a nivel nacional administrativo.
      
     \item \textbf{Generación de Informes Médicos:} Este módulo recibe la peticion del \englishText{gateway} junto a
     los datos extraidos en las etapas anteriores y genera dos artefactos: 
