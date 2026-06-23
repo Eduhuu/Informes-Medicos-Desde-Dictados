@@ -91,6 +91,8 @@ especializados para la medicina en español, destacando la familia de modelos
 (entrenados con miles de millones de palabras extraídas de la literatura médica y registros de salud electrónicos) 
 y sus variantes ajustadas para tareas específicas.
 
+% \input{imagenes/diagramas/capitulo_marco_teorico/Ecosistema_BSC}
+
 Es precisamente sobre este ecosistema de datos y modelos del \englishText{BSC} donde se apoyan las herramientas empleadas en el 
 sistema propuesto en este trabajo. En concreto, el sistema utiliza dos modelos con un linaje tecnológico directo
 con estos esfuerzos: por un lado, \englishText{spanish-medical-ner}, un modelo de la comunidad optimizado para la 
@@ -385,7 +387,7 @@ Esto permite que diversos sistemas de información sanitaria interactúen e inte
 precisión semántica \cite{sanidad2023}.
 
 
-\subsection{Marco Normativo de Protección de Datos en el Ámbito Sanitario}
+\subsection{Normativo de Protección de Datos}
 
 El desarrollo e implantación de sistemas de software orientados a la gestión, transcripción y estructuración
 de historias clínicas electrónicas exigen el cumplimiento estricto del marco jurídico vigente en materia de
@@ -447,7 +449,7 @@ generativos mediante la validación y el enriquecimiento previo.
 \subsection{Flujo Arquitectónico de Datos y Conocimiento}
 Como se ilustra en la Figura \ref{fig:diagrama_arquitectura_horizontal}, el ciclo de 
 vida del dato clínico sigue un \englishText{pipeline} lineal en sus fases tempranas, 
-transformándose en un proceso de enriquecimiento contextual antes de la intervención
+transformándose en un proceso de enriquecimiento antes de la intervención
 del modelo generativo:
 
 \begin{enumerate}
@@ -491,9 +493,9 @@ del modelo generativo:
     Este informe es redactado por un \englishText{LLM} y es uno de los resultados finales de la sesión.
 
     \textbf{JSON de \englishText{FHIR}:}
-    Este artefacto a generar es un \englishText{JSON} que cumple con el estandar \englishText{FHIR} que representa el informe clínico en formato
-    estandarizado. Este \englishText{JSON} es generado por la aplicación backend y es uno de los resultados finales de la sesión.
-    del informe clínico.
+    Este artefacto a generar es un \englishText{JSON} que cumple con el estandar \englishText{FHIR} que representa 
+    el informe clínico en formato estandarizado. Este \englishText{JSON} es generado por la aplicación
+    de procesamiento lingüístico y es uno de los resultados finales de la sesión.
 \end{enumerate}
 
 

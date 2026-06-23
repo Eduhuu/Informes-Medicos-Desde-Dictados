@@ -61,15 +61,19 @@ iteraciones anteriores, se detalla en el Apéndice~\ref{appendix:gestion}.
 \subsection{Vista general y despliegue}\label{subsection:vista_general}
 
 La arquitectura implementada sigue un modelo cliente--\englishText{gateway}--servicio en tres capas
-desacopladas, como se resume en la Tabla~\ref{tab:componentes_sistema}.
+desacopladas, como se resume en la Figura~\ref{fig:arquitectura_implementada}.
 
-% \input{tablas/capitulo_desarrollo_del_tfm/componentes_sistema_despliegue.tex}
 \input{imagenes/diagramas/desarrollo_del_tfm/arquitectura_implementada.tex}
 
 \boldparagraph{Capa cliente}{
     la aplicación móvil captura audio en formato PCM a 16\,kHz, mono y 16\,bits, lo segmenta
     mediante detección de actividad de voz (\englishText{Voice Activity Detection}, VAD) y lo
-    transmite al \englishText{gateway} mediante \englishText{WebSocket}.
+    transmite al \englishText{gateway} mediante \englishText{WebSocket}. Esta configuración de
+    audio no es arbitraria: coincide exactamente con el formato de entrada nativo de
+    \englishText{Whisper} (PCM de 16\,bits, mono, muestreado a 16\,kHz), de modo que el servicio
+    \englishText{ASR} recibe el audio listo para inferencia sin necesidad de remuestrear ni
+    convertir canales en el servidor, lo que reduce la latencia por fragmento y evita la pérdida de
+    calidad introducida por conversiones adicionales.
 }
 
 \boldparagraph{Capa de acceso}{
@@ -101,10 +105,8 @@ al finalizar la sesión para poder depurar errores en caso de ser necesario.
 \subsection{Arquitectura de seguridad y privacidad}\label{subsection:seguridad_privacidad}
 
 La protección de datos clínicos constituye un requisito transversal del sistema, alineado con el
-marco normativo español (RGPD y LOPDGDD) y con el principio de privacidad por diseño descrito en la
+marco normativo español \englishText{(RGPD y LOPDGDD)} y con el principio de privacidad por diseño descrito en la
 Introducción. La Tabla~\ref{tab:medidas_seguridad} muestra las medidas previstas en el diseño.
-
-\vspace{1cm}
 
 \input{tablas/capitulo_desarrollo_del_tfm/medidas_seguridad.tex}
 
@@ -116,15 +118,65 @@ y lenguaje se ejecutan en entorno local, evitando la exfiltración de dictados m
 La aplicación móvil, desarrollada con React Native y Expo en el directorio \texttt{generacion-informes/},
 cumple el rol de cliente de captura de dictados médicos.
 
+\subsubsection{Prototipado y diseño de la interfaz}\label{subsubsection:prototipado_diseno}
+
+El núcleo de este TFM reside en el \englishText{pipeline} de transcripción, normalización
+terminológica y generación de informes descrito en las secciones anteriores; la interfaz móvil
+cumple un rol instrumental como cliente de captura y no constituye un objeto de estudio en sí
+mismo. Por ello, su diseño siguió un proceso de prototipado en lugar de un ciclo completo de
+diseño centrado en el usuario, suficiente para validar los dos flujos de entrada de audio
+(micrófono en tiempo real y fichero pregrabado) sin desviar esfuerzo del desarrollo del
+\textit{backend}.
+
+\boldparagraph{\englishText{Wireframes}}{
+    se diseñan dos modos de captura como pestañas (\textit{tabs}) de una misma pantalla
+    con elementos en comun como: un indicador de estado de conexión persistente,
+    un área de contenido específica de cada modo y un botón de inicio de sesión.
+    Estos \textit{wireframes} se
+    trasladaron directamente a componentes de React Native reutilizables
+    (\texttt{ModeSelector.js} para la selección de pestaña, \texttt{AudioFileList.js} para la
+    cola de ficheros y \texttt{RecordingScreen.js} como contenedor de pantalla), priorizando una
+    paleta de colores y tipografía mínimas para no introducir variables de confusión en las
+    pruebas de evaluación del Capítulo~\ref{chapter:evaluacion}.
+}
+
+\boldparagraph{Implementación incremental}{
+    primero se construyó el modo \textit{Micrófono} (estado de sesión, nivel de voz en tiempo
+    real, duración y contador de fragmentos emitidos) y después el modo \textit{Archivo}, que
+    reutiliza el mismo cliente \englishText{WebSocket} pero sustituye la captura en vivo por la
+    selección y el envío secuencial de ficheros \englishText{WAV} pregrabados (Figura~\ref{fig:wireframes_app}).
+    Este segundo modo no responde a una necesidad de uso clínico real, sino a una necesidad
+    metodológica: permite cargar el mismo audio pregrabado de forma repetible y determinista,
+    lo que resulta indispensable para las pruebas cuantitativas del \englishText{ASR} y de
+    extremo a extremo (\englishText{end-to-end}) del Capítulo~\ref{chapter:evaluacion}, donde se
+    requiere comparar resultados sobre un conjunto fijo de dictados de referencia en lugar de
+    depender de grabaciones en vivo no reproducibles.
+}
+
+La Figura~\ref{fig:wireframes_app} ilustra el resultado de este proceso: la pantalla del modo
+\textit{Micrófono}, con la monitorización del nivel de voz y los contadores de sesión
+(Figura~\ref{fig:wireframes_app}a), y la pantalla del modo \textit{Archivo}, con la cola de
+ficheros pendientes de envío (Figura~\ref{fig:wireframes_app}b).
+
+\input{imagenes/diagramas/desarrollo_del_tfm/wireframes_app.tex}
+
 \boldparagraph{Entradas}{
     señal de audio del micrófono del dispositivo o ficheros de audio pregrabados en formato PCM/WAV.
+    En el modo \textit{Archivo}, la aplicación valida que el fichero seleccionado cumpla el mismo
+    formato exigido al micrófono (\englishText{WAV} \englishText{PCM} de 16\,kHz, mono y 16\,\englishText{bits}); 
+    en caso contrario, rechaza
+    el fichero. Esta restricción
+    es intencional: garantiza que ambos flujos de entrada entreguen al
+    servicio \englishText{ASR} audio en el formato que \englishText{faster-whisper} espera de forma
+    nativa, evitando remuestreos implícitos que degraden la calidad de la transcripción o
+    introduzcan variabilidad entre sesiones durante la evaluación del Capítulo~\ref{chapter:evaluacion}.
 }
 
 \boldparagraph{Procesamiento}{
     el servicio de captura PCM (\texttt{PcmAudioCaptureService}) produce fragmentos de audio que el
     detector de actividad de voz (\texttt{VoiceActivityDetector}) segmenta según los umbrales
     definidos en \texttt{AudioConstants.js}. Por cada fragmento, el cliente \englishText{WebSocket}
-    (\texttt{AudioStreamWebSocketClient.js}) envía un par de mensajes: primero un objeto JSON con
+    (\texttt{AudioStream WebSocketClient.js}) envía un par de mensajes: primero un objeto JSON con
     metadatos (\texttt{type}, \texttt{sessionId}, \texttt{sequence}, \texttt{timestamp},
     \texttt{sampleRate}) y, a continuación, los bytes PCM en binario. Al finalizar el dictado, envía
     un mensaje \texttt{session\_end}.
@@ -174,7 +226,7 @@ fragmento de audio, o de forma diferida al cierre de sesión para la generación
 \boldparagraph{Procesamiento}{el proveedor \englishText{faster-whisper} (\texttt{FastWhisperProvider})
     transcribe el audio aplicando un \textit{initial prompt} con terminología médica configurada en
     \texttt{config.yaml}, esto es, palabras clave que ayudan al modelo a transcribir de forma mas precisa.}
-
+    PlnOrchestrator
 
 \boldparagraph{Salidas}{texto transcrito, segmentos temporales, confianza y latencia en milisegundos.}
 
@@ -186,8 +238,12 @@ fragmento de audio, o de forma diferida al cierre de sesión para la generación
     \englishText{NER}: \texttt{pln\_medical} (\englishText{spanish\_medical\_ner}) para entidades
     clínicas generales y \texttt{pln\_farmacos} (\englishText{bsc-bio-ehr-es-pharmaconer}) para
     terminología farmacológica. Si ambos modelos detectan el mismo intervalo de texto, se conserva
-    únicamente la entidad de \texttt{pln\_farmacos} dado que este es mas específico. Finalmente,
-    se fusionan entidades marcadas que sean contiguas y que posean la misma etiqueta.
+    únicamente la entidad de \texttt{pln\_farmacos}, dado que este es más específico. Como optimización
+    introducida durante el desarrollo, la función \texttt{group\_entities} fusiona además entidades
+    contiguas que comparten etiqueta: los modelos suelen fragmentar términos clínicos multipalabra
+    (p.\ ej.\ \textit{hipertensión arterial} como dos entidades \texttt{Problem}), y su unión permite
+    consultar \englishText{SNOMED CT} con un término compuesto en lugar de realizar búsquedas aisladas
+    (Figura~\ref{fig:union_entidades_ner}).
     \input{imagenes/diagramas/desarrollo_del_tfm/fusion_entidades_NER.tex}
 }
 
@@ -295,14 +351,20 @@ verificada para el \englishText{LLM} y reporte de control en texto plano.}
 
 \subsection{Flujo por fragmento de audio}\label{subsection:flujo_fragmento}
 
-La Figura~\ref{fig:diagrama_conceptual} presenta el diagrama de secuencia del flujo completo de
-procesamiento, desde la conexión inicial hasta la generación de los artefactos finales de sesión.
+Las Figuras~\ref{fig:diagrama_conceptual_transcripcion}, \ref{fig:diagrama_conceptual_informe_llm}
+y \ref{fig:diagrama_conceptual_fhir} presentan el diagrama de secuencia del flujo completo de
+procesamiento, desde la conexión inicial hasta la generación de los artefactos finales de sesión,
+dividido en sus tres fases: transcripción en tiempo real por fragmento de audio, cierre de sesión
+con generación del informe clínico mediante \englishText{LLM}, y generación del informe
+estructurado \englishText{FHIR}.
 
 \input{imagenes/diagramas/desarrollo_del_tfm/Diagrama de Flujos App.tex}
 
 Por cada fragmento de voz detectado, el ciclo de procesamiento sigue estos pasos:
 
 \begin{enumerate}
+    \item Se genera la conexion inicial con el \englishText{gateway} mediante el endpoint
+    \texttt{WSS connect /audio}.
     \item La aplicación móvil envía el par de mensajes \englishText{WebSocket} (metadatos JSON +
     binario PCM).
     \item El \englishText{gateway} reenvía el audio al servicio \englishText{ASR} mediante
@@ -330,12 +392,14 @@ finalización:
     \item Limpia el almacén de entidades en memoria del \englishText{gateway}.
 \end{enumerate}
 
-\subsection{Patrones de diseño y configuración}\label{subsection:patrones_configuracion}
+\subsection{Patrones de diseño y rutas}\label{subsection:patrones_configuracion}
 
 La Tabla~\ref{tab:endpoints_asr} resume los endpoints HTTP principales del servicio \englishText{ASR},
 definidos en \texttt{app/api/routes.py}.
 
 \input{tablas/capitulo_desarrollo_del_tfm/endpoints_ASR_PLN.tex}
+
+\subsubsection{Patrones de diseño}\label{subsubsection:patrones_diseno}
 
 Entre los patrones de diseño aplicados destacan:
 
@@ -368,8 +432,9 @@ diferenciados:
 \begin{itemize}
     \item \textbf{\texttt{Reporte.txt}} --- reporte de control enriquecido que consolida la
     transcripción acumulada, las entidades \englishText{NER}, los conceptos \englishText{SNOMED CT}
-    y los códigos \englishText{CIE-10-ES} de todos los fragmentos. Constituye la entrada
-    verificada y estructurada para el módulo \englishText{LLM}.
+    y los códigos \englishText{CIE-10-ES} de todos los fragmentos. Este se guarda en memoria siempre
+    y cuando en la configuracion del sistema se encuentre activado el flag \texttt{reports.enabled}.
+    El contenido del mismo es la entrada verificada y estructurada para el módulo \englishText{LLM}.
     \item \textbf{\texttt{Informe.txt}} --- informe clínico redactado por el \englishText{LLM} a
     partir del reporte de control, conforme a la definición de \textit{Informe Resultante} del
     Capítulo~\ref{chapter:marco_teorico_y_referencial}.
