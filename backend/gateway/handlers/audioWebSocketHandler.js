@@ -66,10 +66,10 @@ function attachAudioWebSocketHandlers(ws) {
                 if (metadata.type === WS_MESSAGE_TYPE_SESSION_END) {
                     pendingMetadata = null;
 
-                    // Si el modo de procesamiento es batch, se maneja el final de la sesión
+                    // Si el modo de procesamiento es batch, se transcribe el audio acumulado
+                    // antes de continuar con la finalización de sesión compartida.
                     if (processingMode === PROCESSING_MODE_BATCH) {
                         await _handleBatchSessionEnd(ws, metadata);
-                        return;
                     }
 
                     if (pendingTranscriptions.size > 0) {

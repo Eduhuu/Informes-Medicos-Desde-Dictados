@@ -1,0 +1,89 @@
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.92\linewidth}{!}{%
+    \begin{tikzpicture}[
+        font=\sffamily,
+        corpusBox/.style={
+            draw, thick, align=center,
+            inner xsep=6pt, inner ysep=6pt,
+            text width=2.3cm, minimum height=1.3cm
+        },
+        unifiedBox/.style={
+            draw, thick, align=center,
+            inner xsep=10pt, inner ysep=8pt,
+            text width=5.0cm, minimum height=1.5cm,
+            fill=blue!5
+        },
+        modelBox/.style={
+            draw, thick, align=center,
+            inner xsep=8pt, inner ysep=8pt,
+            text width=3.9cm, minimum height=1.6cm
+        },
+        finalBox/.style={
+            draw, thick, align=center,
+            inner xsep=8pt, inner ysep=8pt,
+            text width=4.2cm, minimum height=1.8cm,
+            fill=blue!10
+        },
+        arrow/.style={-{Stealth[scale=1]}, thick},
+        lbl/.style={align=center, font=\bfseries}
+    ]
+
+    % ---------- Fila 1: corpus individuales ----------
+    \node[corpusBox] (pharmaconer) at (0,0)
+        {\footnotesize\textbf{PharmaCoNER}\\\scriptsize Fármacos y proteínas\\\scriptsize(\textit{SPACCC})};
+    \node[corpusBox, right=0.45cm of pharmaconer] (symptemist)
+        {\footnotesize\textbf{SympTEMIST}\\\scriptsize Síntomas};
+    \node[corpusBox, right=0.45cm of symptemist] (medprocner)
+        {\footnotesize\textbf{MedProcNER}\\\scriptsize Procedimientos};
+    \node[corpusBox, right=0.45cm of medprocner] (distemist)
+        {\footnotesize\textbf{DisTEMIST}\\\scriptsize Enfermedades};
+
+    % Punto medio de toda la fila 1, para centrar el título
+    \coordinate (rowMid) at ($(pharmaconer.north)!0.5!(distemist.north)$);
+    \node[lbl, above=0.3cm of rowMid] (corpusTitle) {Campañas de evaluación del BSC};
+
+    % Punto medio entre SympTEMIST y MedProcNER, para centrar el corpus unificado
+    \coordinate (midTop) at ($(symptemist.east)!0.5!(medprocner.west)$);
+
+    % ---------- Fila 2: corpus unificado ----------
+    \node[unifiedBox, below=0.9cm of midTop, anchor=north] (unified) {
+        \textbf{Corpus Multiclase Unificado}\\[3pt]
+        \footnotesize Reconocimiento y vinculación (\textit{entity linking}) de entidades biomédicas en español, mapeadas a \textit{SNOMED CT}
+    };
+
+    % ---------- Fila 3: modelos derivados (simétricos bajo unified) ----------
+    \node[modelBox, below=0.9cm of unified, anchor=north, xshift=-2.4cm] (robertaModel) {
+        \footnotesize\textbf{RoBERTa-base-biomedical-clinical-es}\\[3pt]
+        \scriptsize Preentrenado con literatura médica y registros de salud electrónicos
+    };
+
+    \node[finalBox, below=0.9cm of unified, anchor=north, xshift=2.5cm] (systemModels) {
+        \footnotesize\textbf{Modelos empleados en el sistema}\\[3pt]
+        \footnotesize\textbf{spanish-medical-ner}\\
+        \scriptsize Síntomas, procedimientos y enfermedades\\[3pt]
+        \footnotesize\textbf{bsc-bio-ehr-es-pharmaconer}\\
+        \scriptsize Fármacos y proteínas
+    };
+
+    % ---------- Conexiones: corpus individuales -> unificado ----------
+    \draw[arrow] (pharmaconer.south) |- (unified.north -| pharmaconer);
+    \draw[arrow] (symptemist.south) -- (unified.north -| symptemist);
+    \draw[arrow] (medprocner.south) -- (unified.north -| medprocner);
+    \draw[arrow] (distemist.south) |- (unified.north -| distemist);
+
+    % ---------- Conexiones: unificado -> modelos derivados ----------
+    \draw[arrow] (unified.south) -- (robertaModel.north)
+        node[font=\scriptsize, pos=0.45, left=2pt] {entrena};
+    \draw[arrow] (unified.south) -- (systemModels.north)
+        node[font=\scriptsize, align=center, pos=0.45, right=2pt] {hereda criterios\\de anotación};
+
+    % ---------- Conexión: RoBERTa -> modelos del sistema ----------
+    \draw[arrow] (robertaModel.east) -- (systemModels.west)
+        node[font=\scriptsize, midway, above] {linaje};
+
+    \end{tikzpicture}%
+    }
+    \caption{Ecosistema de corpus y modelos biomédicos en español desarrollados por el Barcelona Supercomputing Center (BSC), y su relación con los modelos empleados en el sistema propuesto.}
+    \label{fig:diagrama_ecosistema_bsc}
+\end{figure}

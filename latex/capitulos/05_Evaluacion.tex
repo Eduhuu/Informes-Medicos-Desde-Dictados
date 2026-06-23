@@ -1,14 +1,22 @@
 \chapter{Evaluación}\label{chapter:evaluacion}
-Explicar porque es importante obtener metricas para evaluar y comparar y que se quiere llegar con estas metricas.
-\section{Obtencion de metricas}
-como se obtuvieron las metricas.
-\subsection{Metricas de transcripcion}
-como se obtuvieron las metricas de transcripcion.
-\subsection{Metricas de extraccion de entidades clínicas}
-como se obtuvieron las metricas de extraccion de entidades clínicas.
-\subsection{Metricas de consulta SNOMED CIE-10-ES}
-como se obtuvieron las metricas de consulta SNOMED CIE-10-ES.
-\subsection{Metricas de end to end}
-como se obtuvieron las metricas de evaluacion de la aplicacion generalmente. Tengo la idea de utilizar el enfoque de 
-modelo IA evalua el sistema y da una nota.
 
+\section{Metodología de evaluación}
+Este capítulo tiene como objetivo contrastar empíricamente el sistema implementado en el Capítulo 3 frente
+a los objetivos específicos definidos en la Sección 1.2.1. La evaluación se estructura en cuatro dimensiones
+técnicas cuantitativas —transcripción (ASR), extracción de entidades (PLN/NER), normalización terminológica y
+validación estructural (FHIR)— complementadas con un análisis de eficiencia temporal del pipeline. 
+Adicionalmente, se discute como limitación metodológica la imposibilidad de realizar la validación cualitativa con
+personal clínico prevista inicialmente.
+
+\section{Conjunto de datos de evaluación}
+
+Para garantizar la reproducibilidad de las métricas, se debe construir un conjunto de evaluación
+(test set) compuesto por dictados médicos de referencia, cada uno acompañado de:
+
+Transcripción de referencia (gold standard): texto verificado manualmente palabra por palabra.
+Anotación de entidades de referencia: marcado manual de las entidades clínicas relevantes 
+(diagnósticos, procedimientos, fármacos, dosis y alergias) 
+según las categorías definidas en el objetivo específico 2 (Sección 1.2.1).
+
+Usar una muestra del corpus SPACCC (mencionado en la Sección 2.1.2) para casos clínicos en español, 
+leyendo los textos en voz alta y grabándolos tú mismo.

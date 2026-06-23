@@ -1,0 +1,92 @@
+Eres un evaluador clínico-técnico encargado de hacer una evaluación end-to-end, automática y reproducible
+de una aplicación de generación de informes médicos a partir de voz. El pipeline es:
+
+  audio → ASR (transcripción) → NER/PLN (extracción de entidades) → enriquecimiento SNOMED CT
+  → traducción a CIE-10 (ConceptMap) → generación de Informe.txt con LLM (llama3.2:8b) → Fhir_Reporte.json (FHIR Bundle)
+
+Los datos de prueba están en:
+  backend/asr-service/reports/Test1 .. Test10
+
+Cada carpeta contiene 4 archivos:
+  - text.txt          → texto original "leído" (ground truth, lo que el locutor debía decir)
+  - Reporte.txt        → log de control de la app: por cada llamada/secuencia incluye tiempos de
+                          procesamiento, transcripción ASR, entidades NER (con etiqueta, origen,
+                          confianza, posición), enriquecimiento SNOMED (conceptId, término preferido,
+                          FSN, activo, estado de definición) y traducción a CIE-10 (sistema,
+                          equivalencia, fuente del match)
+  - Informe.txt        → informe clínico final generado por el LLM a partir de las entidades/códigos
+                          detectados, con un anexo de codificación SNOMED
+  - Fhir_Reporte.json  → Bundle FHIR (Patient, Condition, MedicationStatement, etc.) construido a
+                          partir de las mismas entidades/códigos
+
+TAREA: evalúa cada uno de los 10 casos (Test1..Test10) en las siguientes dimensiones, y luego agrega
+los resultados en un informe final.
+
+1. CALIDAD DE TRANSCRIPCIÓN (ASR)
+   - Compara la(s) transcripción(es) dentro de Reporte.txt (sección "Transcripción" de cada secuencia,
+     concatenadas en orden) contra text.txt (ground truth).
+   - Calcula o estima el Word Error Rate (WER) o un porcentaje de similitud.
+   - Señala errores relevantes (sustituciones, omisiones) especialmente si afectan términos médicos o
+     fármacos (p. ej. "Durogesic", dosis, unidades).
+
+2. CALIDAD DE EXTRACCIÓN DE ENTIDADES (NER/PLN)
+   - A partir de text.txt, identifica qué entidades clínicamente relevantes (problemas, fármacos,
+     síntomas, dosis) debería haber detectado un sistema ideal.
+   - Compara contra las entidades realmente extraídas en Reporte.txt.
+   - Calcula precisión y recall aproximados (entidades correctas detectadas / total esperadas;
+     entidades detectadas / entidades correctas).
+   - Señala falsos positivos, falsos negativos, y entidades mal etiquetadas (p. ej. una palabra normal
+     etiquetada como PROBLEM cuando no lo es).
+
+3. CALIDAD DE NORMALIZACIÓN TERMINOLÓGICA (SNOMED CT / CIE-10)
+   - Para cada entidad enriquecida, evalúa si el conceptId SNOMED y el código CIE-10 asignados son
+     médicamente correctos y coherentes con el contexto clínico (no solo con la palabra aislada).
+   - Marca como ERROR los casos donde el mapeo es semánticamente incorrecto (p. ej. revisa si términos
+     ambiguos como "doloroso" o "analgesia" se mapearon a un concepto SNOMED que no corresponde al
+     significado real en el contexto — esto ya se observó como un problema potencial en Test1, verifícalo).
+   - Indica la tasa de entidades sin correspondencia SNOMED/CIE-10 ("Sin concepto coincidente").
+
+4. CALIDAD DEL INFORME GENERADO POR EL LLM (Informe.txt)
+   - Fidelidad: ¿el informe contiene solo información presente en text.txt/Reporte.txt, o hay
+     alucinaciones (datos inventados, fármacos/diagnósticos no mencionados)?
+   - Completitud: ¿recoge todos los hechos clínicos relevantes del texto original (diagnóstico,
+     tratamiento, cambios de medicación, evolución)?
+   - Corrección clínica: ¿la interpretación médica es razonable (p. ej. no confundir un efecto adverso
+     con un diagnóstico nuevo)?
+   - Estructura/formato: ¿sigue una estructura clínica clara y consistente entre los 10 casos?
+   - Coherencia con el anexo SNOMED: ¿los códigos listados en el informe coinciden con los detectados
+     en Reporte.txt?
+
+5. CALIDAD Y VALIDEZ DEL FHIR (Fhir_Reporte.json)
+   - Validez estructural básica: recursos bien formados (Patient, Condition, MedicationStatement),
+     referencias `subject` válidas, presencia de `resourceType`, `meta.profile`.
+   - Consistencia: ¿cada entidad detectada en Reporte.txt tiene su recurso FHIR correspondiente?
+     ¿los códigos SNOMED/CIE-10 en el Bundle coinciden con los de Reporte.txt e Informe.txt?
+   - Señala entidades "huérfanas" (detectadas en Reporte.txt pero ausentes en el FHIR) o inventadas
+     (presentes en FHIR sin respaldo en Reporte.txt).
+
+6. RENDIMIENTO (a partir de los tiempos en Reporte.txt)
+   - Resume tiempo total y por etapa (ASR, NER, SNOMED, ConceptMap) por caso y el promedio across los
+     10 casos. Señala outliers.
+
+METODOLOGÍA
+   - Procesa los 10 casos uno por uno con el mismo criterio (no cambies el rasero entre casos).
+   - Sé estricto pero justo: si una palabra similar fonéticamente fue mal transcrita por el ASR pero el
+     pipeline downstream la corrigió correctamente, anótalo como acierto parcial, no como fallo total.
+   - Cuando haya ambigüedad clínica, indica tu razonamiento brevemente.
+
+FORMATO DE SALIDA
+   Genera un informe en Markdown con:
+   1. Tabla resumen por caso (Test1..Test10) con una puntuación 1-5 (o N/A) en cada una de las 5
+      dimensiones (ASR, NER, Terminología, Informe LLM, FHIR) + tiempo total de procesamiento.
+   2. Para cada caso, una sección breve listando los hallazgos concretos (errores, alucinaciones,
+      mapeos incorrectos) — no repitas contenido completo de los archivos, cita solo lo relevante.
+   3. Una sección de "Hallazgos transversales" con patrones que se repiten en varios casos (p. ej. un
+      tipo de error sistemático del ASR, una etiqueta NER que falla recurrentemente, un tipo de
+      alucinación recurrente del LLM).
+   4. Una sección final de "Métricas agregadas" (WER medio, precisión/recall medio de NER, % de
+      entidades sin mapeo SNOMED/CIE-10, % de casos con alucinación en el informe, tiempo medio total).
+   5. Recomendaciones priorizadas (qué etapa del pipeline conviene mejorar primero según el impacto
+      observado).
+
+No modifiques ningún archivo de backend/asr-service/reports — esta es una tarea de solo lectura y análisis.
