@@ -71,14 +71,28 @@ en la forma en que el \englishText{gateway} agrupa y envía los fragmentos de au
 transcripción, se reportan los resultados promediados de los informes de evaluación de ambas
 modalidades en la Tabla~\ref{tab:asr_promedios}.
 
+Adicionalmente a la métrica \englishText{WER}, se le asigna a la transcripción de cada caso una
+puntuación en una escala de 1 a 5. Esta puntuación, se define a partir
+del porcentaje de palabras transcritas correctamente, según la Tabla~\ref{tab:asr_escala}.
+
+\input{tablas/capitulo_evaluacion/tabla_asr_escala.tex}
+
+La Tabla~\ref{tab:asr_scores_detalle} recoge, para cada uno de los 10 casos y ambas modalidades, el
+porcentaje de palabras correctas obtenido frente al \textit{gold standard} y la puntuación que se
+deriva de él según la escala anterior.
+
+\input{tablas/capitulo_evaluacion/tabla_asr_scores_detalle.tex}
+
 \input{tablas/capitulo_evaluacion/tabla_asr_promedios.tex}
 
-El \englishText{WER} medio combinado ($\approx$6\,\%) se encuentra por debajo del umbral definido en
-el objetivo específico~1 ($\le$10--12\,\%, Sección~\ref{section:objetivos-especificos}), lo que permite
-considerar este objetivo cumplido. El comportamiento del módulo es, además, consistente entre
-modalidades: en 9 de los 10 casos el \englishText{WER} se mantiene en un rango bajo
-($\approx$2--10\,\%), con errores menores que en general no alteran el sentido clínico de la nota
-(sustituciones fonéticamente similares, fragmentación de términos compuestos).
+El \englishText{WER} medio combinado ($\approx$7.2\,\%) se encuentra por debajo del umbral definido
+en el objetivo específico~1 ($\le$10--12\,\%, Sección~\ref{section:objetivos-especificos}), lo que
+permite considerar este objetivo cumplido. El comportamiento del módulo es, además, consistente
+entre modalidades: en 9 de los 10 casos el \englishText{WER} se mantiene en un rango bajo
+($\approx$0.6--13.6\,\%), con errores menores que en general no alteran el sentido clínico de la
+nota (sustituciones fonéticamente similares, fragmentación de términos compuestos). El caso
+\texttt{Test9} en modo \textit{batch} ($\approx$20\,\%\,\englishText{WER}) constituye la única
+excepción relevante, asociada a una posible contaminación cruzada de audio.
 
 \subsection{Extracción de entidades \englishText{PLN}/\englishText{NER}}\label{subsection:evaluacion_pln}
 \boldparagraph{Comparacion de resultados en función al tipo de entidades a buscar segun su granularidad}{}
@@ -137,7 +151,7 @@ y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}
 \input{tablas/capitulo_evaluacion/tabla_e2e_comparacion.tex}
 
 \boldparagraph{Calidad de transcripción y extracción de entidades}{
-    las puntuaciones de \englishText{ASR} (3.9 frente a 4.0) y \englishText{NER} (2.3 frente a 2.4) son
+    las puntuaciones de \englishText{ASR} (3.9 frente a 3.8) y \englishText{NER} (2.3 frente a 2.4) son
     prácticamente equivalentes entre modalidades, lo que confirma que la forma de agrupar y enviar los
     fragmentos de audio no afecta de forma apreciable a la calidad de estas dos primeras etapas del
     \englishText{pipeline}.
