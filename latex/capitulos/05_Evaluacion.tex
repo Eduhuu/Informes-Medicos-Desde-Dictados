@@ -1,22 +1,208 @@
 \chapter{Evaluación}\label{chapter:evaluacion}
 
 \section{Metodología de evaluación}
-Este capítulo tiene como objetivo contrastar empíricamente el sistema implementado en el Capítulo 3 frente
-a los objetivos específicos definidos en la Sección 1.2.1. La evaluación se estructura en cuatro dimensiones
-técnicas cuantitativas —transcripción (ASR), extracción de entidades (PLN/NER), normalización terminológica y
-validación estructural (FHIR)— complementadas con un análisis de eficiencia temporal del pipeline. 
-Adicionalmente, se discute como limitación metodológica la imposibilidad de realizar la validación cualitativa con
-personal clínico prevista inicialmente.
 
-\section{Conjunto de datos de evaluación}
+Este capítulo tiene como objetivo contrastar empíricamente el sistema implementado en el Capítulo~\ref{chapter:desarrollo}
+frente a los objetivos específicos definidos en la Sección~\ref{section:objetivos-especificos}. La evaluación se
+organiza en dos niveles complementarios:
 
-Para garantizar la reproducibilidad de las métricas, se debe construir un conjunto de evaluación
-(test set) compuesto por dictados médicos de referencia, cada uno acompañado de:
+\boldparagraph{Evaluación por módulos}{
+    cada etapa del \englishText{pipeline}: transcripción (\englishText{ASR}), extracción de entidades
+    (\englishText{NER}) y normalización terminológica
+    (\englishText{SNOMED CT}/\englishText{CIE-10-ES}) se evalúa de forma independiente sobre el
+    conjunto de datos descrito en la Sección~\ref{section:conjunto_datos_evaluacion}, empleando
+    métricas cuantitativas estándar como error por palabra (\englishText{WER}), precisión, \textit{recall} y \englishText{F1}.
+}
 
-Transcripción de referencia (gold standard): texto verificado manualmente palabra por palabra.
-Anotación de entidades de referencia: marcado manual de las entidades clínicas relevantes 
-(diagnósticos, procedimientos, fármacos, dosis y alergias) 
-según las categorías definidas en el objetivo específico 2 (Sección 1.2.1).
+\boldparagraph{Evaluación \englishText{end-to-end} asistida por IA}{
+    el sistema completo se evalúa de extremo a extremo, desde el audio de entrada hasta los entregables
+    finales (informe clínico, \englishText{JSON FHIR}), utilizando un modelo de lenguaje como juez automático
+    (\englishText{LLM-as-judge}) que contrasta cada artefacto de salida contra el texto de referencia.
+    Esta evaluación se realiza sobre las dos modalidades de funcionamiento del sistema:
+    (\textit{batch} y \textit{streaming}), descritas en la Sección~\ref{section:evaluacion_e2e}.
+}
 
-Usar una muestra del corpus SPACCC (mencionado en la Sección 2.1.2) para casos clínicos en español, 
-leyendo los textos en voz alta y grabándolos tú mismo.
+\section{Conjunto de datos de evaluación}\label{section:conjunto_datos_evaluacion}
+
+Para garantizar la reproducibilidad de las métricas obtenidas, se construyó un conjunto de evaluación 
+compuesto por 10 dictados médicos de referencia (indexados del 1 al 10). Estos fueron seleccionados 
+de forma aleatoria a partir de los 1.000 casos clínicos en español que integran el corpus 
+\englishText{SPACCC} (\englishText{Spanish Clinical Case Corpus}), detallado en el 
+Capítulo~\ref{chapter:marco_teorico_y_referencial}. Con el objetivo de llevar a cabo las evaluaciones 
+a partir de la muestra seleccionada, se definen los siguientes componentes fundamentales:
+
+\boldparagraph{Texto de referencia}{
+    Texto original destinado a la lectura en voz alta y almacenado para cada caso de prueba.
+}
+
+\boldparagraph{Entidades de referencia}{
+    Anotación de las entidades clínicas relevantes, tales como diagnósticos, procedimientos, fármacos, 
+    dosis y alergias. Para la etiquetar y señalar las entidades de referencia, 
+    se empleó el modelo de lenguaje Claude 4.5 Opus actuando como agente de anotación automática. Los 
+    detalles correspondientes al diseño y ejecución de los \englishText{prompts} utilizados se encuentran 
+    disponibles en el (Anexo~\ref{anexo:claude_opus_4_5}).
+}
+
+\boldparagraph{Entidades normalizadas a SNOMED CT y CIE-10-ES}{
+    Vinculación y codificación de las entidades de referencia con los vocabularios estándares 
+    \englishText{SNOMED CT} y \englishText{CIE-10-ES}, un proceso realizado a través de los buscadores 
+    de términos médicos provistos por \englishText{SNOMED CT} y \englishText{CIE-10-ES}.
+}
+
+Este conjunto de tres elementos constituye el estándar de referencia (\englishText{gold standard}) 
+de la presente evaluación, frente al cual se contrastan los resultados generados por el sistema 
+para determinar su rendimiento y calidad.
+
+
+\section{Evaluación de los módulos individuales}\label{section:evaluacion_modulos}
+
+Esta sección evalúa de forma independiente cada una de las tres etapas técnicas del
+\englishText{pipeline} de procesamiento: transcripción \englishText{ASR}, extracción de entidades
+\englishText{NER} y normalización terminológica \englishText{SNOMED CT}/\englishText{CIE-10-ES}.
+
+\subsection{Transcripción \englishText{ASR}}\label{subsection:evaluacion_asr}
+
+El módulo \englishText{ASR} se evaluó calculando la tasa de error de palabra (\englishText{Word Error
+Rate, WER}) entre la transcripción producida por \englishText{faster-whisper} y el \textit{gold
+standard} de cada uno de los 10 casos, sobre las dos modalidades de funcionamiento del sistema
+(\textit{batch} y \textit{streaming}). Dado que el modelo \englishText{ASR} y el
+audio de entrada son idénticos en ambas modalidades. La diferencia entre ellas reside únicamente
+en la forma en que el \englishText{gateway} agrupa y envía los fragmentos de audio, no en el motor de
+transcripción, se reportan los resultados promediados de los informes de evaluación de ambas
+modalidades en la Tabla~\ref{tab:asr_promedios}.
+
+\input{tablas/capitulo_evaluacion/tabla_asr_promedios.tex}
+
+El \englishText{WER} medio combinado ($\approx$6\,\%) se encuentra por debajo del umbral definido en
+el objetivo específico~1 ($\le$10--12\,\%, Sección~\ref{section:objetivos-especificos}), lo que permite
+considerar este objetivo cumplido. El comportamiento del módulo es, además, consistente entre
+modalidades: en 9 de los 10 casos el \englishText{WER} se mantiene en un rango bajo
+($\approx$2--10\,\%), con errores menores que en general no alteran el sentido clínico de la nota
+(sustituciones fonéticamente similares, fragmentación de términos compuestos).
+
+\subsection{Extracción de entidades \englishText{PLN}/\englishText{NER}}\label{subsection:evaluacion_pln}
+\boldparagraph{Comparacion de resultados en función al tipo de entidades a buscar segun su granularidad}{}
+\nota{Sección pendiente: completar con la evaluación cuantitativa individual del módulo PLN/NER
+(precisión, \textit{recall} y F1 frente a las entidades de referencia anotadas manualmente, conforme
+al objetivo específico 2), independiente de la evaluación end-to-end asistida por IA de la
+Sección~\ref{section:evaluacion_e2e}.}
+
+\subsection{Normalización terminológica \englishText{SNOMED CT}/\englishText{CIE-10-ES}}\label{subsection:evaluacion_snomed}
+
+\nota{Sección pendiente: completar con la evaluación cuantitativa individual del módulo de
+normalización terminológica (p.\ ej. \% de entidades con mapeo correcto a SNOMED CT y CIE-10-ES
+frente a la anotación de referencia), independiente de la evaluación end-to-end asistida por IA de la
+Sección~\ref{section:evaluacion_e2e}.}
+
+\section{Evaluación \englishText{end-to-end} asistida por IA}\label{section:evaluacion_e2e}
+
+\subsection{Metodología y modalidades evaluadas}\label{subsection:metodologia_e2e}
+
+Complementariamente a la evaluación por módulos de la Sección~\ref{section:evaluacion_modulos}, se
+evaluó el sistema de extremo a extremo utilizando un \englishText{LLM} como juez automático
+(\englishText{LLM-as-judge}). Para cada uno de los 10 casos de referencia, el modelo evaluador comparó
+el texto de referencia frente a los tres artefactos de salida generados
+por el sistema: el reporte de control enriquecido (\texttt{Reporte.txt}), el informe clínico
+redactado por el \englishText{LLM} (\texttt{Informe.txt}) y el \englishText{Bundle FHIR}
+(\texttt{Fhir\_Reporte.json}), asignando una puntuación de 1 a 5 en cinco dimensiones
+(\englishText{ASR}, \englishText{NER}, terminología (\englishText{SNOMED CT} y \englishText{CIE-10-ES}), 
+informe \englishText{LLM} y \englishText{FHIR}) y registrando el tiempo total de procesamiento de 
+cada caso.
+
+Esta evaluación se ejecutó por separado sobre las dos modalidades de funcionamiento previstas en el
+diseño del sistema (Capítulo~\ref{chapter:desarrollo}):
+
+\boldparagraph{Modo \textit{streaming}}{
+    el \englishText{gateway} reenvía cada fragmento de audio de forma independiente al servicio
+    \englishText{ASR} a medida que la aplicación móvil lo emite, generando y acumulando la información
+    de transcripción, entidades y códigos terminológicos de forma incremental, fragmento a fragmento,
+    durante toda la sesión de dictado.
+}
+
+\boldparagraph{Modo \textit{batch}}{
+    el \englishText{gateway} almacena la totalidad de los fragmentos de audio recibidos durante la
+    sesión y los envía como un único bloque consolidado al servicio \englishText{ASR} al finalizar el
+    dictado, procesándose de una sola vez en lugar de incrementalmente.
+}
+
+\subsection{Comparación de resultados entre modalidades}\label{subsection:comparacion_e2e}
+
+La Tabla~\ref{tab:e2e_comparacion_modos} resume las puntuaciones medias obtenidas en cada dimensión y
+el tiempo total medio por caso para ambas modalidades, a partir de los informes completos de
+evaluación de cada una (directorios \texttt{reports/mode\_batches/} y
+\texttt{reports/mode\_streaming/}). El detalle caso por caso de ambas modalidades, a partir del cual
+se calculan estos promedios, se recoge en las Tablas~\ref{tab:e2e_detalle_batch}
+y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}.
+
+\input{tablas/capitulo_evaluacion/tabla_e2e_comparacion.tex}
+
+\boldparagraph{Calidad de transcripción y extracción de entidades}{
+    las puntuaciones de \englishText{ASR} (3.9 frente a 4.0) y \englishText{NER} (2.3 frente a 2.4) son
+    prácticamente equivalentes entre modalidades, lo que confirma que la forma de agrupar y enviar los
+    fragmentos de audio no afecta de forma apreciable a la calidad de estas dos primeras etapas del
+    \englishText{pipeline}.
+}
+
+\boldparagraph{Terminológica (\englishText{SNOMED CT} y \englishText{CIE-10-ES})}{
+    constituye la dimensión con mayor diferencia entre modalidades: 2.0 en \textit{batch} frente a 1.4
+    en \textit{streaming}. En ambas modalidades coincide el mismo patrón de fallo --- mapeos léxicos sin
+    desambiguación contextual que asocian términos cotidianos o ambiguos (p.\ ej. ``corrección'',
+    ``doloroso'', ``amarillento'') a conceptos \englishText{SNOMED CT} clínicamente ajenos al dominio
+    de la nota (especies animales o vegetales, síndromes genéticos raros, hallazgos psiquiátricos) ---,
+    pero este patrón se manifiesta con mayor frecuencia e intensidad en el modo \textit{streaming}, en el
+    que el porcentaje de casos con error semántico grave de terminología alcanza el 90\,\%
+    (9 de 10 casos).
+}
+
+\boldparagraph{Informe \englishText{LLM}}{
+    ambas modalidades obtienen puntuaciones bajas y similares (2.1 en \textit{batch}, 1.9 en
+    \textit{streaming}), con dos modos de fallo recurrentes en los dos conjuntos de resultados: la
+    alucinación de contenido no presente en la fuente (diagnósticos inventados, expansión de siglas,
+    referencias bibliográficas fabricadas, errores de negación/polaridad) y el colapso de la tarea, en
+    el que el modelo genera una meta-descripción del propio \englishText{pipeline} de codificación en
+    lugar de un informe clínico estructurado.
+}
+
+\boldparagraph{Bundle \englishText{FHIR}}{
+    obtiene puntuaciones equivalentes entre modalidades (2.7 en \textit{batch}, 2.6 en
+    \textit{streaming}). En ambos casos el Bundle es estructuralmente válido en el 100\,\% de los casos,
+    pero no filtra ni valida los códigos heredados de las etapas anteriores, propagando fielmente los
+    errores de \englishText{NER} y terminología hacia recursos clínicos formales.
+}
+
+\boldparagraph{Tiempo total de procesamiento}{
+    es la diferencia más marcada entre ambas modalidades: $\approx$32.1\,s de media por caso en modo
+    \textit{batch} frente a $\approx$178.3\,s en modo \textit{streaming}, es decir, un tiempo medio
+    aproximadamente 5.5 veces superior en \textit{streaming}. Esta diferencia no se explica por el
+    módulo \englishText{ASR} --- rápido y estable en ambas modalidades ---, sino por el efecto acumulativo
+    de ejecutar de forma independiente, para cada uno de los fragmentos de audio de la sesión, las
+    etapas de \englishText{NER} y de traducción \englishText{CIE-10-ES}
+    (\englishText{ConceptMap \$translate}), cuyo tiempo combinado domina el tiempo total en modo
+    \textit{streaming} (p.\ ej.\ \texttt{Test6} y \texttt{Test10}, con $\approx$370\,s y más de 300\,s de
+    \englishText{NER}+\englishText{ConceptMap} combinados). El modo \textit{batch}, al concentrar todo el
+    audio en una sola invocación, evita esta repetición de llamadas y resulta sustancialmente más
+    eficiente en tiempo total, a costa de no ofrecer retroalimentación incremental durante la sesión.
+}
+
+En conjunto, ambas modalidades presentan un patrón de fortalezas y debilidades equivalente ---
+\englishText{ASR} sólido, \englishText{NER} y terminología como eslabones débiles, informe
+\englishText{LLM} propenso a alucinaciones o colapso de formato, y \englishText{FHIR} estructuralmente
+válido pero semánticamente ciego ---, lo que indica que estos problemas son inherentes a la lógica de
+procesamiento compartida por ambas rutas y no a la estrategia de envío de audio. La modalidad
+\textit{streaming} agrava ligeramente los errores de terminología y multiplica el tiempo total de
+procesamiento, por lo que el modo \textit{batch} resulta preferible en escenarios donde no se requiera
+retroalimentación incremental durante el dictado.
+
+\section{Limitaciones metodológicas}\label{section:limitaciones_evaluacion}
+
+\nota[Validación cualitativa con personal clínico]{
+    el diseño original de la evaluación contemplaba contrastar la aceptación de los informes generados
+    por el sistema con personal médico (objetivo específico~3, Sección~\ref{section:objetivos-especificos}),
+    mediante la revisión directa de los informes y el conteo de ediciones menores requeridas. Esta
+    validación no pudo realizarse dentro del alcance temporal de este TFM, por lo que el objetivo
+    específico~3 no se evalúa empíricamente en este capítulo. Como aproximación, la evaluación
+    \englishText{end-to-end} asistida por IA de la Sección~\ref{section:evaluacion_e2e} ofrece una
+    estimación automática de la fidelidad y coherencia clínica del informe \englishText{LLM}, pero no
+    sustituye el juicio de un profesional sanitario sobre la utilidad real del informe en un flujo de
+    trabajo clínico.
+}

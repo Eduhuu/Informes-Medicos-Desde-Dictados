@@ -112,112 +112,119 @@
     \end{tikzpicture}%
     \end{adjustbox}%
     \shorthandon{<>}
-    \caption{Diagrama de secuencia del flujo de transcripción en tiempo real: captura de audio, transcripción \englishText{ASR} y enriquecimiento semántico por fragmento.}
+    \caption{Diagrama de secuencia del flujo de transcripción en tiempo real en modo \textit{streaming}: captura de audio, transcripción \englishText{ASR} y enriquecimiento semántico por fragmento.}
     \label{fig:diagrama_conceptual_transcripcion}
 \end{figure}
 
-% \begin{figure}[htbp]
-%     \centering
-%     \shorthandoff{<>}
-%     \begin{adjustbox}{max width=\linewidth, max height=0.5\textheight, center}
-%     \begin{tikzpicture}[
-%         font=\sffamily,
-%         >=Stealth,
-%         box/.style={
-%             draw,
-%             rectangle,
-%             fill=blue!8,
-%             draw=blue!60!black,
-%             line width=0.8pt,
-%             minimum width=2cm,
-%             minimum height=0.95cm,
-%             align=center,
-%             rounded corners=3pt,
-%             font=\scriptsize\bfseries
-%         },
-%         lifeline/.style={draw, dashed, color=gray!70, line width=0.6pt},
-%         msg/.style={font=\tiny, midway, align=center, fill=white, inner sep=1pt},
-%         note/.style={font=\tiny, align=left, fill=white, inner sep=1pt},
-%         call/.style={-{Stealth[length=2mm]}, line width=0.7pt, color=black!80},
-%         resp/.style={{Stealth[length=2mm]}-, dashed, line width=0.7pt, color=black!70}
-%     ]
+\begin{figure}[htbp]
+    \centering
+    \shorthandoff{<>}
+    \begin{adjustbox}{max width=\linewidth, max height=0.55\textheight, center}
+    \begin{tikzpicture}[
+        font=\sffamily,
+        >=Stealth,
+        box/.style={
+            draw,
+            rectangle,
+            fill=blue!8,
+            draw=blue!60!black,
+            line width=0.8pt,
+            minimum width=2cm,
+            minimum height=0.95cm,
+            align=center,
+            rounded corners=3pt,
+            font=\scriptsize\bfseries
+        },
+        lifeline/.style={draw, dashed, color=gray!70, line width=0.6pt},
+        msg/.style={font=\tiny, midway, align=center, fill=white, inner sep=1pt},
+        note/.style={font=\tiny, align=left, fill=white, inner sep=1pt},
+        call/.style={-{Stealth[length=2mm]}, line width=0.7pt, color=black!80},
+        resp/.style={{Stealth[length=2mm]}-, dashed, line width=0.7pt, color=black!70}
+    ]
 
-%         % --- Participantes ---
-%         \node[box] (M) at (0,0) {App móvil\\\mdseries (M)};
-%         \node[box] (G) at (2.3,0) {Gateway\\\mdseries (G :8000)};
-%         \node[box] (A) at (4.8,0) {ASR Service\\\mdseries (A :8001)};
-%         \node[box] (L) at (7.2,0) {LLM\\\mdseries (Ollama) (L)};
+        % --- Participantes ---
+        \node[box] (M) at (0,0) {App móvil\\\mdseries (M)};
+        \node[box] (G) at (2.3,0) {Gateway\\\mdseries (G :8000)};
+        \node[box] (A) at (4.8,0) {ASR Service\\\mdseries (A :8001)};
 
-%         % --- Líneas de vida ---
-%         \pgfmathsetmacro{\lifelineDepth}{-6.0}
-%         \foreach \n in {M,G,A,L} {
-%             \draw[lifeline] (\n.south) -- (\n.center |- 0,\lifelineDepth);
-%         }
-%         \node[box, font=\tiny\bfseries] (M bot) at (M.center |- 0,\lifelineDepth) {App móvil};
-%         \node[box, font=\tiny\bfseries] (G bot) at (G.center |- 0,\lifelineDepth) {Gateway};
-%         \node[box, font=\tiny\bfseries] (A bot) at (A.center |- 0,\lifelineDepth) {ASR Service};
-%         \node[box, font=\tiny\bfseries] (L bot) at (L.center |- 0,\lifelineDepth) {LLM};
+        % --- Líneas de vida ---
+        \pgfmathsetmacro{\lifelineDepth}{-7.7}
+        \foreach \n in {M,G,A} {
+            \draw[lifeline] (\n.south) -- (\n.center |- 0,\lifelineDepth);
+        }
+        \node[box, font=\tiny\bfseries] (M bot) at (M.center |- 0,\lifelineDepth) {App móvil};
+        \node[box, font=\tiny\bfseries] (G bot) at (G.center |- 0,\lifelineDepth) {Gateway};
+        \node[box, font=\tiny\bfseries] (A bot) at (A.center |- 0,\lifelineDepth) {ASR Service};
 
-%         % --- Cierre de sesión ---
-%         \draw[call] ($(M.south)+(0,-0.4)$) -- ($(G.south)+(0,-0.4)$)
-%             node[msg] {JSON session\_end};
+        % --- Conexión inicial ---
+        \draw[call] ($(M.south)+(0,-0.5)$) -- ($(G.south)+(0,-0.5)$)
+            node[msg, below] {WSS connect /audio};
 
-%         \draw[call]
-%             ($(G.south)+(0,-0.8)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(G.south)+(0,-1.15)$)
-%             node[note, right, xshift=0.15cm] {Espera transcripciones\\pendientes};
+        % --- Bucle por fragmento: solo acumulación, sin llamada al ASR ---
+        \coordinate (loopNW) at (-0.5,-0.75);
+        \coordinate (loopSE) at (5.9,-2.7);
 
-%         \draw[call] ($(G.south)+(0,-1.65)$) -- ($(A.south)+(0,-1.65)$)
-%             node[msg] {POST /finalize-session/[id]};
+        \draw[call] ($(M.south)+(0,-1.0)$) -- ($(G.south)+(0,-1.0)$)
+            node[msg] {JSON metadata (audio\_chunk)};
+        \draw[call] ($(M.south)+(0,-1.55)$) -- ($(G.south)+(0,-1.55)$)
+            node[msg] {Binario PCM (audio)};
 
-%         \begin{scope}[on background layer]
-%             \coordinate (optReportsNW) at (3.6,-1.8);
-%             \coordinate (optReportsSE) at (5.95,-2.7);
-%             \node[
-%                 draw=blue!70!black,
-%                 fill=blue!8,
-%                 fill opacity=0.25,
-%                 rectangle,
-%                 rounded corners=3pt,
-%                 fit={(optReportsNW) (optReportsSE)},
-%                 inner sep=4pt
-%             ] (optReportsBox) {};
-%             \node[
-%                 fill=blue!20,
-%                 draw=blue!70!black,
-%                 font=\tiny\bfseries,
-%                 text=blue!60!black,
-%                 rounded corners=2pt,
-%                 anchor=north west,
-%                 inner sep=2pt
-%             ] at (optReportsBox.north west) {opt [\texttt{reports.enabled}]};
-%         \end{scope}
+        \draw[call]
+            ($(G.south)+(0,-1.95)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(G.south)+(0,-2.3)$)
+            node[note, right, xshift=0.15cm] {Acumula fragmento en buffer\\(\texttt{batchAudioBuffer.addChunk})};
 
-%         \draw[call]
-%             ($(A.south)+(0,-2.05)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(A.south)+(0,-2.4)$)
-%             node[note, right, xshift=0.15cm] {Escribe \texttt{Reporte.txt}\\en disco};
+        \begin{scope}[on background layer]
+            \node[
+                draw=orange!80!black,
+                fill=orange!8,
+                fill opacity=0.25,
+                rectangle,
+                rounded corners=3pt,
+                fit={(loopNW) (loopSE)},
+                inner sep=6pt
+            ] (loopBox) {};
+            \node[
+                fill=orange!20,
+                draw=orange!80!black,
+                font=\tiny\bfseries,
+                text=orange!60!black,
+                rounded corners=2pt,
+                anchor=north west,
+                inner sep=2pt
+            ] at (loopBox.north west) {LOOP: Por cada fragmento de voz (sin enviar al ASR)};
+        \end{scope}
 
-%         \draw[resp] ($(M.south)+(0,-2.9)$) -- ($(G.south)+(0,-2.9)$)
-%             node[msg] {WS session\_end};
+        % --- Fin de sesión: vaciado del buffer y única llamada al ASR ---
+        \draw[call] ($(M.south)+(0,-3.2)$) -- ($(G.south)+(0,-3.2)$)
+            node[msg] {JSON session\_end};
 
-%         % --- Informe LLM ---
-%         \draw[call] ($(G.south)+(0,-3.4)$) -- ($(A.south)+(0,-3.4)$)
-%             node[msg] {POST /generate-report/[id]};
-%         \draw[call] ($(A.south)+(0,-3.9)$) -- ($(L.south)+(0,-3.9)$)
-%             node[msg] {Lee Reporte.txt, genera informe};
-%         \draw[resp] ($(L.south)+(0,-4.4)$) -- ($(A.south)+(0,-4.4)$)
-%             node[msg] {Informe.txt};
+        \draw[call]
+            ($(G.south)+(0,-3.6)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(G.south)+(0,-3.95)$)
+            node[note, right, xshift=0.15cm] {\texttt{flushSession}: concatena fragmentos\\(\texttt{Buffer.concat})};
 
-%         \draw[resp] ($(G.south)+(0,-4.9)$) -- ($(A.south)+(0,-4.9)$)
-%             node[msg] {JSON report};
-%         \draw[resp] ($(M.south)+(0,-5.4)$) -- ($(G.south)+(0,-5.4)$)
-%             node[msg] {WS llm\_report};
+        \draw[call] ($(G.south)+(0,-4.45)$) -- ($(A.south)+(0,-4.45)$)
+            node[msg] {POST /transcribe \{batch: true\}\\(audio completo de la sesión)};
 
-%     \end{tikzpicture}%
-%     \end{adjustbox}%
-%     \shorthandon{<>}
-%     \caption{Diagrama de secuencia del cierre de sesión y generación del informe clínico mediante \englishText{LLM}.}
-%     \label{fig:diagrama_conceptual_informe_llm}
-% \end{figure}
+        \draw[call]
+            ($(A.south)+(0,-4.85)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(A.south)+(0,-5.2)$)
+            node[note, right, xshift=0.15cm] {\textit{Pipeline} interno \\(Mismo que en el caso anterior)};
+
+        \draw[resp] ($(G.south)+(0,-5.7)$) -- ($(A.south)+(0,-5.7)$)
+            node[msg] {JSON (text, entities, ...)};
+
+        \draw[call]
+            ($(G.south)+(0,-6.1)$) -- ++(0.45,0) -- ++(0,-0.35) -- ($(G.south)+(0,-6.45)$)
+            node[note, right, xshift=0.15cm] {Acumula \\ sessionEntitiesStore};
+
+    \end{tikzpicture}%
+    \end{adjustbox}%
+    \shorthandon{<>}
+    \caption{Diagrama de secuencia del flujo de transcripción en modo \textit{batch}: los fragmentos de
+        audio se acumulan en memoria durante toda la sesión y se envían como un único bloque al
+        servicio \englishText{ASR} al recibir \texttt{session\_end}. A partir de aquí el flujo de
+        cierre de sesión es común a ambas modalidades (Figura~\ref{fig:diagrama_conceptual_informe_llm}).}
+    \label{fig:diagrama_conceptual_transcripcion_batch}
+\end{figure}
 
 \begin{figure}[htbp]
     \centering

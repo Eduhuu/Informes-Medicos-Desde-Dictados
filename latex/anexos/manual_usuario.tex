@@ -1,9 +1,185 @@
-\chapter{Ejemplo de anexo: Manual de usuario (opcional)}
+\chapter{Prompts utilizados con modelos de lenguaje como agentes auxiliares}\label{anexo:claude_opus_4_5}
 
-Este es un apéndice opcional, en caso de que quieras añadir un manual de usuario del software realizado.
+Este apéndice recoge, de forma reproducible, los dos \textit{prompts} empleados para apoyar la
+evaluación del sistema descrita en el Capítulo~\ref{chapter:evaluacion}: el prompt de anotación
+automática de entidades de referencia (Sección~\ref{section:anexo_prompt_anotacion}) y el prompt de
+evaluación \englishText{end-to-end} mediante \englishText{LLM-as-judge}
+(Sección~\ref{section:anexo_prompt_evaluacion}).
 
-Puedes incluir tantos capítulos de Anexos como te haga falta. Si no tienes anexos, puedes comentar las líneas en el fichero \textbf{tfm.tex}.
+\section{Anotación automática de entidades de referencia}\label{section:anexo_prompt_anotacion}
 
-\section{Texto añadido}
+Para construir el \textit{gold standard} de entidades clínicas sobre los 10 casos de evaluación
+(Sección~\ref{section:conjunto_datos_evaluacion}) se empleó \englishText{Claude Opus 4.5} como agente de anotación
+automática: a partir de los textos de referencia de cada caso de prueba, el modelo identifica
+las entidades clínicamente relevantes, evitando así una anotación manual exhaustiva de los
+10 casos. El listado~\ref{lst:prompt_anotacion_entidades} reproduce el prompt utilizado.
 
-% \lipsum[1-15]
+\begin{lstlisting}[
+    caption={Prompt de identificación de entidades médicas de referencia (\englishText{Claude Opus 4.5}).},
+    label={lst:prompt_anotacion_entidades},
+    basicstyle=\scriptsize\ttfamily,
+    breaklines=true,
+    frame=single,
+    numbers=none
+]
+Eres un anotador clinico encargado de construir un "gold standard" de entidades medicas a partir de
+un texto en espanol, para evaluar un sistema de extraccion de entidades (NER) de uso clinico.
+
+ENTRADA: un texto clinico en espanol (dictado o informe), proporcionado a continuacion.
+
+TAREA: lee el texto cuidadosamente y extrae TODAS las entidades clinicamente relevantes que un
+sistema NER ideal deberia detectar, clasificandolas en una de las siguientes categorias:
+
+  - DIAGNOSTICO    : enfermedades, sindromes, problemas de salud (p. ej. "diabetes mellitus tipo 2",
+                      "hipertension arterial").
+  - PROCEDIMIENTO   : intervenciones, pruebas diagnosticas, tecnicas terapeuticas (p. ej.
+                      "ecografia abdominal", "biopsia").
+  - FARMACO         : principios activos o nombres comerciales de medicamentos (p. ej.
+                      "Durogesic", "paracetamol").
+  - DOSIS           : cantidad, unidad y/o pauta posologica asociada a un farmaco (p. ej.
+                      "25 microgramos/hora", "cada 8 horas"). Si la dosis aparece pegada al
+                      farmaco en el texto, anotala como una entidad DOSIS independiente, ligada al
+                      farmaco mas cercano mediante el campo "farmaco_asociado".
+  - ALERGIA         : sustancias o farmacos a los que el paciente presenta alergia o intolerancia
+                      conocida.
+
+REGLAS DE ANOTACION:
+  1. Anota el "span" minimo y completo del termino clinico (p. ej. "hipertension arterial" como una
+     sola entidad, no "hipertension" y "arterial" por separado).
+  2. No anotes palabras genericas sin valor clinico por si solas (p. ej. "paciente", "tratamiento",
+     "consulta") salvo que formen parte de un termino compuesto relevante.
+  3. Si una misma entidad aparece varias veces en el texto, anotala cada vez que aparece, indicando
+     la posicion (offset de caracter) de cada aparicion.
+  4. Ante terminos ambiguos o coloquiales, infiere la entidad clinica mas probable segun el contexto
+     y justifica brevemente tu decision en el campo "nota".
+  5. No inventes entidades que no esten respaldadas por el texto. No omitas entidades relevantes por
+     estar expresadas de forma indirecta o coloquial.
+
+FORMATO DE SALIDA: devuelve EXCLUSIVAMENTE un JSON con la siguiente estructura, sin texto adicional:
+
+{
+  "entidades": [
+    {
+      "texto": "<texto exacto tal como aparece>",
+      "categoria": "DIAGNOSTICO | PROCEDIMIENTO | FARMACO | DOSIS | ALERGIA",
+      "inicio": <offset de caracter de inicio en el texto>,
+      "fin": <offset de caracter de fin en el texto>,
+      "farmaco_asociado": "<texto del farmaco relacionado, solo si categoria=DOSIS, si no null>",
+      "nota": "<breve justificacion solo si hubo ambiguedad, si no cadena vacia>"
+    }
+  ]
+}
+
+TEXTO A ANOTAR:
+<<<TEXT.TXT>>>
+\end{lstlisting}
+
+\section{Evaluación end-to-end asistida por IA (\textit{LLM-as-judge})}\label{section:anexo_prompt_evaluacion}
+
+La evaluación de extremo a extremo descrita en la Sección~\ref{section:evaluacion_e2e} se realizó
+proporcionando a un modelo de lenguaje, en calidad de juez automático, los cuatro artefactos
+generados por el sistema para cada uno de los 10 casos de prueba (transcripción, entidades
+enriquecidas, informe clínico y \textit{Bundle} FHIR) junto con el texto de referencia. El
+listado~\ref{lst:prompt_evaluacion_e2e} reproduce el prompt utilizado para guiar dicha evaluación.
+
+\begin{lstlisting}[
+    caption={Prompt de evaluación end-to-end asistida por IA (\textit{LLM-as-judge}).},
+    label={lst:prompt_evaluacion_e2e},
+    basicstyle=\scriptsize\ttfamily,
+    breaklines=true,
+    frame=single,
+    numbers=none
+]
+Eres un evaluador clinico-tecnico encargado de hacer una evaluacion end-to-end, automatica y reproducible
+de una aplicacion de generacion de informes medicos a partir de voz. El pipeline es:
+
+  audio -> ASR (transcripcion) -> NER/PLN (extraccion de entidades) -> enriquecimiento SNOMED CT
+  -> traduccion a CIE-10 (ConceptMap) -> generacion de Informe.txt con LLM (llama3.2:8b) -> Fhir_Reporte.json (FHIR Bundle)
+
+Los datos de prueba estan en:
+  backend/asr-service/reports/Test1 .. Test10
+
+Cada carpeta contiene 4 archivos:
+  - text.txt          -> texto original "leido" (ground truth, lo que el locutor debia decir)
+  - Reporte.txt        -> log de control de la app: por cada llamada/secuencia incluye tiempos de
+                          procesamiento, transcripcion ASR, entidades NER (con etiqueta, origen,
+                          confianza, posicion), enriquecimiento SNOMED (conceptId, termino preferido,
+                          FSN, activo, estado de definicion) y traduccion a CIE-10 (sistema,
+                          equivalencia, fuente del match)
+  - Informe.txt        -> informe clinico final generado por el LLM a partir de las entidades/codigos
+                          detectados, con un anexo de codificacion SNOMED
+  - Fhir_Reporte.json  -> Bundle FHIR (Patient, Condition, MedicationStatement, etc.) construido a
+                          partir de las mismas entidades/codigos
+
+TAREA: evalua cada uno de los 10 casos (Test1..Test10) en las siguientes dimensiones, y luego agrega
+los resultados en un informe final.
+
+1. CALIDAD DE TRANSCRIPCION (ASR)
+   - Compara la(s) transcripcion(es) dentro de Reporte.txt (seccion "Transcripcion" de cada secuencia,
+     concatenadas en orden) contra text.txt (ground truth).
+   - Calcula o estima el Word Error Rate (WER) o un porcentaje de similitud.
+   - Senala errores relevantes (sustituciones, omisiones) especialmente si afectan terminos medicos o
+     farmacos (p. ej. "Durogesic", dosis, unidades).
+
+2. CALIDAD DE EXTRACCION DE ENTIDADES (NER/PLN)
+   - A partir de text.txt, identifica que entidades clinicamente relevantes (problemas, farmacos,
+     sintomas, dosis) deberia haber detectado un sistema ideal.
+   - Compara contra las entidades realmente extraidas en Reporte.txt.
+   - Calcula precision y recall aproximados (entidades correctas detectadas / total esperadas;
+     entidades detectadas / entidades correctas).
+   - Senala falsos positivos, falsos negativos, y entidades mal etiquetadas (p. ej. una palabra normal
+     etiquetada como PROBLEM cuando no lo es).
+
+3. CALIDAD DE NORMALIZACION TERMINOLOGICA (SNOMED CT / CIE-10)
+   - Para cada entidad enriquecida, evalua si el conceptId SNOMED y el codigo CIE-10 asignados son
+     medicamente correctos y coherentes con el contexto clinico (no solo con la palabra aislada).
+   - Marca como ERROR los casos donde el mapeo es semanticamente incorrecto (p. ej. revisa si terminos
+     ambiguos como "doloroso" o "analgesia" se mapearon a un concepto SNOMED que no corresponde al
+     significado real en el contexto -- esto ya se observo como un problema potencial en Test1, verificalo).
+   - Indica la tasa de entidades sin correspondencia SNOMED/CIE-10 ("Sin concepto coincidente").
+
+4. CALIDAD DEL INFORME GENERADO POR EL LLM (Informe.txt)
+   - Fidelidad: el informe contiene solo informacion presente en text.txt/Reporte.txt, o hay
+     alucinaciones (datos inventados, farmacos/diagnosticos no mencionados)?
+   - Completitud: recoge todos los hechos clinicos relevantes del texto original (diagnostico,
+     tratamiento, cambios de medicacion, evolucion)?
+   - Correccion clinica: la interpretacion medica es razonable (p. ej. no confundir un efecto adverso
+     con un diagnostico nuevo)?
+   - Estructura/formato: sigue una estructura clinica clara y consistente entre los 10 casos?
+   - Coherencia con el anexo SNOMED: los codigos listados en el informe coinciden con los detectados
+     en Reporte.txt?
+
+5. CALIDAD Y VALIDEZ DEL FHIR (Fhir_Reporte.json)
+   - Validez estructural basica: recursos bien formados (Patient, Condition, MedicationStatement),
+     referencias `subject` validas, presencia de `resourceType`, `meta.profile`.
+   - Consistencia: cada entidad detectada en Reporte.txt tiene su recurso FHIR correspondiente?
+     los codigos SNOMED/CIE-10 en el Bundle coinciden con los de Reporte.txt e Informe.txt?
+   - Senala entidades "huerfanas" (detectadas en Reporte.txt pero ausentes en el FHIR) o inventadas
+     (presentes en FHIR sin respaldo en Reporte.txt).
+
+6. RENDIMIENTO (a partir de los tiempos en Reporte.txt)
+   - Resume tiempo total y por etapa (ASR, NER, SNOMED, ConceptMap) por caso y el promedio across los
+     10 casos. Senala outliers.
+
+METODOLOGIA
+   - Procesa los 10 casos uno por uno con el mismo criterio (no cambies el rasero entre casos).
+   - Se estricto pero justo: si una palabra similar foneticamente fue mal transcrita por el ASR pero el
+     pipeline downstream la corrigio correctamente, anotalo como acierto parcial, no como fallo total.
+   - Cuando haya ambiguedad clinica, indica tu razonamiento brevemente.
+
+FORMATO DE SALIDA
+   Genera un informe en Markdown con:
+   1. Tabla resumen por caso (Test1..Test10) con una puntuacion 1-5 (o N/A) en cada una de las 5
+      dimensiones (ASR, NER, Terminologia, Informe LLM, FHIR) + tiempo total de procesamiento.
+   2. Para cada caso, una seccion breve listando los hallazgos concretos (errores, alucinaciones,
+      mapeos incorrectos) -- no repitas contenido completo de los archivos, cita solo lo relevante.
+   3. Una seccion de "Hallazgos transversales" con patrones que se repiten en varios casos (p. ej. un
+      tipo de error sistematico del ASR, una etiqueta NER que falla recurrentemente, un tipo de
+      alucinacion recurrente del LLM).
+   4. Una seccion final de "Metricas agregadas" (WER medio, precision/recall medio de NER, % de
+      entidades sin mapeo SNOMED/CIE-10, % de casos con alucinacion en el informe, tiempo medio total).
+   5. Recomendaciones priorizadas (que etapa del pipeline conviene mejorar primero segun el impacto
+      observado).
+
+No modifiques ningun archivo de backend/asr-service/reports -- esta es una tarea de solo lectura y analisis.
+\end{lstlisting}

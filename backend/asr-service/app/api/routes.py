@@ -52,12 +52,15 @@ from shared.constants.CodingLookupConstants import (
 )
 from shared.constants.FhirReportConstants import FHIR_REQUEST_BODY_KEY_ENTITIES
 from shared.constants.PlnConstants import (
+    NER_GENERIC_NOISE_WORDS,
     NER_GROUP_SPACE_TOLERANCE,
     NER_KEY_END,
     NER_KEY_ENTITY_GROUP,
+    NER_KEY_PLN_SOURCE,
     NER_KEY_SCORE,
     NER_KEY_START,
     NER_KEY_WORD,
+    NER_MIN_CONFIDENCE_SCORE,
 )
 
 router = APIRouter()
@@ -258,26 +261,35 @@ def _parse_timestamp(raw_timestamp: str | None) -> int | None:
         ) from exc
 
 
-def group_entities(ner_entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Merge consecutive entities that share the same label into a single entry.
+def _is_punctuation_only(word: str) -> bool:
+    return not any(char.isalnum() for char in word)
 
-    Entities separated by at most NER_GROUP_SPACE_TOLERANCE characters are
-    treated as contiguous so that multi-token clinical terms such as
-    "diabetes mellitus tipo 2" are forwarded to SNOMED as one concept instead
-    of three separate lookups.
-    """
-    if not ner_entities:
+
+def _is_low_value_entity(entity: dict[str, Any]) -> bool:
+    word = entity[NER_KEY_WORD].strip()
+    if _is_punctuation_only(word):
+        return True
+    if entity[NER_KEY_SCORE] < NER_MIN_CONFIDENCE_SCORE:
+        return True
+    return word.lower() in NER_GENERIC_NOISE_WORDS
+
+
+def group_entities(ner_entities: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    filtered_entities = [e for e in ner_entities if not _is_low_value_entity(e)]
+    if not filtered_entities:
         return []
 
-    sorted_entities = sorted(ner_entities, key=lambda e: e[NER_KEY_START])
+    sorted_entities = sorted(filtered_entities, key=lambda e: e[NER_KEY_START])
     grouped: list[dict[str, Any]] = []
     current = sorted_entities[0].copy()
 
     for next_entity in sorted_entities[1:]:
-        same_label = current[NER_KEY_ENTITY_GROUP] == next_entity[NER_KEY_ENTITY_GROUP]
+        same_source = current[NER_KEY_PLN_SOURCE] == next_entity[NER_KEY_PLN_SOURCE]
         contiguous = (next_entity[NER_KEY_START] - current[NER_KEY_END]) <= NER_GROUP_SPACE_TOLERANCE
 
-        if same_label and contiguous:
+        if same_source and contiguous:
+            if next_entity[NER_KEY_SCORE] > current[NER_KEY_SCORE]:
+                current[NER_KEY_ENTITY_GROUP] = next_entity[NER_KEY_ENTITY_GROUP]
             current[NER_KEY_WORD] += " " + next_entity[NER_KEY_WORD]
             current[NER_KEY_END] = next_entity[NER_KEY_END]
             current[NER_KEY_SCORE] = (current[NER_KEY_SCORE] + next_entity[NER_KEY_SCORE]) / 2

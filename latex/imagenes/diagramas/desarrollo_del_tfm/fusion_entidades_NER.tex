@@ -2,49 +2,60 @@
     \centering
     \begin{tikzpicture}[
         scale=0.85, transform shape,
-        font=\sffamily\scriptsize, 
+        font=\sffamily\scriptsize,
         entity/.style={align=center, minimum width=1.6cm},
+        discard/.style={align=center, minimum width=1.1cm, draw=black!40, dashed, rounded corners, font=\small, text=black!40},
         arrow/.style={-{Stealth[scale=0.8]}, thick},
         lbl/.style={align=center, font=\scriptsize\bfseries\color{black!80}}
     ]
 
         % ========================================================
-        % SECCIÓN IZQUIERDA: ENTIDADES ORIGINALES
+        % FILA 1: ENTIDADES ORIGINALES (salida de los dos modelos NER)
         % ========================================================
-        % Centrado entre las dos palabras originales (coordenada X = 1.4)
-        \node[lbl] (titleLeft) at (1.4, 1.2) {ENTIDADES ORIGINALES};
+        \node[lbl] (titleRaw) at (1.4, 1.2) {ENTIDADES ORIGINALES (\texttt{pln\_medical})};
 
-        % Palabra: "hipertensión"
         \node[entity, font=\small\bfseries] (hip) at (0, 0) {Hipertensión};
         \draw[thick] ([yshift=-2pt]hip.south west) -- ([yshift=-2pt]hip.south east);
-        \node[anchor=north, yshift=-2pt, font=\small\bfseries] at (hip.south) {Problem};
+        \node[anchor=north, yshift=-2pt, font=\scriptsize\bfseries] at (hip.south) {Problem (0.95)};
 
-        % Palabra: "Arterial" (Separada un poco más de 'hipertensión')
-        \node[entity, font=\small\bfseries] (art) at (2.8, 0) {Arterial};
+        % \node[discard] (comma) at (1.7, 0) {,};
+        % \node[anchor=north, yshift=-2pt, font=\scriptsize, text=black!40] {};
+
+        \node[entity, font=\small\bfseries] (art) at (3.4, 0) {Arterial};
         \draw[thick] ([yshift=-2pt]art.south west) -- ([yshift=-2pt]art.south east);
-        \node[anchor=north, yshift=-2pt, font=\small\bfseries] at (art.south) {Problem};
+        \node[anchor=north, yshift=-2pt, font=\scriptsize\bfseries] at (art.south) {Symptom (0.97)};
 
-
-        % ========================================================
-        % SECCIÓN CENTRAL: FLECHA DE PROCESO
-        % ========================================================
-        % Desplazada a la derecha para dejar aire tras "Arterial"
-        \draw[arrow] (4.2, -0.1) -- (6.2, -0.1) 
-            node[midway, above, align=center, font=\scriptsize\bfseries] {PROCESO\\DE UNIÓN};
-
+        \draw[arrow] (4.7, -0.3) -- (4.7, -1.3)
+            node[midway, right, align=left, font=\scriptsize\bfseries] {FILTRADO\\\textit{(\textsf{score} y ruido)}};
 
         % ========================================================
-        % SECCIÓN DERECHA: ENTIDAD FUSIONADA
+        % FILA 2: TRAS FILTRADO
         % ========================================================
-        % Movido todo el bloque derecho hacia la coordenada X = 9.2 para separarlo de la flecha
-        \node[lbl] (titleRight) at (9.2, 1.2) {ENTIDAD FUSIONADA};
+        \node[lbl] (titleFiltered) at (1.7, -2.0) {TRAS FILTRADO};
 
-        % Palabra combinada: "hipertensión Arterial"
-        \node[entity, minimum width=3.4cm, font=\small\bfseries] (fusion) at (9.2, 0) {Hipertensión arterial};
+        \node[entity, font=\small\bfseries] (hip2) at (0, -3.2) {Hipertensión};
+        \draw[thick] ([yshift=-2pt]hip2.south west) -- ([yshift=-2pt]hip2.south east);
+        \node[anchor=north, yshift=-2pt, font=\scriptsize\bfseries] at (hip2.south) {Problem (0.95)};
+
+        \node[entity, font=\small\bfseries] (art2) at (3.4, -3.2) {Arterial};
+        \draw[thick] ([yshift=-2pt]art2.south west) -- ([yshift=-2pt]art2.south east);
+        \node[anchor=north, yshift=-2pt, font=\scriptsize\bfseries] at (art2.south) {Symptom (0.97)};
+
+        \draw[arrow] (4.7, -3.5) -- (4.7, -4.5)
+            node[midway, right, align=left, font=\scriptsize\bfseries] {FUSIÓN\\\textit{(mismo pln\_source)}};
+
+        % ========================================================
+        % FILA 3: ENTIDAD FUSIONADA
+        % ========================================================
+        \node[lbl] (titleMerged) at (1.7, -5.2) {ENTIDAD FUSIONADA};
+
+        \node[entity, minimum width=3.4cm, font=\small\bfseries] (fusion) at (1.7, -6.4) {Hipertensión arterial};
         \draw[thick] ([yshift=-2pt]fusion.south west) -- ([yshift=-2pt]fusion.south east);
-        \node[anchor=north, yshift=-2pt, font=\small\bfseries] at (fusion.south) {Problem};
+        \node[anchor=north, yshift=-2pt, font=\scriptsize\bfseries] at (fusion.south) {Symptom (0.96)};
 
     \end{tikzpicture}
-    \caption{Proceso de unión automática de entidades NER clínicas contiguas.}
+    \caption{Filtrado de entidades de bajo valor y fusión de entidades \englishText{NER} contiguas
+        del mismo modelo de origen. La entidad resultante hereda la etiqueta del fragmento con mayor
+        confianza (\texttt{Symptom}, en lugar de \texttt{Problem}) y una puntuación promediada.}
     \label{fig:union_entidades_ner}
 \end{figure}
