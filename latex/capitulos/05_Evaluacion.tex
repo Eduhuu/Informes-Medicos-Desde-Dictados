@@ -95,11 +95,140 @@ nota (sustituciones fonéticamente similares, fragmentación de términos compue
 excepción relevante, asociada a una posible contaminación cruzada de audio.
 
 \subsection{Extracción de entidades \englishText{PLN}/\englishText{NER}}\label{subsection:evaluacion_pln}
-\boldparagraph{Comparacion de resultados en función al tipo de entidades a buscar segun su granularidad}{}
-\nota{Sección pendiente: completar con la evaluación cuantitativa individual del módulo PLN/NER
-(precisión, \textit{recall} y F1 frente a las entidades de referencia anotadas manualmente, conforme
-al objetivo específico 2), independiente de la evaluación end-to-end asistida por IA de la
-Sección~\ref{section:evaluacion_e2e}.}
+
+El módulo \englishText{NER} se evaluó de forma independiente a la evaluación
+\englishText{end-to-end} de la Sección~\ref{section:evaluacion_e2e}, calculando precisión,
+\textit{recall} y F1 sobre los 10 casos del conjunto de evaluación
+(Sección~\ref{section:conjunto_datos_evaluacion}), comparando las entidades detectadas por el
+\textit{pipeline} de extracción frente a las entidades de referencia anotadas para cada
+caso. La comparación se realiza mediante coincidencia exacta de texto (normalizado a minúsculas)
+entre el conjunto de entidades detectadas y el conjunto de entidades de referencia: toda entidad
+detectada que no coincide literalmente con ninguna entidad de referencia se cuenta como falso
+positivo, y toda entidad de
+referencia no cubierta por ninguna detección se cuenta como falso negativo.
+
+A partir de esta comparación se definen los tres conjuntos sobre los que se calculan las métricas de
+esta sección:
+
+\boldparagraph{Verdaderos positivos (\textit{true positives}, TP)}{
+    entidades detectadas por el módulo \englishText{NER} cuyo texto coincide exactamente con una
+    entidad de referencia del caso.
+}
+
+\boldparagraph{Falsos positivos (\textit{false positives}, FP)}{
+    entidades detectadas por el módulo \englishText{NER} que no coinciden con ninguna entidad de
+    referencia, ya sea porque corresponden a un fragmento parcial de una entidad de referencia más
+    larga o porque no guardan relación alguna con las entidades buscadas que se puede interpretar 
+    como ruido clínico genérico.
+}
+
+\boldparagraph{Falsos negativos (\textit{false negatives}, FN)}{
+    entidades de referencia del caso que no son cubiertas por ninguna de las entidades detectadas.
+}
+
+A partir de estos tres conteos se obtienen, para cada caso, las tres métricas reportadas en esta
+subsección:
+
+\begin{gather*}
+    \text{Precisión} = \frac{\mathrm{TP}}{\mathrm{TP} + \mathrm{FP}} \\[8pt]
+    \textit{Recall} = \frac{\mathrm{TP}}{\mathrm{TP} + \mathrm{FN}} \\[8pt]
+    \mathrm{F1} = 2 \cdot \frac{\text{Precisión} \cdot \textit{Recall}}{\text{Precisión} + \textit{Recall}} \\[1pt]
+\end{gather*}
+
+donde la precisión mide qué proporción de las entidades detectadas son correctas, el \textit{recall}
+mide qué proporción de las entidades de referencia fueron efectivamente detectadas, y el F1 resume
+ambas en su media armónica. Estas tres métricas se reportan en dos variantes de promedio sobre los
+10 casos: el promedio \textit{macro}, que calcula la métrica de cada caso por separado y luego
+promedia esos 10 valores, y el promedio \textit{micro}, que primero suma los TP, FP y FN de los 10
+casos y calcula las métricas una sola vez sobre esos totales agregados, dando así mayor peso a los
+casos con más entidades de referencia.
+
+Durante la ejecución de esta evaluación se realizaron las siguientes dos pruebas:
+
+\boldparagraph{Evaluación estricta (entidad semántica completa)}{
+    en una primera prueba, el \textit{gold standard} de cada caso se anotó exigiendo la
+    entidad semántica completa de cada entidad clínica (p.\ ej.\
+    \texttt{atrofia moderada de las vellosidades intestinales} como una única entidad). Bajo este
+    criterio, el modelo obtuvo un F1 micro de 32,0\,\% (precisión 24,8\,\%, \textit{recall} 44,9\,\%),
+    según el resumen de la Tabla~\ref{tab:ner_resumen_estricta} y el detalle completo por caso de la
+    Tabla~\ref{tab:ner_detalle_estricta} (Anexo~\ref{anexo:resultados_ner_completos}). El análisis
+    caso por caso reveló que la causa dominante de error no era la omisión total del contenido
+    clínico, sino la \textbf{sobre-segmentación}: el modelo tiende a detectar fragmentos cortos
+    dentro de una entidad de referencia más larga (p.\ ej.\ detecta \texttt{doloroso} en lugar de
+    \texttt{cuadro doloroso}, o \texttt{leucocitos} en lugar de \texttt{16.000 leucocitos}), de modo
+    que el fragmento se contabiliza como falso positivo y la entidad completa como falso negativo,
+    penalizando dos veces el mismo error. A este patrón se suman dos fuentes de error adicionales:
+    siglas y abreviaturas clínicas no reconocidas (\texttt{SDRC}, \texttt{HCA}, \texttt{DLE},
+    \texttt{AOC}, \texttt{DG}, \texttt{RMN}) y un volumen elevado de falsos positivos por términos
+    genéricos de exploración o síntomas parciales (\texttt{exploración física}, \texttt{dolor},
+    \texttt{lesión}).
+}
+
+\input{tablas/capitulo_evaluacion/tabla_ner_resumen_estricta.tex}
+
+% \boldparagraph{Evaluación granular (\textit{gold standard} fragmentado)}{
+%     a partir del patrón de sobre-segmentación identificado en la evaluación estricta, se diseñó una
+%     segunda prueba en la que el \textit{gold standard} se redefinió con mayor granularidad,
+%     fragmentando las entidad de referencia en palabras más cortas que el modelo tiende a
+%     producir de forma consistente (p.\ ej.\ \texttt{atrofia moderada} y
+%     \texttt{vellosidades intestinales} como dos entidades independientes, en lugar de una sola). El
+%     objetivo de esta segunda prueba es aislar qué proporción del F1 obtenido en la evaluación
+%     estricta se explica por un criterio de delimitación de \textit{span} demasiado exigente, frente a
+%     contenido clínico realmente no detectado por el modelo. Bajo este criterio más granular, el
+%     modelo obtuvo un F1 micro de 43,8\,\% (precisión 37,3\,\%, \textit{recall} 53,1\,\%), según el
+%     resumen de la Tabla~\ref{tab:ner_resumen_granular} y el detalle completo por caso de la
+%     Tabla~\ref{tab:ner_detalle_granular} (Anexo~\ref{anexo:resultados_ner_completos}). Aun con este
+%     criterio relajado, persisten los mismos tres errores estructurales identificados en la
+%     evaluación estricta --- desalineación fina de límites de \textit{span}, ceguera ante siglas y
+%     abreviaturas, y un volumen de falsos positivos genéricos prácticamente sin cambios (101 frente a
+%     121) ---, lo que indica que estos no son artefactos del criterio de anotación sino limitaciones
+%     reales del modelo.
+% }
+
+\boldparagraph{Evaluación granular (\textit{gold standard} fragmentado)}{
+    A partir del patrón de sobresegmentación identificado en la evaluación estricta, se diseñó un 
+    segundo experimento en el que el \textit{gold standard} se redefinió con mayor granularidad. Para 
+    ello, las entidades de referencia se fragmentaron en las unidades más cortas que el modelo 
+    tiende a predecir de forma consistente (por ejemplo, dividiendo \texttt{atrofia moderada vellosidades 
+    intestinales} en dos entidades independientes: \texttt{atrofia moderada} y \texttt{vellosidades 
+    intestinales}). 
+
+    % El objetivo de esta prueba es determinar qué proporción de la caída en la métrica $F_1$ de la evaluación 
+    % estricta se debe a un criterio de delimitación de \textit{span} excesivamente riguroso, en lugar de a 
+    % un verdadero fallo en la detección del contenido clínico. 
+    El objetivo de esta prueba es saber cuántos errores del modelo se debieron a un criterio de evaluación
+    demasiado estricto (al exigir límites exactos en las palabras), y cuántos a una pérdida
+    real de información clínica.
+
+    Bajo este criterio granular, el modelo alcanzó un $F_1$ micro del 43,8\% (precisión: 37,3\%; \textit{recall}: 
+    53,1\%), como se resume en la Tabla~\ref{tab:ner_resumen_granular} y se detalla por caso en la 
+    Tabla~\ref{tab:ner_detalle_granular} (Anexo~\ref{anexo:resultados_ner_completos}). Sin embargo, aun con 
+    este criterio flexible, persisten los mismos tres errores estructurales de la evaluación estricta: 
+    la desalineación fina en los límites de los \textit{spans}, la incapacidad para reconocer siglas o 
+    abreviaturas, y un volumen de falsos positivos genéricos casi idéntico (101 frente a 121). Esto demuestra 
+    que dichos errores no son artefactos del criterio de anotación, sino limitaciones reales del modelo.
+}
+
+\input{tablas/capitulo_evaluacion/tabla_ner_resumen_granular.tex}
+
+La Tabla~\ref{tab:ner_comparacion} resume la diferencia entre los promedios micro de ambas
+pruebas. El F1 mejora 11,8 puntos porcentuales (de 32,0\,\% a 43,8\,\%) al pasar del criterio
+estricto al granular, una mejora explicada principalmente por una reducción de 20 falsos
+positivos (121 a 101) que pasan a sumarse como un verdaderos positivos al relajar la
+exigencia de \textit{span} completo; el número de falsos negativos se mantiene prácticamente
+estable (49 a 53), ya que el \textit{gold standard} granular contiene más entidades individuales
+a cubrir. Esta diferencia permite estimar que aproximadamente un 37\,\% de la brecha de F1 
+se explica por la granularidad con la que se delimitan los
+\textit{spans} de las entidades, mientras que el 63\,\% restante corresponde a limitaciones reales
+de la extracción: siglas y abreviaturas no reconocidas, valores numéricos con unidades no
+capturados como una sola entidad, y un volumen elevado de falsos positivos por términos clínicos
+genéricos. En ambas pruebas, el modelo se comporta de forma consistentemente mejor con
+diagnósticos y fármacos expresados en una o dos palabras (p.\ ej.\ \texttt{hernia discal},
+\texttt{azatioprina}) que con expresiones clínicas compuestas, acrónimos y cuantificaciones
+numéricas, lo que señala estas últimas como las áreas prioritarias de mejora del módulo
+\englishText{NER} de cara a un uso en producción.
+
+\input{tablas/capitulo_evaluacion/tabla_ner_comparacion.tex}
 
 \subsection{Normalización terminológica \englishText{SNOMED CT}/\englishText{CIE-10-ES}}\label{subsection:evaluacion_snomed}
 
