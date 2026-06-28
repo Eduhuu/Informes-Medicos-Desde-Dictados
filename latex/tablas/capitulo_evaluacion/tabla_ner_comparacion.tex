@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+    \centering
+    \caption{Comparación de los promedios micro entre la evaluación con \textit{span} completo
+    (estricta) y la evaluación con granularidad de fragmento (granular).}
+    \label{tab:ner_comparacion}
+    \begin{tabular}{@{}lccc@{}}
+    \toprule
+    \textbf{Métrica (micro)} & \textbf{Estricta} & \textbf{Granular} & \textbf{$\Delta$} \\
+    \midrule
+    Precisión & 24,8\,\% & 37,3\,\% & +12,4\,pp \\
+    \textit{Recall} & 44,9\,\% & 53,1\,\% & +8,2\,pp \\
+    F1 & 32,0\,\% & 43,8\,\% & +11,8\,pp \\
+    Verdaderos positivos (TP) & 40 & 60 & +20 \\
+    Falsos positivos (FP) & 121 & 101 & $-$20 \\
+    Falsos negativos (FN) & 49 & 53 & +4 \\
+    \bottomrule
+    \end{tabular}
+\end{table}

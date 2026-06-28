@@ -9,3 +9,27 @@ Tablas~\ref{tab:e2e_detalle_batch} y~\ref{tab:e2e_detalle_streaming}.
 \input{tablas/capitulo_evaluacion/tabla_e2e_detalle_batch.tex}
 
 \input{tablas/capitulo_evaluacion/tabla_e2e_detalle_streaming.tex}
+
+\chapter{Resultados completos de la evaluación \englishText{NER}}\label{anexo:resultados_ner_completos}
+
+Este anexo recoge el detalle caso por caso de la evaluación cuantitativa del módulo
+\englishText{NER} descrita en la Sección~\ref{subsection:evaluacion_pln}, para las dos
+configuraciones de \textit{gold standard} empleadas: la evaluación estricta, con coincidencia de
+la entidad médica completa (Tabla~\ref{tab:ner_detalle_estricta}), y la evaluación granular, con el
+\textit{gold standard} fragmentado (Tabla~\ref{tab:ner_detalle_granular}). Los promedios resumidos
+en las Tablas~\ref{tab:ner_resumen_estricta} y~\ref{tab:ner_resumen_granular} se calculan a partir
+de estos resultados por caso.
+
+Cada fila de caso incluye los conteos TP (verdaderos positivos), FP (falsos positivos) y FN (falsos
+negativos) y las métricas derivadas de ellos. Una detección cuenta como TP si su texto coincide
+exactamente con una entidad de referencia; como FP si no coincide con ninguna; y cada entidad de
+referencia no cubierta se contabiliza como FN. La precisión, el \textit{recall} y el F1 de cada caso
+se obtienen respectivamente como $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$,
+$\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ y la media armónica de ambas. La fila \textit{Macro} del
+pie de tabla promedia esas tres métricas entre los 10 casos; la fila \textit{Micro} suma los TP, FP
+y FN globales y recalcula las métricas sobre esos totales (véase la definición completa en la
+Sección~\ref{subsection:evaluacion_pln}).
+
+\input{tablas/capitulo_evaluacion/tabla_ner_detalle_estricta.tex}
+
+\input{tablas/capitulo_evaluacion/tabla_ner_detalle_granular.tex}
