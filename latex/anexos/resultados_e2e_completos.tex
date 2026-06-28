@@ -1,18 +1,13 @@
-\chapter{Resultados completos de la evaluación end-to-end}\label{anexo:resultados_e2e_completos}
+\chapter{Resultados de la evaluación}\label{anexo:resultados_modulos_completos}
 
-Este anexo recoge el detalle caso por caso de la evaluación \englishText{end-to-end} asistida por
-IA descrita en la Sección~\ref{section:evaluacion_e2e}, para las dos modalidades de funcionamiento
-del sistema (\textit{batch} y \textit{streaming}). Las puntuaciones medias resumidas en la
-Tabla~\ref{tab:e2e_comparacion_modos} se obtienen promediando los valores de las
-Tablas~\ref{tab:e2e_detalle_batch} y~\ref{tab:e2e_detalle_streaming}.
+Este anexo recoge el detalle caso por caso de las evaluaciones cuantitativas individuales
+presentadas en la Sección~\ref{section:evaluacion_modulos} y en la evaluación
+\englishText{end-to-end} de la Sección~\ref{section:evaluacion_e2e}, organizado en una subsección
+por cada una de las pruebas realizadas.
 
-\input{tablas/capitulo_evaluacion/tabla_e2e_detalle_batch.tex}
+\section{Extracción de entidades \englishText{NER}}\label{anexo:resultados_ner_completos}
 
-\input{tablas/capitulo_evaluacion/tabla_e2e_detalle_streaming.tex}
-
-\chapter{Resultados completos de la evaluación \englishText{NER}}\label{anexo:resultados_ner_completos}
-
-Este anexo recoge el detalle caso por caso de la evaluación cuantitativa del módulo
+Esta sección recoge el detalle caso por caso de la evaluación cuantitativa del módulo
 \englishText{NER} descrita en la Sección~\ref{subsection:evaluacion_pln}, para las dos
 configuraciones de \textit{gold standard} empleadas: la evaluación estricta, con coincidencia de
 la entidad médica completa (Tabla~\ref{tab:ner_detalle_estricta}), y la evaluación granular, con el
@@ -33,3 +28,24 @@ Sección~\ref{subsection:evaluacion_pln}).
 \input{tablas/capitulo_evaluacion/tabla_ner_detalle_estricta.tex}
 
 \input{tablas/capitulo_evaluacion/tabla_ner_detalle_granular.tex}
+
+\section{Normalización terminológica \englishText{SNOMED CT}/\englishText{CIE-10-ES}}\label{anexo:resultados_snomed_cie_completos}
+
+Esta sección recoge el detalle caso por caso de la evaluación cuantitativa del módulo de
+normalización terminológica descrita en la Sección~\ref{subsection:evaluacion_snomed}
+(Tabla~\ref{tab:snomed_cie_detalle}), a partir del cual se calculan los promedios resumidos en la
+Tabla~\ref{tab:snomed_cie_resumen}.
+
+\input{tablas/capitulo_evaluacion/tabla_snomed_cie_detalle.tex}
+
+\section{Evaluación \englishText{end-to-end}}\label{anexo:resultados_e2e_completos}
+
+Esta sección recoge el detalle caso por caso de la evaluación \englishText{end-to-end} asistida por
+IA descrita en la Sección~\ref{section:evaluacion_e2e}, para las dos modalidades de funcionamiento
+del sistema (\textit{batch} y \textit{streaming}). Las puntuaciones medias resumidas en la
+Tabla~\ref{tab:e2e_comparacion_modos} se obtienen promediando los valores de las
+Tablas~\ref{tab:e2e_detalle_batch} y~\ref{tab:e2e_detalle_streaming}.
+
+\input{tablas/capitulo_evaluacion/tabla_e2e_detalle_batch.tex}
+
+\input{tablas/capitulo_evaluacion/tabla_e2e_detalle_streaming.tex}

@@ -4,19 +4,6 @@ asr:
   device: cpu  # cpu | cuda
   language: es
   compute_type: int8 # int8 | float16 | float32
-  prompt:
-    - hipertensión
-    - diabetes
-    - Enalapril
-    - Metformina
-    - Losartán
-    - Atorvastatina
-    - Omeprazol
-    - hemoglobina glicosilada
-    - función renal
-    - sístole
-    - diástole
-    - cefalea
 
 pln_medical:
   task: token-classification
@@ -53,7 +40,7 @@ llm:
     **INFORME CLÍNICO**
     * **Motivo de Consulta / Enfermedad Actual:** (Sintetiza de forma médica los síntomas mencionados en la transcripción. Si no hay antecedentes, omite la sección de antecedentes).
     * **Plan Diagnóstico y Terapéutico:** (Lista los medicamentos recomendados, dosis si existen, y exámenes solicitados indicados en la transcripción).
-    * **Impresión Diagnóstica:** (Diagnóstico presuntivo directo basado únicamente en el texto. Si es ambiguo, pon "Cefalea a estudio" o similar. No inventes causas).
+    * **Impresión Diagnóstica:** (Diagnóstico presuntivo directo basado únicamente en el texto.
 
     ---
     **ANEXO DE CODIFICACIÓN CLÍNICA (SNOMED CT)**

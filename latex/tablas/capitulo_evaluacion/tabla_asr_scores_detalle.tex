@@ -1,6 +1,10 @@
 \begin{table}[htbp]
     \centering
-    \caption{Porcentaje de palabras correctamente transcritas}
+    \caption{Porcentaje de palabras correctamente transcritas. El valor de \texttt{Test9} en modo
+    \textit{batch} se recalcula tras detectar que el archivo de audio cargado para ese caso
+    contenía, por un error de carga durante la evaluación, un fragmento adicional ajeno al texto de
+    referencia; descontado dicho fragmento, el resto de la transcripción solo difiere del
+    \textit{gold standard} en la sigla \texttt{SDRC}, transcrita como \texttt{DSDRC}.}
     \label{tab:asr_scores_detalle}
     \begin{tabular}{@{}lcccc@{}}
     \toprule
@@ -15,10 +19,10 @@
     Test6  & 94.8\,\% & 4 & 94.8\,\%  & 4 \\
     Test7  & 94.4\,\% & 4 & 95.7\,\%  & 4 \\
     Test8  & 95.9\,\% & 4 & 93.0\,\%  & 4 \\
-    Test9  & 80.0\,\% & 3 & 100.0\,\% & 5 \\
+    Test9  & 96.4\,\% & 4 & 100.0\,\% & 5 \\
     Test10 & 99.4\,\% & 5 & 97.8\,\%  & 4 \\
     \midrule
-    \textbf{Promedio} & \textbf{91.9\,\%} & \textbf{3.9} & \textbf{93.6\,\%} & \textbf{3.8} \\
+    \textbf{Promedio} & \textbf{93.5\,\%} & \textbf{4.0} & \textbf{93.6\,\%} & \textbf{3.8} \\
     \bottomrule
     \end{tabular}
 \end{table}

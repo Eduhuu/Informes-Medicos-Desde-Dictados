@@ -347,9 +347,9 @@ verificada para el \englishText{LLM} y reporte de control en texto plano.}
 \subsection{Servicios externos: Docker \englishText{SNOMED}}\label{subsection:servicios_externos_snomed}
 
 \boldparagraph{Docker \englishText{SNOMED}}{
-    el fichero \texttt{snomed/docker-compose.yml} despliega Elasticsearch~7.17.10 y Snowstorm
+    el fichero \texttt{snomed/docker-compose.yml} despliega Elasticsearch~7.17.10 y \englishText{Snowstorm}
     (\texttt{snomedinternational/snowstorm:latest}) sobre la rama \texttt{MAIN/SNOMEDCT-ES}.
-    Tras el arranque del contenedor, se importaron en Snowstorm los paquetes terminológicos
+    Tras el arranque del contenedor, se importaron en \englishText{Snowstorm} los paquetes terminológicos
     \texttt{SnomedCT International Edition (Dependencia EE SNS)} y
     \texttt{SnomedCT Spanish Edition (Dependencia EE SNS)}, distribuidos por el
     Sistema Nacional de Salud.
@@ -361,7 +361,7 @@ verificada para el \englishText{LLM} y reporte de control en texto plano.}
     identificadores únicos (\texttt{conceptId}), así
     como las operaciones \englishText{FHIR} de traducción hacia \englishText{CIE-10-ES} descritas
     en la Sección~\ref{subsubsection:modulo_cie10}.
-    Snowstorm expone la API REST de terminología y el endpoint \englishText{FHIR} en el puerto~8080,
+    \englishText{Snowstorm} expone la API REST de terminología y el endpoint \englishText{FHIR} en el puerto~8080,
     necesarios para las etapas de normalización clínica.
 }
 
@@ -487,4 +487,4 @@ diferenciados:
     Capítulo~\ref{chapter:marco_teorico_y_referencial}.
     \item \textbf{\texttt{Fhir\_Reporte.json}} --- \englishText{Bundle FHIR} R4B generado de forma
     independiente del informe \englishText{LLM}, a partir de las entidades deduplicadas de la sesión.
-\end{itemize}.
+\end{itemize}
