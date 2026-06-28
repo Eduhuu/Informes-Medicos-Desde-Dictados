@@ -1,4 +1,293 @@
 \chapter{Resultados y discusión}\label{chapter:resultados}
-Tengo que validar o refutar los objetivos generales y específicos.
-Utilizando las metricas de evaluacion.
-Contrastar y comparar las evaluaciones end to end cada uno de los componentes por separado, para ver donde es que se puede mejorar.
+
+Este capítulo presenta y discute los resultados obtenidos al aplicar la metodología de evaluación
+descrita en el Capítulo~\ref{chapter:evaluacion}, contrastándolos con los objetivos específicos
+definidos en la Sección~\ref{section:objetivos-especificos}.
+
+\section{Resultados de la evaluación por módulos}\label{section:resultados_modulos}
+
+\subsection{Transcripción \englishText{ASR}}\label{subsection:resultados_asr}
+
+La Tabla~\ref{tab:asr_scores_detalle} recoge, para cada uno de los 10 casos y ambas modalidades, el
+porcentaje de palabras correctas obtenido frente al \textit{gold standard} y la puntuación que se
+deriva de él según la escala de la Tabla~\ref{tab:asr_escala} (Sección~\ref{subsection:evaluacion_asr}).
+
+\input{tablas/capitulo_evaluacion/tabla_asr_scores_detalle.tex}
+
+\input{tablas/capitulo_evaluacion/tabla_asr_promedios.tex}
+
+El \englishText{WER} medio combinado ($\approx$6.5\,\%) se encuentra por debajo del umbral definido
+en el objetivo específico~1 ($\le$10--12\,\%, Sección~\ref{section:objetivos-especificos}), lo que
+permite considerar este objetivo cumplido. El comportamiento del módulo es, además, consistente
+entre las dos modalidades y los 10 casos de referencia, con un \englishText{WER} que se mantiene en
+todos ellos en un rango bajo ($\approx$0.6--13.6\,\%), y con errores menores que en general no
+alteran el sentido clínico de la nota.
+
+\subsection{Extracción de entidades \englishText{PLN}/\englishText{NER}}\label{subsection:resultados_pln}
+
+Bajo el criterio de \textbf{evaluación estricta} (entidad semántica completa, definida en la
+Sección~\ref{subsection:evaluacion_pln}), el modelo obtuvo un F1 micro de 32,0\,\% (precisión 24,8\,\%,
+\textit{recall} 44,9\,\%), según el resumen de la Tabla~\ref{tab:ner_resumen_estricta} y el detalle
+completo por caso de la Tabla~\ref{tab:ner_detalle_estricta} (Anexo~\ref{anexo:resultados_ner_completos}).
+El análisis caso por caso reveló que la causa dominante de error no era la omisión total del
+contenido clínico, sino la \textbf{sobre-segmentación}: el modelo tiende a detectar fragmentos cortos
+dentro de una entidad de referencia más larga (p.\ ej.\ detecta \texttt{doloroso} en lugar de
+\texttt{cuadro doloroso}, o \texttt{leucocitos} en lugar de \texttt{16.000 leucocitos}), de modo
+que el fragmento se contabiliza como falso positivo y la entidad completa como falso negativo,
+penalizando dos veces el mismo error. A este patrón se suman dos fuentes de error adicionales:
+siglas y abreviaturas clínicas no reconocidas (\texttt{SDRC}, \texttt{HCA}, \texttt{DLE},
+\texttt{AOC}, \texttt{DG}, \texttt{RMN}) y un volumen elevado de falsos positivos por términos
+genéricos de exploración o síntomas parciales (\texttt{exploración física}, \texttt{dolor},
+\texttt{lesión}).
+
+\input{tablas/capitulo_evaluacion/tabla_ner_resumen_estricta.tex}
+
+Bajo el criterio de \textbf{evaluación granular} (\textit{gold standard} fragmentado, definida en la
+Sección~\ref{subsection:evaluacion_pln}), el modelo alcanzó un $F_1$ micro del 43,8\% (precisión: 37,3\%;
+\textit{recall}: 53,1\%), como se resume en la Tabla~\ref{tab:ner_resumen_granular} y se detalla por
+caso en la Tabla~\ref{tab:ner_detalle_granular} (Anexo~\ref{anexo:resultados_ner_completos}). Sin
+embargo, aun con este criterio flexible, persisten los mismos tres errores estructurales de la
+evaluación estricta: la desalineación fina en los límites de los \textit{spans}, la incapacidad para
+reconocer siglas o abreviaturas, y un volumen de falsos positivos genéricos casi idéntico (101 frente
+a 121). Esto demuestra que dichos errores no son artefactos del criterio de anotación, sino
+limitaciones reales del modelo.
+
+\input{tablas/capitulo_evaluacion/tabla_ner_resumen_granular.tex}
+
+La Tabla~\ref{tab:ner_comparacion} resume la diferencia entre los promedios micro de ambas
+pruebas. El F1 mejora 11,8 puntos porcentuales (de 32,0\,\% a 43,8\,\%) al pasar del criterio
+estricto al granular, una mejora explicada principalmente por una reducción de 20 falsos
+positivos (121 a 101) que pasan a sumarse como un verdaderos positivos al relajar la
+exigencia de \textit{span} completo; el número de falsos negativos se mantiene prácticamente
+estable (49 a 53), ya que el \textit{gold standard} granular contiene más entidades individuales
+a cubrir. Esta diferencia permite estimar que aproximadamente un 37\,\% de la brecha de F1
+se explica por la granularidad con la que se delimitan los
+\textit{spans} de las entidades, mientras que el 63\,\% restante corresponde a limitaciones reales
+de la extracción: siglas y abreviaturas no reconocidas, valores numéricos con unidades no
+capturados como una sola entidad, y un volumen elevado de falsos positivos por términos clínicos
+genéricos. En ambas pruebas, el modelo se comporta de forma consistentemente mejor con
+diagnósticos y fármacos expresados en una o dos palabras (p.\ ej.\ \texttt{hernia discal},
+\texttt{azatioprina}) que con expresiones clínicas compuestas, acrónimos y cuantificaciones
+numéricas, lo que señala estas últimas como las áreas prioritarias de mejora del módulo
+\englishText{NER} de cara a un uso en producción.
+
+\input{tablas/capitulo_evaluacion/tabla_ner_comparacion.tex}
+
+El F1 obtenido en ambos criterios (32,0--43,8\,\%) se sitúa muy por debajo del umbral fijado en el
+objetivo específico~2 ($F1 \ge 0,85$, Sección~\ref{section:objetivos-especificos}), por lo que este
+objetivo no se considera cumplido.
+
+\subsection{Normalización terminológica \englishText{SNOMED CT}/\englishText{CIE-10-ES}}\label{subsection:resultados_snomed}
+
+La Tabla~\ref{tab:snomed_cie_resumen} resume el porcentaje de acierto agregado para ambos
+vocabularios; el detalle caso por caso, a partir del cual se calculan estos promedios, se recoge en
+la Tabla~\ref{tab:snomed_cie_detalle} del Anexo~\ref{anexo:resultados_ner_completos}.
+
+\input{tablas/capitulo_evaluacion/tabla_snomed_cie_resumen.tex}
+
+\boldparagraph{\englishText{SNOMED CT}}{
+    obtiene un porcentaje de acierto elevado y consistente entre casos (85,5\,\% micro, 85,9\,\%
+    macro), con 7 de los 10 casos alcanzando un acierto igual o superior al 77,8\,\% y 5 de ellos con
+    un acierto del 100\,\%.
+}
+
+\boldparagraph{\englishText{CIE-10-ES}}{
+    obtiene un porcentaje de acierto considerablemente más bajo (39,4\,\% micro, 37,2\,\% macro), sin
+    que ningún caso supere el 60\,\%.
+}
+
+La diferencia entre ambos vocabularios es consistente en los 10 casos: en ninguno de ellos el
+porcentaje de acierto en \englishText{CIE-10-ES} supera al de \englishText{SNOMED CT}
+(Tabla~\ref{tab:snomed_cie_detalle}, Anexo~\ref{anexo:resultados_snomed_cie_completos}). Esto es
+coherente con que \englishText{CIE-10-ES} es una clasificación diagnóstica de propósito más
+general que \englishText{SNOMED CT}, lo que reduce el número de conceptos con un código directo
+equivalente y, por tanto, el número de entidades con identificador de referencia disponibles para
+esta métrica (33 frente a 69 en \englishText{SNOMED CT}).
+% Además, el mapa oficial
+% \englishText{SNOMED CT}~$\rightarrow$~\englishText{ICD-10} incluye reglas de traducción que
+% dependen explícitamente del contexto clínico del paciente (reglas \texttt{IFA},
+% \textit{"if associated with"}), por ejemplo el sexo o hallazgos
+% asociados, al no disponer de dicho contexto, el cliente
+% \texttt{FhirConceptMapClient} degrada estas traducciones hacia el escalón menos específico de la
+% cadena de búsqueda.
+
+A esto se suma una limitación propia del método de evaluación: la búsqueda local se realizó por
+coincidencia de texto sobre la propia entidad detectada, sin el contexto del dictado que permitiría
+refinar un código general hacia uno más específico. Por ejemplo, \texttt{dolor abdominal} por sí
+solo conduce a un código general, mientras que el contexto (p.\ ej.\ fiebre, diarrea) podría
+justificar uno más específico como \texttt{gastroenteritis}. Parte del bajo acierto en
+\englishText{CIE-10-ES} se debe, por tanto, a esta limitación metodológica y no únicamente a una
+carencia del propio vocabulario.
+
+\section{Resultados de la evaluación \englishText{end-to-end} asistida por IA}\label{section:resultados_e2e}
+
+\subsection{Comparación de resultados entre modalidades}\label{subsection:comparacion_e2e}
+
+La Tabla~\ref{tab:e2e_comparacion_modos} resume las puntuaciones medias obtenidas en cada dimensión y
+el tiempo total medio por caso para ambas modalidades, a partir de los informes completos de
+evaluación de cada una (directorios \texttt{reports/mode\_batches/} y
+\texttt{reports/mode\_streaming/}). El detalle caso por caso de ambas modalidades, a partir del cual
+se calculan estos promedios, se recoge en las Tablas~\ref{tab:e2e_detalle_batch}
+y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}.
+
+\input{tablas/capitulo_evaluacion/tabla_e2e_comparacion.tex}
+
+\boldparagraph{Calidad de transcripción}{
+    el \englishText{ASR} obtiene una puntuación algo superior en \textit{streaming} que en
+    \textit{batch} (4.0 frente a 3.75), en línea con los resultados de la evaluación por módulos de
+    la Sección~\ref{subsection:resultados_asr}. El caso de \textit{batch} con mayor penalización es
+    \texttt{Test2} (puntuación 2, por la confusión \textit{``TTG''}~$\rightarrow$~\textit{``CTG''},
+    que induce aguas abajo un mapeo terminológico erróneo a \textit{Mantoux positive}). En el resto
+    de casos de ambas modalidades, los errores residuales se concentran casi exclusivamente en
+    siglas y epónimos clínicos cortos (\texttt{TTG}, \texttt{DLE}, \texttt{FII},
+    \texttt{Billroth~II}, \texttt{AOC}/\texttt{DG}, \texttt{SDRC}~$\rightarrow$~\texttt{DSDRC} en
+    \texttt{Test9}), que se transcriben mal de forma persistente y rara vez se recuperan en las
+    etapas posteriores del \textit{pipeline}, mientras que los errores ortográficos menores sobre
+    vocabulario común (p.\ ej.\ \textit{``eficiencia''} por \textit{``eficacia''}) se diluyen sin
+    impacto clínico.
+}
+
+\boldparagraph{Extracción de entidades (\englishText{NER})}{
+    muestra una diferencia apreciable entre modalidades: 2.10 en \textit{batch} frente a 2.90 en
+    \textit{streaming}. El procesamiento incremental favorece ligeramente la detección de entidades frente al
+    bloque único del \textit{batch}. A pesar de ello, ambas modalidades comparten dos patrones de error:
+    la pérdida de partículas de negación (p.\ ej., \textit{``no fumador''} detectado como \textit{``fumador''};
+    \textit{``sin complicaciones...''} interpretado como hallazgo positivo en \textit{streaming}~\texttt{Test4},
+    o \textit{``sin nevos''} invertido en \textit{streaming}~\texttt{Test5}) y la omisión de siglas o diagnósticos
+    clave (\texttt{AOC}/\texttt{DG} en \texttt{Test5}, proptosis en \texttt{batch}~\texttt{Test10} o disuria en
+    \texttt{batch}~\texttt{Test7}). La ventaja del \textit{streaming} radica en que el enfoque incremental
+    no satura la ventana de contexto del modelo, optimizando su capacidad de extracción.
+}
+
+\boldparagraph{Terminológica (\englishText{SNOMED CT} y \englishText{CIE-10-ES})}{
+    es, en ambas modalidades, la dimensión con la puntuación más baja de toda la evaluación
+    (1.55 en \textit{batch}, 1.90 en \textit{streaming}) y el eslabón más débil del \textit{pipeline}.
+    El patrón de fallo dominante es idéntico: el motor de enlace normaliza palabras o calificadores
+    aislados sin considerar el contexto clínico completo, generando mapeos \englishText{SNOMED CT}
+    erróneos. Por ejemplo, el error \textit{``corrección''}~$\rightarrow$~\textit{``Penal institution''}
+    se repite de forma idéntica en tres casos distintos de ambas modalidades, lo que evidencia un fallo
+    determinista del diccionario de enlace. Se observan otros mapeos incoherentes debido a esta falta de
+    contexto, como traducir \textit{``amarillento''} como una especie de ave o \textit{``intervenido''}
+    como un trastorno delirante. Asimismo, la cobertura de códigos \englishText{CIE-10-ES} es muy baja
+    en ambas modalidades ($\approx$10--20\,\%), lo que limita la interoperabilidad real del \englishText{Bundle}
+    resultante.
+}
+
+\boldparagraph{Informe \englishText{LLM}}{
+    obtiene una puntuación baja en ambas modalidades, con una ligera ventaja en \textit{streaming}
+    (2.20 frente a 1.95 en \textit{batch}). Aplicando el criterio de \textbf{informe aceptable}
+    definido en la Sección~\ref{subsection:metodologia_e2e} del objetivo 
+    específico~3 en la Sección~\ref{section:objetivos-especificos} (veredicto \texttt{Sí}/\texttt{No} del \englishText{LLM-as-judge} sobre la ausencia
+    de errores graves de diagnóstico, dosis, lateralidad, antecedentes o inversión de hechos
+    clínicos), se obtienen 2 informes aceptables de 10 en \textit{batch} (20\,\%: \texttt{Test7} y
+    \texttt{Test10}, ambos sin alucinaciones ni inversiones y con una impresión diagnóstica correcta)
+    y 3 de 10 en \textit{streaming} (30\,\%: \texttt{Test2}, \texttt{Test4} y \texttt{Test7}), por lo
+    que el objetivo no se considera cumplido en ninguna de las dos modalidades. El análisis detallado
+    revela que el rendimiento se ve afectado por dos dinámicas de fallo diferenciadas:
+
+    \begin{itemize}
+        \item \textbf{Activación del \textit{fallback} de seguridad:} El sistema está programado para
+        escribir \textit{``No hay información suficiente para formular un diagnóstico'' o similar} ante diagnósticos ambiguos. Esto ocurre en 5 de los
+        20 casos evaluados debido, principalmente, a que el módulo \englishText{NER} aguas arriba le transfiere
+        entidades incompletas o truncadas (p.\ ej., \textit{``hernia''} en vez de \textit{``hernia discal''}).
+        No obstante, en un caso aislado (\textit{streaming}~\texttt{Test1}) se evidenció una limitación de
+        abstracción propia del LLM, que no logró trasladar el diagnóstico correcto al campo final a pesar de
+        conocerlo.
+
+        \item \textbf{Alucinaciones y colapsos de contenido:} Independientemente del \textit{fallback}, persisten
+        errores propios del modelo. Estos incluyen la invención de siglas erróneas (como expandir una
+        mala transcripción a \textit{``Distrofia de Duchenne''}), la inversión de datos clínicos (como negar una
+        cirugía realizada), un error de magnitud grave en dosis médicas (un factor $\times$1000 al pasar de
+        $\mu$g/h a mg/h). En escenarios de alta
+        densidad de datos, el modelo llega a colapsar, generando contenido totalmente ajeno al caso (p.\ ej.,
+        describir insuficiencia cardíaca en un paciente neuroquirúrgico).
+    \end{itemize}
+}
+
+\boldparagraph{Bundle \englishText{FHIR}}{
+    obtiene la puntuación más alta de las cinco dimensiones evaluadas en ambas modalidades, algo
+    superior en \textit{streaming} (3.2) que en \textit{batch} (2.7). En los 20 casos evaluados el
+    \englishText{Bundle} es estructuralmente válido (\texttt{resourceType}, referencias \texttt{subject} y
+    \texttt{meta.profile} correctos), pero esta robustez estructural no implica corrección semántica:
+    el \englishText{Bundle} no filtra ni valida los códigos heredados de las etapas anteriores, propagando
+    hacia recursos clínicos formales los errores de negación de \englishText{NER} y
+    los mapeos terminológicos erróneos. En relación con el objetivo específico~4 ($>$95\,\%
+    de validaciones automáticas exitosas sin errores críticos, Sección~\ref{section:objetivos-especificos}),
+    el 100\,\% de los \texttt{Bundles} generados en los 20 casos supera la validación estructural, pero
+    dado que esta no filtra los errores semánticos heredados de etapas anteriores, el cumplimiento del
+    objetivo no puede darse por garantizado en cuanto a la ausencia de errores críticos.
+}
+
+\boldparagraph{Tiempo total de procesamiento}{
+    es la diferencia más marcada entre ambas modalidades: $\approx$30.6\,s de media por caso en modo
+    \textit{batch} frente a $\approx$184.9\,s en modo \textit{streaming}, es decir, un tiempo medio
+    aproximadamente 6 veces superior en \textit{streaming}. Esta diferencia no se explica por el módulo
+    \englishText{ASR} --- rápido y estable en ambas modalidades ---, sino por el efecto acumulativo de
+    ejecutar de forma independiente, para cada uno de los fragmentos de audio de la sesión, las etapas
+    de \englishText{NER} y de traducción \englishText{CIE-10-ES} (\englishText{ConceptMap \$translate}),
+    que en modo \textit{streaming} consumen más del 80\,\% del tiempo total en los casos de mayor
+    tamaño (\texttt{Test6} y \texttt{Test10}, con 412.8\,s y 378.2\,s respectivamente, frente a una
+    etapa dominada por el \englishText{ASR} en un 70--85\,\% del tiempo en modo \textit{batch}). El
+    modo \textit{batch}, al concentrar todo el audio en una sola invocación, evita esta repetición de
+    llamadas y resulta sustancialmente más eficiente en tiempo total, a costa de no ofrecer
+    retroalimentación incremental durante la sesión.
+}
+
+% \section{Discusión de resultados}\label{section:discusion_resultados}
+
+% A modo de balance preliminar frente a los cuatro objetivos específicos definidos en la
+% Sección~\ref{section:objetivos-especificos} --- y que se retomará con mayor profundidad en las
+% conclusiones del Capítulo~\ref{chapter:conclusiones} ---, los resultados obtenidos permiten
+% considerar cumplido el objetivo~1 (\englishText{WER} $\le$10--12\,\%) y, con reservas, el
+% objetivo~4 (validación estructural \englishText{FHIR} $>$95\,\%); el objetivo~2 ($F1 \ge 0,85$ en
+% \englishText{NER}) no se cumple, con resultados muy por debajo del umbral fijado; y el
+% objetivo~3 (aceptación de los informes por personal médico), evaluado mediante el veredicto binario
+% del \englishText{LLM-as-judge} tampoco
+% se cumple (20\,\% en \textit{batch}, 30\,\% en \textit{streaming}, frente al 80\,\% exigido).
+
+\section{Discusión de resultados}\label{section:discusion_resultados}
+
+Un primer patrón que emerge al contrastar los resultados de la Sección~\ref{section:resultados_modulos}
+con los de la Sección~\ref{section:resultados_e2e} es que cada módulo, evaluado de forma aislada
+frente a su propio \textit{gold standard}, obtiene un desempeño notablemente superior al que muestra
+esa misma etapa dentro de la evaluación \englishText{end-to-end}. El \englishText{ASR} alcanza un
+\englishText{WER} medio de solo $\approx$6,5\,\% (Sección~\ref{subsection:resultados_asr}) y
+\englishText{SNOMED CT} un 85,5\,\% de acierto micro
+(Sección~\ref{subsection:resultados_snomed}); incluso el \englishText{NER}, el módulo más débil de
+los tres, mejora hasta un F1 micro de 43,8\,\% bajo el criterio granular
+(Sección~\ref{subsection:resultados_pln}). Sin embargo, en la evaluación \englishText{end-to-end}
+las dimensiones equivalentes obtienen puntuaciones muy bajas en la escala 1--5: 2,10--2,90 en
+\englishText{NER}, 1,55--1,90 en terminología y 1,95--2,20 en el informe \englishText{LLM}
+(Tabla~\ref{tab:e2e_comparacion_modos}).
+
+La causa de esta brecha no es una inconsistencia entre ambas evaluaciones, sino una consecuencia
+directa de la arquitectura secuencial del \textit{pipeline}: cada etapa consume como entrada la
+salida de la etapa anterior, de modo que los errores no se mantienen acotados
+a su módulo de origen, sino que se propagan y se amplifican aguas abajo en lugar de corregirse o
+diluirse. Esta cadena de propagación ya se observa repetidamente en los casos
+analizados a lo largo de este capítulo: la confusión fonética \texttt{TTG}~$\rightarrow$~\texttt{CTG}
+del \englishText{ASR} en \texttt{Test2} (\textit{batch}) --- un único error, irrelevante para el
+\englishText{WER} agregado del caso --- conduce a que \englishText{NER} extraiga la sigla mal
+transcrita y a que el motor de normalización la mapee a \textit{Mantoux positive}, un concepto
+\englishText{SNOMED CT} clínicamente erróneo; de forma análoga, la pérdida de la sigla
+\texttt{SDRC}~$\rightarrow$~\texttt{DSDRC} en \texttt{Test9} se traslada sin corrección hasta el
+informe \englishText{LLM}, que la expande como ``Distrofia de Duchenne de Becker'', sustituyendo el
+diagnóstico real (un síndrome de dolor regional complejo) por uno completamente distinto; y la
+sobre-segmentación del \englishText{NER} al truncar \texttt{hernia discal} en solo \texttt{hernia}
+(Sección~\ref{subsection:resultados_pln}) hace que la normalización terminológica y, finalmente, la
+impresión diagnóstica del informe pierdan la localización exacta de la lesión. En los tres casos, el
+error individual de la etapa de origen es moderado, pero su efecto compuesto sobre las etapas
+siguientes es severo. Esto explica que, aun con
+módulos individuales razonablemente competentes, únicamente entre el 20\,\% y el 30\,\% de los
+informes completos resulten aceptables bajo el veredicto del \englishText{LLM-as-judge}.
+
+A modo de balance preliminar frente a los cuatro objetivos específicos definidos en la
+Sección~\ref{section:objetivos-especificos}, los resultados obtenidos muestran un grado de cumplimiento dispar:
+
+\begin{itemize}
+    \item \textbf{Objetivo 1 (\englishText{WER} $\le$10--12\,\%):} Se considera \textbf{cumplido}, registrando tasas de error dentro del rango tolerable.
+    \item \textbf{Objetivo 2 ($F_1 \ge 0.85$ en \englishText{NER}):} \textbf{No se cumple}, situándose los resultados significativamente por debajo del umbral fijado.
+    \item \textbf{Objetivo 3 (Aceptación médica del informe $\ge$80\,\%):} \textbf{No se cumple}, obteniendo apenas un 20\,\% en \textit{batch} y un 30\,\% en \textit{streaming} según el veredicto de \englishText{LLM-as-judge}.
+    \item \textbf{Objetivo 4 (Validación estructural \englishText{FHIR} $>$95\,\%):} Se considera \textbf{cumplido con reservas}, al alcanzar la conformidad técnica en la estructura de los datos.
+\end{itemize}
+
