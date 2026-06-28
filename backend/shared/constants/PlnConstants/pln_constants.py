@@ -42,7 +42,14 @@ NER_KEY_WORD = "word"
 NER_KEY_START = "start"
 NER_KEY_END = "end"
 NER_KEY_SCORE = "score"
+NER_KEY_PLN_SOURCE = "pln_source"
 
-# Maximum character gap between two consecutive entities to still consider them
-# part of the same multi-token concept (e.g. "diabetes mellitus tipo 2")
 NER_GROUP_SPACE_TOLERANCE = 1
+
+NER_MIN_CONFIDENCE_SCORE = 0.5
+
+NER_GENERIC_NOISE_WORDS = frozenset({
+    "nivel", "una", "un", "anterior", "bajo", "derecho", "existencia",
+    "paciente", "clínica", "tipo", "ingresa", "datos", "consulta", "cuadro",
+    "bolsa", "zona", "estudio", "estudios", "tratamiento",
+})

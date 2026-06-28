@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+    \centering
+    \caption{Comparación de las puntuaciones medias (escala 1--5) y el tiempo total medio por caso
+    entre las modalidades \textit{batch} y \textit{streaming}, evaluadas mediante IA sobre los mismos
+    10 casos de referencia.}
+    \label{tab:e2e_comparacion_modos}
+    \begin{tabular}{@{}lcc@{}}
+    \toprule
+    \textbf{Dimensión evaluada} & \textbf{Modo \textit{batch}} & \textbf{Modo \textit{streaming}} \\
+    \midrule
+    \englishText{ASR} & 3.9 & 4.0 \\
+    \englishText{NER} (\englishText{PLN}) & 2.3 & 2.4 \\
+    Terminología (\englishText{SNOMED CT} / \englishText{CIE-10-ES}) & 2.0 & 1.4 \\
+    Informe \englishText{LLM} & 2.1 & 1.9 \\
+    \englishText{FHIR} & 2.7 & 2.6 \\
+    \midrule
+    Tiempo total medio por caso & $\approx$32.1\,s & $\approx$178.3\,s \\
+    \bottomrule
+    \end{tabular}
+\end{table}

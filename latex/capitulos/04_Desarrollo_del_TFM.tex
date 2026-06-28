@@ -212,6 +212,26 @@ puerto~8000, exponiendo el endpoint \texttt{/audio} para conexiones \englishText
     \texttt{session\_end}, \texttt{llm\_report} y \texttt{fhir\_report}.
 }
 
+\boldparagraph{Modalidades de funcionamiento}{
+    el reenvío de audio al servicio \englishText{ASR} descrito en el \textit{Procesamiento} admite dos
+    modalidades, seleccionadas mediante la constante \texttt{DEFAULT\_PROCESSING\_MODE}
+    (\texttt{PROCESSING\_MODE\_STREAMING} / \texttt{PROCESSING\_MODE\_BATCH}) y resueltas una única vez
+    por conexión en \texttt{resolveProcessingMode()}. En la modalidad \textit{streaming}, cada
+    fragmento recibido se reenvía de inmediato a \texttt{POST /transcribe}, y la promesa de
+    transcripción se registra en el conjunto \texttt{pendingTranscriptions} para poder esperarlas todas
+    al recibir \texttt{session\_end}. En la modalidad \textit{batch}, los fragmentos no se reenvían al
+    llegar: el servicio \texttt{batchAudioBuffer.js} los acumula en memoria mediante
+    \texttt{addChunk(sessionId, audioBuffer, metadata)}, conservando únicamente los metadatos del primer
+    fragmento. Al recibir \texttt{session\_end}, \texttt{flushSession(sessionId)} concatena
+    (\texttt{Buffer.concat}) todos los fragmentos acumulados en un único búfer y lo envía en una sola
+    llamada a \texttt{POST /transcribe} con la opción \texttt{\{batch: true\}}, que amplía el tiempo de
+    espera de la petición a \texttt{ASR\_BATCH\_TIMEOUT\_MS} (10 minutos) frente al tiempo por defecto
+    usado para fragmentos individuales. En ambos casos el resto del \textit{pipeline} (finalización de
+    sesión, generación de informe y de \textit{Bundle} \englishText{FHIR}) es idéntico: la única
+    diferencia entre modalidades reside en cómo el \englishText{gateway} agrupa y envía el audio al
+    motor de transcripción, no en dicho motor.
+}
+
 \subsection{Servicio \englishText{ASR / PLN}}\label{subsection:asr_service}
 
 El servicio \englishText{ASR} (\texttt{backend/asr-service/}) aloja el núcleo de procesamiento del
@@ -238,12 +258,18 @@ fragmento de audio, o de forma diferida al cierre de sesión para la generación
     \englishText{NER}: \texttt{pln\_medical} (\englishText{spanish\_medical\_ner}) para entidades
     clínicas generales y \texttt{pln\_farmacos} (\englishText{bsc-bio-ehr-es-pharmaconer}) para
     terminología farmacológica. Si ambos modelos detectan el mismo intervalo de texto, se conserva
-    únicamente la entidad de \texttt{pln\_farmacos}, dado que este es más específico. Como optimización
-    introducida durante el desarrollo, la función \texttt{group\_entities} fusiona además entidades
-    contiguas que comparten etiqueta: los modelos suelen fragmentar términos clínicos multipalabra
-    (p.\ ej.\ \textit{hipertensión arterial} como dos entidades \texttt{Problem}), y su unión permite
-    consultar \englishText{SNOMED CT} con un término compuesto en lugar de realizar búsquedas aisladas
-    (Figura~\ref{fig:union_entidades_ner}).
+    únicamente la entidad de \texttt{pln\_farmacos}, dado que este es más específico. El resultado
+    combinado, ya etiquetado con su modelo de origen (\texttt{pln\_source}), se pasa a la función
+    \texttt{group\_entities}, que aplica dos optimizaciones introducidas durante el desarrollo. En
+    primer lugar, descarta entidades de bajo valor: \textit{tokens} compuestos únicamente por
+    puntuación, detecciones con confianza inferior a un umbral (\(0.5\)) y palabras genéricas sin
+    valor clínico (p.\ ej.\ \textit{paciente}, \textit{tratamiento}) recogidas en una lista de ruido.
+    En segundo lugar, fusiona entidades contiguas procedentes del mismo modelo de origen: los
+    modelos suelen fragmentar términos clínicos multipalabra (p.\ ej.\ \textit{hipertensión arterial}
+    como dos entidades \texttt{Problem}), y su unión permite consultar \englishText{SNOMED CT} con un
+    término compuesto en lugar de realizar búsquedas aisladas. Durante la fusión, la etiqueta final
+    del grupo se actualiza con la del \textit{token} de mayor confianza, en lugar de conservar siempre
+    la del primer fragmento detectado (Figura~\ref{fig:union_entidades_ner}).
     \input{imagenes/diagramas/desarrollo_del_tfm/fusion_entidades_NER.tex}
 }
 
@@ -351,16 +377,18 @@ verificada para el \englishText{LLM} y reporte de control en texto plano.}
 
 \subsection{Flujo por fragmento de audio}\label{subsection:flujo_fragmento}
 
-Las Figuras~\ref{fig:diagrama_conceptual_transcripcion}, \ref{fig:diagrama_conceptual_informe_llm}
-y \ref{fig:diagrama_conceptual_fhir} presentan el diagrama de secuencia del flujo completo de
-procesamiento, desde la conexión inicial hasta la generación de los artefactos finales de sesión,
-dividido en sus tres fases: transcripción en tiempo real por fragmento de audio, cierre de sesión
-con generación del informe clínico mediante \englishText{LLM}, y generación del informe
-estructurado \englishText{FHIR}.
+Las Figuras~\ref{fig:diagrama_conceptual_transcripcion}, \ref{fig:diagrama_conceptual_transcripcion_batch},
+\ref{fig:diagrama_conceptual_informe_llm} y \ref{fig:diagrama_conceptual_fhir} presentan el diagrama
+de secuencia del flujo completo de procesamiento, desde la conexión inicial hasta la generación de
+los artefactos finales de sesión, dividido en sus fases: transcripción del audio --- en sus dos
+modalidades de funcionamiento, \textit{streaming} y \textit{batch}
+(Sección~\ref{subsection:gateway}) ---, cierre de sesión con generación del informe clínico mediante
+\englishText{LLM}, y generación del informe estructurado \englishText{FHIR}.
 
 \input{imagenes/diagramas/desarrollo_del_tfm/Diagrama de Flujos App.tex}
 
-Por cada fragmento de voz detectado, el ciclo de procesamiento sigue estos pasos:
+En la modalidad \textit{streaming} (Figura~\ref{fig:diagrama_conceptual_transcripcion}), por cada
+fragmento de voz detectado el ciclo de procesamiento sigue estos pasos:
 
 \begin{enumerate}
     \item Se genera la conexion inicial con el \englishText{gateway} mediante el endpoint
@@ -375,6 +403,25 @@ Por cada fragmento de voz detectado, el ciclo de procesamiento sigue estos pasos
     \texttt{SessionReportWriter}.
     \item El \englishText{gateway} acumula las la transcripción enriquecida.
 \end{enumerate}
+
+En la modalidad \textit{batch} (Figura~\ref{fig:diagrama_conceptual_transcripcion_batch}), en cambio,
+ningún fragmento se reenvía al servicio \englishText{ASR} durante la sesión:
+
+\begin{enumerate}
+    \item Cada fragmento recibido se acumula en memoria mediante \texttt{batchAudioBuffer.addChunk},
+    conservando únicamente los metadatos del primer fragmento.
+    \item Al recibir \texttt{session\_end}, \texttt{flushSession} concatena
+    (\texttt{Buffer.concat}) todos los fragmentos acumulados en un único búfer de audio.
+    \item El \englishText{gateway} envía ese búfer en una sola llamada a \texttt{POST /transcribe}
+    con la opción \texttt{\{batch: true\}}.
+    \item El servicio \englishText{ASR} ejecuta el mismo \englishText{pipeline} interno que en modo
+    \textit{streaming}, esta vez sobre el audio completo de la sesión.
+    \item El \englishText{gateway} acumula la única transcripción enriquecida recibida.
+\end{enumerate}
+
+A partir de este punto, el flujo de cierre de sesión (espera de transcripciones pendientes,
+finalización, generación del informe \englishText{LLM} y del \englishText{Bundle} \englishText{FHIR})
+es común a ambas modalidades.
 
 \subsection{Cierre de sesión y generación de artefactos}\label{subsection:cierre_sesion}
 
