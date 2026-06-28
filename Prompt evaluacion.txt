@@ -5,7 +5,7 @@ de una aplicación de generación de informes médicos a partir de voz. El pipel
   → traducción a CIE-10 (ConceptMap) → generación de Informe.txt con LLM (llama3.2:8b) → Fhir_Reporte.json (FHIR Bundle)
 
 Los datos de prueba están en:
-  backend/asr-service/reports/Test1 .. Test10
+  backend/asr-service/reports/end_to_end_tests/MODO/Test1 .. Test10
 
 Cada carpeta contiene 4 archivos:
   - text.txt          → texto original "leído" (ground truth, lo que el locutor debía decir)
@@ -19,7 +19,7 @@ Cada carpeta contiene 4 archivos:
   - Fhir_Reporte.json  → Bundle FHIR (Patient, Condition, MedicationStatement, etc.) construido a
                           partir de las mismas entidades/códigos
 
-TAREA: evalúa cada uno de los 10 casos (Test1..Test10) en las siguientes dimensiones, y luego agrega
+TAREA: evalúa cada uno de los 10 casos (Test1..Test10) para cada uno de los modos en las siguientes dimensiones, y luego agrega
 los resultados en un informe final.
 
 1. CALIDAD DE TRANSCRIPCIÓN (ASR)
