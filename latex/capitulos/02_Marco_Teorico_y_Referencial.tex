@@ -1,4 +1,4 @@
-\chapter{Marco Teorico y Referencial}\label{chapter:marco_teorico_y_referencial}
+\chapter{Marco Teórico y Referencial}\label{chapter:marco_teorico_y_referencial}
 
 \section{Estado del Arte}
 
@@ -219,24 +219,24 @@ independiente de un informe \englishText{HL7 FHIR}. De este modo, el \englishTex
 actúa no como intérprete primario del dictado, sino como redactor de un informe cuyo 
 contenido clínico ya ha sido validado y normalizado en etapas anteriores del pipeline.
 
-\section{Marco Teorico}
+\section{Marco Teórico}
 
 % Dentro de este trabajo fin de master se tomaran en cuenta los siguientes conceptos teoricos:
 
-\subsection{Aplicacion web}
+\subsection{Aplicación web}
 
 Una aplicación web es un sistema de software (sistema distribuido del tipo cliente-servidor) basado
-en tecnologías y estándares del Consorcio \englishText{World Wide Web} (\englishText{W3C}, por sus siglas en inglés) 
-que proporciona recursos web especíﬁcos, como contenido y servicios, a través de la interfaz
+en tecnologías y estándares del Consorcio \englishText{World Wide Web} (\englishText{W3C}, por sus siglas en inglés)
+que proporciona recursos web específicos, como contenido y servicios, a través de la interfaz
 de usuario provista por el navegador web.
 
-\subsection{Aplicacion Movil}
+\subsection{Aplicación Móvil}
 
-Una aplicación móvil es un software diseñado para ejecutarse en dispositivos móviles, 
-tales como smartphones y tabletas. Estas aplicaciones se desarrollan para aprovechar las capacidades especíﬁcas de los dispositivos móviles, 
+Una aplicación móvil es un software diseñado para ejecutarse en dispositivos móviles,
+tales como smartphones y tabletas. Estas aplicaciones se desarrollan para aprovechar las capacidades específicas de los dispositivos móviles,
 como la cámara, el \englishText{GPS}, el acelerómetro y la pantalla táctil.
 
-Dentro del contexto de este trabajo fin de master, la aplicación móvil desemepñará el rol de cliente grabando 
+Dentro del contexto de este trabajo fin de master, la aplicación móvil desempeñará el rol de cliente grabando
 el audio del dictado médico.
 
 \subsection{Aplicación \englishText{Backend}}
@@ -312,7 +312,7 @@ interpretar y manipular el lenguaje humano de forma automatizada \citeText{jm3}.
 El \englishText{PLN} abarca tareas complejas que van desde el análisis morfosintáctico elemental 
 (como la tokenización y el etiquetado gramatical) hasta la comprensión del lenguaje natural 
 (\englishText{NLU}), la gestión del conocimiento semántico y el reconocimiento de entidades nombradas (\englishText{NER}). 
-Este último permite extraer de forma automática identificar entidades en categorias previamente definidas.
+Este último permite extraer de forma automática identificar entidades en categorías previamente definidas.
 
 \subsection{Reconocimiento de Entidades Nombradas (\englishText{NER})}
 El Reconocimiento de Entidades Nombradas (\englishText{Named Entity Recognition} o \englishText{NER}) 
@@ -341,7 +341,7 @@ traducción de estilos narrativos y la comprensión de instrucciones estructurad
 En el contexto de esta aplicación, el \englishText{LLM} no se utiliza como una fuente primaria de diagnóstico, 
 sino como el redactor de la información extraída. Su propósito fundamental es actuar como un transformador:
 toma la transcripción literal del audio médico, las entidades médicas extraídas 
-junto a los detalles extraidos de los vocabularios estándar de interoperabilidad (\englishText{SNOMED CT} y 
+junto a los detalles extraídos de los vocabularios estándar de interoperabilidad (\englishText{SNOMED CT} y
 \englishText{CIE-10-ES}) para generar un informe clínico y coherente.
 
 \subsection{Estándares de Interoperabilidad (\englishText{SNOMED CT} y \englishText{CIE-10-ES})}
@@ -365,7 +365,7 @@ diferenciado:
     Ministerio de Sanidad como el referente obligatorio para la codificación clínica en el Sistema 
     Nacional de Salud (SNS) de España. A diferencia de \englishText{SNOMED CT} 
     (concebida para el registro clínico directo), la \englishText{CIE-10-ES} es un sistema de clasificación
-    cerrado, monoárquico y mutuamente excluyente. Su diseño está optimizado para 
+    cerrado, monojerárquico y mutuamente excluyente. Su diseño está optimizado para
     la agregación de datos con fines estadísticos, gestión epidemiológica, financiación sanitaria a 
     través de los Grupos Relacionados por el Diagnóstico (GRD) y auditoría médica institucional 
     \cite{sanidad2026}.
@@ -453,7 +453,7 @@ transformándose en un proceso de enriquecimiento antes de la intervención
 del modelo generativo:
 
 \begin{enumerate}
-    \item \textbf{App móvil:} La aplicacion móvil captura el audio del profesional de la salud y lo envía 
+    \item \textbf{App móvil:} La aplicación móvil captura el audio del profesional de la salud y lo envía
     mediante el protocolo \englishText{WebSocket} al \englishText{gateway}.
     \item \textbf{\englishText{Gateway}:} El \englishText{gateway} orquesta las sesiones cliente, 
     capturando cada fragmento de audio por sesión que mantenga con la aplicación móvil. Por cada fragmento recibido 
@@ -463,37 +463,37 @@ del modelo generativo:
     Cuando la sesión finaliza, el \englishText{gateway} invoca mediante peticiones \englishText{HTTP POST}
     la finalización del reporte de control, la generación del informe clínico y la construcción del \englishText{JSON}
     de \englishText{FHIR}.
-    \item \textbf{Procesamiento Lingüístico:} Este módulo recibe la peticion del \englishText{gateway} y procesa la
-    transcripción, para extraer las entidades médicas nombradas partiendo de cada fragmento de audio. 
-    
-    \textbf{Modulo de \englishText{ASR}:} Primera etapa del procesamiento, donde se recibe un fragmento de audio y
+    \item \textbf{Procesamiento Lingüístico:} Este módulo recibe la petición del \englishText{gateway} y procesa la
+    transcripción, para extraer las entidades médicas nombradas partiendo de cada fragmento de audio.
+
+    \textbf{Módulo de \englishText{ASR}:} Primera etapa del procesamiento, donde se recibe un fragmento de audio y
     se genera una transcripción utilizando el modelo de \englishText{ASR}.
-        
-    \textbf{Modulo de \englishText{PLN}:} Segunda etapa del procesamiento, donde se procesa la transcripción y se
-    extraen las entidades medicas utilizando modelos \englishText{NER} especializados en terminología médica
+
+    \textbf{Módulo de \englishText{PLN}:} Segunda etapa del procesamiento, donde se procesa la transcripción y se
+    extraen las entidades médicas utilizando modelos \englishText{NER} especializados en terminología médica
     en español.
-    
-    \item \textbf{Normalización Clínica (\englishText{SNOMED CT} / \englishText{CIE-10-ES}):} 
-    Las entidades extraídas son mapeadas a códigos únicos de los vocabularios estándar y se extre informacion medica relevante,
+
+    \item \textbf{Normalización Clínica (\englishText{SNOMED CT} / \englishText{CIE-10-ES}):}
+    Las entidades extraídas son mapeadas a códigos únicos de los vocabularios estándar y se extrae información médica relevante,
     para su posterior uso en el modelo generativo.
-    
-    \textbf{Modulo de \englishText{SNOMED CT}:} Tercera etapa del procesamiento, donde se hace la consulta
+
+    \textbf{Módulo de \englishText{SNOMED CT}:} Tercera etapa del procesamiento, donde se hace la consulta
     a la base de datos de \englishText{SNOMED CT} para obtener la información relevante de la entidad junto
     a un identificador único.
-    
-    \textbf{Modulo de \englishText{CIE-10-ES}:} Última etapa del \englishText{pipeline} de procesamiento, donde
-    se \englishText{mappean} los códigos unicos de \englishText{SNOMED CT} a códigos únicos de \englishText{CIE-10-ES} 
+
+    \textbf{Módulo de \englishText{CIE-10-ES}:} Última etapa del \englishText{pipeline} de procesamiento, donde
+    se \englishText{mappean} los códigos únicos de \englishText{SNOMED CT} a códigos únicos de \englishText{CIE-10-ES}
     represente el concepto médico a nivel nacional administrativo.
-     
-    \item \textbf{Generación de Informes Médicos:} Este módulo recibe la peticion del \englishText{gateway} junto a
-    los datos extraidos en las etapas anteriores y genera dos artefactos: 
-    
+
+    \item \textbf{Generación de Informes Médicos:} Este módulo recibe la petición del \englishText{gateway} junto a
+    los datos extraídos en las etapas anteriores y genera dos artefactos:
+
     \textbf{Informe médico enriquecido:} Este artefacto a generar es un informe clínico enriquecido
-    con la información extraida de las entidades medicas y la transcripción del audio médico. 
+    con la información extraída de las entidades médicas y la transcripción del audio médico.
     Este informe es redactado por un \englishText{LLM} y es uno de los resultados finales de la sesión.
 
     \textbf{JSON de \englishText{FHIR}:}
-    Este artefacto a generar es un \englishText{JSON} que cumple con el estandar \englishText{FHIR} que representa 
+    Este artefacto a generar es un \englishText{JSON} que cumple con el estándar \englishText{FHIR} que representa
     el informe clínico en formato estandarizado. Este \englishText{JSON} es generado por la aplicación
     de procesamiento lingüístico y es uno de los resultados finales de la sesión.
 \end{enumerate}
@@ -521,5 +521,5 @@ siguientes propiedades operacionales:
 \end{itemize}
 
 Este reporte de control enriquecido es un artefacto intermedio que se utiliza para generar el informe resultante.
-El cual se genera apartir de los datos obtenidos de las entidades medicas y la transcripción del audio médico y se
+El cual se genera a partir de los datos obtenidos de las entidades médicas y la transcripción del audio médico y se
 guarda en memoria para su posterior uso en el modelo generativo.

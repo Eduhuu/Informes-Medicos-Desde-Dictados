@@ -25,9 +25,9 @@ siete iteraciones principales y su correspondencia con los componentes implement
 Los principios ágiles quedan reflejados en decisiones de ingeniería concretas:
 
 \boldparagraph{Modularidad y extensibilidad}{
-    se utilizo el patron de diseño \englishText{Factory} y \englishText{Strategy} para la selección y
-    creacion de los componentes del sistema por cada etapa, lo que permite: la abstraccion de la creacion
-    de cada elemento y la sustitucion de los mismos sin alterar el contrato de la API y el flujo de ejecucion.
+    se utilizó el patrón de diseño \englishText{Factory} y \englishText{Strategy} para la selección y
+    creación de los componentes del sistema por cada etapa, lo que permite: la abstracción de la creación
+    de cada elemento y la sustitución de los mismos sin alterar el contrato de la API y el flujo de ejecución.
 }
 
 \boldparagraph{Validación continua}{
@@ -79,8 +79,8 @@ desacopladas, como se resume en la Figura~\ref{fig:arquitectura_implementada}.
 \boldparagraph{Capa de acceso}{
     el \englishText{gateway} actúa como intermediario de protocolo: traduce los mensajes
     \englishText{WebSocket} del cliente en peticiones HTTP al servicio \englishText{ASR}, acumula
-    el texto transcrito junto a las entidades clínicas de la sesión y la informacion populada 
-    por el servicio de normalizacion terminologica y traduccion de codigos \englishText{SNOMED CT} y \englishText{CIE-10-ES},
+    el texto transcrito junto a las entidades clínicas de la sesión y la información poblada
+    por el servicio de normalización terminológica y traducción de códigos \englishText{SNOMED CT} y \englishText{CIE-10-ES},
     y dispara la generación de informes al finalizar el dictado.
 }
 
@@ -89,16 +89,16 @@ desacopladas, como se resume en la Figura~\ref{fig:arquitectura_implementada}.
     normalización terminológica, reporte de control, generación \englishText{LLM} y salida
     \englishText{FHIR}. A diferencia del marco conceptual del Capítulo~\ref{chapter:marco_teorico_y_referencial},
     estos módulos constituyen componentes internos de un único proceso FastAPI y no microservicios
-    desplegables de forma independiente. Aunque no se implementaron como microservicios, se considero
-    la posibilidad de hacerlo en una futura version del sistema.
+    desplegables de forma independiente. Aunque no se implementaron como microservicios, se consideró
+    la posibilidad de hacerlo en una futura versión del sistema.
 }
 
 Esta implementación, \textbf{no almacena transcripciones completas} en memoria únicamente
 acumula las entidades clínicas enriquecidas (\texttt{sessionEntitiesStore.js}). 
 La transcripción y el reporte de control se almacenan temporalmente en el
 \englishText{Gateway} mediante \texttt{SessionReportWriter}, para luego ser enviado
-al servico de Generación de Informes Médicos. 
-De igual manera, este reporte de control se puede almacener de como un fichero \texttt{Reporte.txt}
+al servicio de Generación de Informes Médicos.
+De igual manera, este reporte de control se puede almacenar como un fichero \texttt{Reporte.txt}
 al finalizar la sesión para poder depurar errores en caso de ser necesario.
 
 
@@ -130,7 +130,7 @@ diseño centrado en el usuario, suficiente para validar los dos flujos de entrad
 
 \boldparagraph{\englishText{Wireframes}}{
     se diseñan dos modos de captura como pestañas (\textit{tabs}) de una misma pantalla
-    con elementos en comun como: un indicador de estado de conexión persistente,
+    con elementos en común como: un indicador de estado de conexión persistente,
     un área de contenido específica de cada modo y un botón de inicio de sesión.
     Estos \textit{wireframes} se
     trasladaron directamente a componentes de React Native reutilizables
@@ -200,10 +200,10 @@ puerto~8000, exponiendo el endpoint \texttt{/audio} para conexiones \englishText
     el manejador \texttt{audioWebSocketHandler.js} diferencia entre mensajes JSON de mensajes binarios
     inspeccionando el primer byte del buffer. Por cada fragmento, reenvía el audio al servicio
     \englishText{ASR} mediante \texttt{POST /transcribe} con las cabeceras \texttt{X-Session-Id},
-    \texttt{X-Sequence} y \texttt{X-Timestamp}. La informacion devueltas se acumulan en
+    \texttt{X-Sequence} y \texttt{X-Timestamp}. La información devuelta se acumula en
     \texttt{sessionEntitiesStore.js}. Al recibir \texttt{session\_end}, espera las transcripciones
     pendientes, invoca \texttt{POST /finalize-session/\{id\}}, \texttt{POST /generate-report/\{id\}}
-    y \texttt{POST /generate-fhir-report/\{id\}} con la informacion acumulada, y finalmente limpia
+    y \texttt{POST /generate-fhir-report/\{id\}} con la información acumulada, y finalmente limpia
     la memoria.
 }
 
@@ -290,7 +290,7 @@ fragmento de audio, o de forma diferida al cierre de sesión para la generación
 \boldparagraph{Entradas}{\texttt{conceptId} de \englishText{SNOMED CT} obtenido en la etapa anterior.}
 
 \boldparagraph{Procesamiento}{el cliente \texttt{FhirConceptMapClient} aplica una cadena de
-    busqueda sobre el endpoint \englishText{FHIR} de Snowstorm
+    búsqueda sobre el endpoint \englishText{FHIR} de Snowstorm
     (\texttt{http://localhost:8080/fhir}): primero \texttt{ConceptMap \$translate} con el mapa
     primario, después con el mapa de reserva y, en última instancia, \texttt{ValueSet \$expand}
     filtrando por el término de la entidad.}
@@ -304,7 +304,7 @@ fragmento de audio, o de forma diferida al cierre de sesión para la generación
     y códigos \englishText{CIE-10-ES} de cada fragmento.}
 
 \boldparagraph{Procesamiento}{\texttt{SessionReportWriter} bufferiza en memoria la información de
-cada llamada a \texttt{/transcribe}, indexada por número de secuencia, y la envia como respuesta
+cada llamada a \texttt{/transcribe}, indexada por número de secuencia, y la envía como respuesta
 al gateway mediante \englishText{WebSocket}. Si es necesario, vuelca el contenido al fichero
 \texttt{Reporte.txt} para poder depurar errores en caso de ser necesario.}
 
@@ -391,7 +391,7 @@ En la modalidad \textit{streaming} (Figura~\ref{fig:diagrama_conceptual_transcri
 fragmento de voz detectado el ciclo de procesamiento sigue estos pasos:
 
 \begin{enumerate}
-    \item Se genera la conexion inicial con el \englishText{gateway} mediante el endpoint
+    \item Se genera la conexión inicial con el \englishText{gateway} mediante el endpoint
     \texttt{WSS connect /audio}.
     \item La aplicación móvil envía el par de mensajes \englishText{WebSocket} (metadatos JSON +
     binario PCM).
@@ -399,9 +399,9 @@ fragmento de voz detectado el ciclo de procesamiento sigue estos pasos:
     \texttt{POST /transcribe}.
     \item El servicio \englishText{ASR} ejecuta el \englishText{pipeline} interno: transcripción
     Whisper $\rightarrow$ \englishText{NER} $\rightarrow$ consulta \englishText{SNOMED CT}
-    $\rightarrow$ traducción \englishText{CIE-10-ES} $\rightarrow$ bufferización y envio por
+    $\rightarrow$ traducción \englishText{CIE-10-ES} $\rightarrow$ bufferización y envío por
     \texttt{SessionReportWriter}.
-    \item El \englishText{gateway} acumula las la transcripción enriquecida.
+    \item El \englishText{gateway} acumula la transcripción enriquecida.
 \end{enumerate}
 
 En la modalidad \textit{batch} (Figura~\ref{fig:diagrama_conceptual_transcripcion_batch}), en cambio,
@@ -480,7 +480,7 @@ diferenciados:
     \item \textbf{\texttt{Reporte.txt}} --- reporte de control enriquecido que consolida la
     transcripción acumulada, las entidades \englishText{NER}, los conceptos \englishText{SNOMED CT}
     y los códigos \englishText{CIE-10-ES} de todos los fragmentos. Este se guarda en memoria siempre
-    y cuando en la configuracion del sistema se encuentre activado el flag \texttt{reports.enabled}.
+    y cuando en la configuración del sistema se encuentre activado el flag \texttt{reports.enabled}.
     El contenido del mismo es la entrada verificada y estructurada para el módulo \englishText{LLM}.
     \item \textbf{\texttt{Informe.txt}} --- informe clínico redactado por el \englishText{LLM} a
     partir del reporte de control, conforme a la definición de \textit{Informe Resultante} del
