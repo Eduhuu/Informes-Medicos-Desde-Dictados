@@ -1,59 +1,233 @@
-\chapter{Ejemplo de anexo: Innovación (opcional)}
+\chapter{Innovación y modelo de negocio}\label{appendix:innovacion}
 
-El Apéndice \thechapter\  puede ser recomendable incluir en los casos en los que se realice un proyecto práctico de desarrollo del software en los que se quiera hacer referencia a la posible innovación en el marco empresarial.
+Este apéndice complementa el desarrollo técnico descrito en el Capítulo~\ref{chapter:desarrollo} con
+una perspectiva de innovación y viabilidad empresarial. Se analiza el mercado de la documentación
+clínica asistida por \englishText{IA}, se define el modelo de negocio mediante el lienzo de modelo de
+negocio (\englishText{Business Model Canvas}) y se describen el producto mínimo viable, el
+\textit{roadmap} de evolución y los aspectos legales relevantes para una eventual explotación
+comercial del sistema.
 
-En caso positivo, se recomienda una posible estructuración en las siguientes subsecciones:
+\section{Estudio del Mercado}\label{section:innovacion_mercado}
 
-\section{Estudio del Mercado}
-Contenido del estudio del mercado
+El mercado de la transcripción y documentación clínica asistida por voz se encuentra en expansión
+acelerada a nivel internacional, impulsado por la sobrecarga administrativa del personal sanitario y
+la madurez reciente de los modelos \englishText{ASR} y \englishText{LLM} descrita en el
+Capítulo~\ref{chapter:marco_teorico_y_referencial}. No obstante, el segmento hispanohablante presenta
+una oportunidad relativamente desatendida: la mayoría de soluciones comerciales consolidadas
+están optimizadas para inglés y para los
+flujos de trabajo y terminología del sistema sanitario de habla inglesa, con una adaptación limitada al
+español médico, a \englishText{SNOMED CT} en su edición nacional y a \englishText{CIE-10-ES}.
 
-\subsection{Segmentos de Clientes}
-Contenido sobre los segmentos de clientes
+\subsection{Segmentos de Clientes}\label{section:innovacion_segmentos}
 
-\subsection{Competidores}
-Información sobre los competidores
+El producto se orienta a un enfoque mixto \textit{B2B} y \textit{B2C}:
 
-\section{Propuesta de Valor}
-Descripción de la propuesta de valor
+\begin{itemize}
+    \item \textbf{\englishText{B2B} -- centros sanitarios:} hospitales, clínicas y centros médicos
+    (públicos y privados) que buscan reducir la carga administrativa, optimizar flujos de trabajo y
+    estandarizar la documentación clínica a escala de servicio o departamento, integrándose con sus
+    sistemas de Historia Clínica Electrónica (\englishText{HCE}).
+    \item \textbf{\englishText{B2C} -- profesionales independientes:} dueños de consultas privadas
+    y pequeñas consultas que necesitan una herramienta ágil, de coste predecible y sin integración
+    compleja, para generar informes normalizados sin depender de personal administrativo.
+\end{itemize}
 
-\section{Recursos Clave}
-Enumeración de los recursos clave
+\subsection{Competidores}\label{section:innovacion_competidores}
 
-\section{Actividades Clave}
-Descripción de las actividades clave
+El panorama competitivo puede agruparse en tres categorías:
 
-\section{Socios y Alianzas Clave}
-Detalles sobre socios y alianzas
+\begin{itemize}
+    \item \textbf{Asistentes de documentación clínicos basados en \englishText{IA} (mercado anglosajón):}
+    soluciones como \englishText{Nuance Dragon Medical One / DAX}, \englishText{Abridge},
+    \englishText{Suki AI} o \englishText{Corti} dominan el mercado de habla inglesa. Ofrecen
+    transcripción ambiental y generación de notas \englishText{SOAP}, pero su despliegue depende de
+    infraestructura en la nube de terceros y su adaptación al español clínico y a las ontologías
+    locales (\englishText{SNOMED CT} edición española, \englishText{CIE-10-ES}) es limitada o
+    inexistente.
+    \item \textbf{Sistemas de dictado genéricos:} herramientas de transcripción de propósito general
+    (por ejemplo, las integradas en suites ofimáticas) que producen texto libre sin estructuración
+    clínica, normalización terminológica ni exportación interoperable, trasladando todo el trabajo de
+    codificación al profesional.
+    \item \textbf{Módulos nativos de \englishText{HCE}:} algunos proveedores de historia clínica
+    electrónica incorporan dictado por voz como funcionalidad adicional, pero típicamente sin
+    extracción semántica de entidades ni mapeo automático a estándares de codificación.
+\end{itemize}
 
-\section{Estructura de Costes Prevista}
+La diferenciación del sistema propuesto frente a estos competidores reside en tres elementos descritos
+en el Capítulo~\ref{chapter:desarrollo}: 
+\begin{enumerate}
+\item Una capa intermedia de \englishText{NER} clínico en
+español que normaliza explícitamente a \englishText{SNOMED CT} y \englishText{CIE-10-ES} antes de la
+generación del informe, reduciendo el riesgo de alucinación frente a sistemas que delegan toda la
+estructuración en el \englishText{LLM}.
+\item La posibilidad de despliegue \textit{on-premise} con
+modelos abiertos (Ollama, \texttt{llama3.1:8b}), evitando el envío de datos clínicos sensibles a
+\englishText{APIs} de terceros.
+\item La salida nativa en formato \englishText{HL7 FHIR}, lista para
+integración con sistemas de \englishText{HCE} del Sistema Nacional de Salud.
+\end{enumerate}
 
-Desglose de los costes estimados. Incluir aquí la estimación presupuestaria de Costes
+\section{Propuesta de Valor}\label{section:innovacion_propuesta_valor}
 
-\section{Vías de Ingresos}
-Estrategias para generar ingresos
+Facilidad de la generación de informes clínicos a partir del dictado médico, reduciendo el tiempo
+dedicado a documentación manual y minimizando errores de transcripción, con un informe final
+normalizado contra estándares clínicos reconocidos (\englishText{SNOMED CT}, \englishText{CIE-10-ES})
+y exportado en formato interoperable \englishText{HL7 FHIR}, lo que mejora su integración con
+sistemas de historia clínica electrónica. La opción de despliegue local de los componentes de
+\englishText{IA} (sin envío de audio o texto clínico a servicios externos de pago por uso) constituye
+además un argumento diferencial frente a soluciones puramente \textit{cloud} en materia de privacidad
+y soberanía del dato.
 
-Incluir aquí la proyección de ingresos a lo largo de los primeros tres años. Incluir las vías o fuentes de financiación.
+\section{Recursos Clave}\label{section:innovacion_recursos}
 
-\section{Canales de Distribución}
+\begin{itemize}
+    \item La aplicación cliente (captura de audio) y la pasarela de orquestación del \textit{pipeline}
+    (Sección~\ref{section:arquitectura_sistema}).
+    \item Los modelos de \englishText{ASR}, \englishText{NER} y el modelo de lenguaje (\englishText{LLM})
+    encargado de estructurar y redactar el informe clínico.
+    \item Un servicio de terminologías (\englishText{Snowstorm}) para mapear conceptos a estándares
+    médicos (\englishText{SNOMED CT} y \englishText{CIE-10-ES}).
+    \item El conjunto de evaluación y la metodología de medición (\englishText{WER}, F1 de
+    \englishText{NER}, precisión de normalización, validación \englishText{FHIR} y juicio
+    \englishText{LLM-as-judge}) desarrollados en el Capítulo~\ref{chapter:evaluacion}, que constituyen
+    una ventaja competitiva para auditar y mejorar la calidad clínica del producto frente a
+    competidores que no publican métricas de fiabilidad.
+    \item Equipo de desarrollo y evaluación de la aplicación.
+    \item Servicio de hosting donde vivirá el backend de la aplicación.
+\end{itemize}
 
-Descripción de los canales de distribución
+\section{Actividades Clave}\label{section:innovacion_actividades}
 
-\section{Relación con los Clientes}
+\begin{itemize}
+    \item Mantenimiento y mejora continua del \textit{pipeline} de \englishText{IA} (re-entrenamiento
+    o sustitución de modelos \englishText{ASR}/\englishText{NER}/\englishText{LLM} conforme evolucione
+    el estado del arte, Sección~\ref{section:trabajos_futuros}).
+    \item Validación clínica continua mediante revisión por profesionales sanitarios o agentes de IA y actualización
+    del \textit{gold standard} de evaluación.
+    \item Integración técnica con sistemas de \englishText{HCE} de clientes \textit{B2B} (adaptación de
+    perfiles \englishText{FHIR}, mapeos específicos por centro).
+    \item Cumplimiento normativo continuo (protección de datos clínicos, certificación como producto
+    sanitario si aplica, véase Sección~\ref{section:innovacion_legal}).
+    \item Soporte técnico y comercial diferenciado por segmento de cliente.
+\end{itemize}
 
-Cómo se relacionará con los clientes
+\section{Socios y Alianzas Clave}\label{section:innovacion_alianzas}
 
-\section{Descripción del Producto Mínimo Viable}
+Como aliados clave se incluyen proveedores de \textit{hosting} e infraestructura, necesarios para
+garantizar la disponibilidad y operación del sistema. En una fase de expansión, podrían incorporarse
+proveedores de servicios de
+transcripción especializados como \englishText{Google Chirp} o \englishText{Amazon Transcribe Medical}
+para una transcripción inicial de mayor calidad en escenarios donde el cliente acepte el procesamiento
+en la nube. Asimismo, resultan estratégicas las alianzas con centros sanitarios piloto para la
+validación clínica del sistema y con el \englishText{Barcelona Supercomputing Center (BSC)}, cuyos
+modelos y corpus en español (Sección~\ref{section:innovacion_mercado}) sustentan el componente de
+\englishText{NER} clínico del sistema.
 
-Detalles sobre el producto mínimo viable
+\section{Estructura de Costes Prevista}\label{section:innovacion_costes}
 
-\section{Roadmap de Desarrollo}
+La estructura de costos se compone principalmente de:
 
-Planificación del desarrollo
+\begin{itemize}
+    \item \textbf{Adquisición de clientes:} inversión en marketing y equipo comercial, especialmente
+    relevante en las etapas iniciales del proyecto.
+    \item \textbf{Infraestructura tecnológica:} servidores, bases de datos, almacenamiento y cómputo
+    (\englishText{GPU}) para inferencia de los modelos \englishText{ASR}/\englishText{NER}/\englishText{LLM}
+    y para la instancia de \englishText{Snowstorm}, conforme a los requisitos descritos en
+    Sección~\ref{section:gestion_herramientas}.
+    \item \textbf{Mantenimiento y escalabilidad:} evolución de la plataforma, soporte técnico y
+    actualización de modelos.
+    \item \textbf{Cumplimiento normativo:} auditorías de protección de datos y, en su caso, costes de
+    certificación regulatoria (Sección~\ref{section:innovacion_legal}).
+\end{itemize}
 
-\section{Aspectos Legales}
+En el despliegue \textit{on-premise}, los costes de inferencia se concentran en hardware local
+(\englishText{CPU}/\englishText{GPU}) en lugar de en consumo de \englishText{APIs} de pago por uso, lo
+que reduce el coste marginal por informe generado a medida que crece el volumen de uso, a costa de una
+mayor inversión inicial en infraestructura.
 
-Consideraciones legales, licencias y patentes
+\section{Vías de Ingresos}\label{section:innovacion_ingresos}
 
-\section{Texto añadido}
+El modelo de ingresos se divide en \textit{B2B} y \textit{B2C}. En \textit{B2B}, se ofrecen contratos
+de mantenimiento y soporte, ya que los informes pueden requerir adaptaciones según el centro médico
+(perfiles \englishText{FHIR} específicos, integración con su \englishText{HCE}, diferentes formatos de salida).
+En \textit{B2C}, se
+propone una suscripción mensual o anual con acceso a la plataforma y generación de informes médicos
+normalizados y estructurados. Como vías de financiación para las primeras fases, se contemplan rondas
+de capital semilla orientadas a \textit{healthtech}, líneas de ayuda pública a la innovación digital en
+salud, y programas piloto remunerados con centros sanitarios colaboradores que permitan financiar la
+validación clínica a la vez que se recopila evidencia de uso real.
 
-% \lipsum[1-15]
+\section{Canales de Distribución}\label{section:innovacion_canales}
+
+Los canales de distribución serán similares para ambos segmentos, al tratarse del mismo mercado
+objetivo. Se contempla el uso de una página web corporativa, redes sociales, campañas de marketing
+digital, así como la participación en ferias y eventos de tecnología y salud.
+
+\section{Relación con los Clientes}\label{section:innovacion_relacion_clientes}
+
+Para el segmento \textit{B2B}, se plantea una relación basada en un equipo de ventas y soporte técnico,
+encargado de la captación, seguimiento y mantenimiento de los contratos con centros médicos. En el
+segmento \textit{B2C}, la relación se gestiona mediante un canal de soporte centralizado, donde los
+usuarios pueden reportar incidencias y recibir asistencia técnica.
+
+\section{Descripción del Producto Mínimo Viable}\label{section:innovacion_mvp}
+
+El sistema desarrollado y evaluado en este trabajo (Capítulos~\ref{chapter:desarrollo}
+y~\ref{chapter:evaluacion}) constituye el producto mínimo viable: una aplicación cliente de captura de
+audio, una pasarela de orquestación, y un \textit{pipeline} completo de transcripción \englishText{ASR},
+extracción de entidades clínicas (\englishText{NER}), normalización a \englishText{SNOMED CT}/
+\englishText{CIE-10-ES}, generación de informe mediante \englishText{LLM} y exportación en
+\englishText{HL7 FHIR}. Como se concluye en el Capítulo~\ref{chapter:conclusiones}, el \englishText{MVP}
+demuestra viabilidad técnica de extremo a extremo, pero su nivel de fiabilidad clínica actual
+($1{,}55$--$2{,}90$ sobre 5 en evaluación \englishText{end-to-end}) requiere que el informe generado se
+emplee como borrador asistido sujeto a revisión y firma de un profesional sanitario, y no como
+documento clínico definitivo sin supervisión.
+
+\section{Roadmap de Desarrollo}\label{section:innovacion_roadmap}
+
+A partir de las líneas de trabajo futuro identificadas en la
+Sección~\ref{section:trabajos_futuros}, se propone el siguiente \textit{roadmap} orientado a producto:
+
+\begin{itemize}
+    \item \textbf{Corto plazo:} mitigación de la propagación de errores entre etapas del
+    \textit{pipeline} mediante verificación intermedia, y mejora del módulo \englishText{NER} (expansión
+    de siglas y abreviaturas clínicas, reducción de la sobre-segmentación de \textit{spans}), como
+    requisito previo a cualquier piloto con centros sanitarios.
+    \item \textbf{Medio plazo:} normalización terminológica sensible al contexto mediante enlace de
+    entidades (\textit{entity linking}), reducción de alucinaciones del informe \englishText{LLM}
+    mediante técnicas de generación aumentada por recuperación (\englishText{RAG}) o verificación
+    post-generación, e incorporación de integraciones \englishText{FHIR} específicas con \englishText{HCE}
+    de los primeros clientes piloto.
+    \item \textbf{Largo plazo:} evaluación y despliegue sobre infraestructura de mayor capacidad que
+    permita emplear modelos \englishText{LLM} de mayor escala, ampliación a otras especialidades
+    clínicas más allá del conjunto evaluado, y, si el caso de uso lo justifica, inicio del proceso de
+    certificación como producto sanitario (Sección~\ref{section:innovacion_legal}).
+\end{itemize}
+
+% \section{Aspectos Legales}\label{section:innovacion_legal}
+
+% Al tratarse de un sistema que procesa datos de salud, su explotación comercial debe abordar, como
+% mínimo, los siguientes aspectos:
+
+% \begin{itemize}
+%     \item \textbf{Protección de datos:} cumplimiento del Reglamento General de Protección de Datos
+%     (\englishText{RGPD}) y de la Ley Orgánica 3/2018 (\englishText{LOPDGDD}) en el tratamiento de datos
+%     de salud, considerados categoría especial. El despliegue \textit{on-premise} descrito en
+%     Sección~\ref{section:innovacion_propuesta_valor} facilita este cumplimiento al evitar la
+%     transferencia de datos clínicos a terceros, aunque dicha transferencia sí debe regularse mediante
+%     los acuerdos correspondientes en los escenarios donde se empleen servicios de transcripción en la
+%     nube (Sección~\ref{section:innovacion_alianzas}).
+%     \item \textbf{Reglamento de Inteligencia Artificial de la Unión Europea:} un sistema que asiste en
+%     la documentación clínica puede quedar comprendido en el ámbito de aplicaciones de alto riesgo
+%     vinculadas a la salud, lo que conllevaría obligaciones de gestión de riesgos, calidad de los datos
+%     de entrenamiento, trazabilidad y supervisión humana, coherentes con el uso del informe generado
+%     como borrador asistido descrito en la Sección~\ref{section:innovacion_mvp}.
+%     \item \textbf{Producto sanitario (\englishText{MDR}):} en función del uso final, una herramienta que
+%     estructura y codifica información clínica de forma automatizada podría requerir evaluación de su
+%     clasificación bajo el Reglamento (UE) 2017/745 de productos sanitarios, especialmente si su salida
+%     se integra directamente en la \englishText{HCE} sin revisión humana intermedia.
+%     \item \textbf{Propiedad intelectual y licencias:} los modelos de terceros empleados (modelos
+%     \englishText{ASR}, \englishText{NER} del \englishText{BSC}, modelos \englishText{LLM} servidos vía
+%     Ollama) deben revisarse en cuanto a sus licencias de uso comercial, así como las condiciones de uso
+%     de \englishText{Snowstorm} y de las ontologías \englishText{SNOMED CT} y \englishText{CIE-10-ES}.
+% \end{itemize}

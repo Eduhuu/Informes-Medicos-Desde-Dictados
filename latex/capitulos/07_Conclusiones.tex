@@ -1,4 +1,91 @@
 \chapter{Conclusiones}\label{chapter:conclusiones}
 
-Debes describir las conclusiones generales del trabajo, pero también debes cubrir qué objetivos se han cubierto. Para ello revisa la sección de \nameref{section:objetivos} (Sección \ref{section:objetivos}).
-Por último cierra el trabajo, y si tienes planes de continuar, menciona los trabajos futuros.
+Este trabajo ha diseñado, implementado y evaluado un sistema \englishText{end-to-end} que transforma
+dictados médicos en informes clínicos estructurados e interoperables, integrando captura segura de
+audio, transcripción \englishText{ASR}, extracción y etiquetado (\englishText{NER}) y normalización de entidades clínicas
+(\englishText{SNOMED CT}/\englishText{CIE-10-ES}), generación de informes mediante \englishText{LLMs}
+y exportación en formato \englishText{HL7 FHIR}. El sistema ha sido construido y desplegado de forma
+funcional, y evaluado tanto a nivel de módulo individual como de \textit{pipeline} completo, lo que
+permite extraer conclusiones tanto sobre su viabilidad técnica como sobre sus limitaciones actuales
+de cara a un uso clínico real.
+
+\section{Conclusiones generales}\label{section:conclusiones_generales}
+
+El resultado más relevante de la evaluación, discutido en la
+Sección~\ref{section:discusion_resultados}, es que el desempeño de un sistema clínico de este tipo no
+puede inferirse a partir del desempeño aislado de sus componentes. Cada módulo evaluado de forma
+independiente frente a su propio \textit{gold standard} obtiene resultados notablemente sólidos: un
+\englishText{WER} medio de $\approx$6,5\,\% en \englishText{ASR}, un 85,5\,\% de acierto micro en la
+normalización a \englishText{SNOMED CT} y un F1 micro de hasta 43,8\,\% en \englishText{NER} bajo
+criterio granular. Sin embargo, al integrarse en un \textit{pipeline} secuencial, donde cada etapa
+consume la salida de la anterior sin posibilidad de corrección aguas abajo, estos mismos componentes
+muestran un rendimiento muy inferior en la evaluación \englishText{end-to-end} (puntuaciones de
+1,55 a 2,90 sobre 5), y únicamente entre el 20\,\% y el 30\,\% de los informes generados resultan
+aceptables para el veredicto del \englishText{LLM-as-judge}. Esto confirma que la arquitectura
+secuencial propaga y amplifica errores moderados de una etapa (una sigla mal transcrita, una entidad
+truncada por sobre-segmentación) hasta convertirlos en errores clínicos graves en el informe final
+(diagnósticos sustituidos, dosis erróneas, inversiones de hallazgos), un comportamiento de
+acumulación de error que constituye el hallazgo central de este trabajo y que cualquier
+arquitectura similar basada en encadenamiento de modelos debe asumir y mitigar explícitamente.
+
+En cuanto al cumplimiento de los objetivos específicos planteados en la
+Sección~\ref{section:objetivos-especificos} (\nameref{section:objetivos}, Sección
+\ref{section:objetivos}), los resultados son dispares. El objetivo~1 (\englishText{WER}
+$\le$10--12\,\%) se cumple con margen, demostrando que los modelos \englishText{ASR} actuales,
+adaptados al léxico médico en español, son suficientemente maduros para esta tarea en entornos
+controlados. El objetivo~4 (validación estructural \englishText{FHIR} $>$95\,\%) se cumple en
+términos estrictamente sintácticos --- el 100\,\% de los \textit{Bundles} generados son
+estructuralmente válidos ---, si bien con la reserva importante de que dicha validación no garantiza
+la corrección semántica del contenido clínico que representa. Por el contrario, los objetivos~2
+($F_1 \ge 0,85$ en \englishText{NER}) y~3 (aceptación médica $\ge$80\,\%) no se cumplen, con
+resultados muy por debajo de los umbrales fijados. El objetivo~2 falla principalmente por
+sobre-segmentación de \textit{spans} y por la falta de reconocimiento de siglas y abreviaturas
+clínicas, mientras que el incumplimiento del objetivo~3 es, en gran medida, una consecuencia directa
+de la propagación de errores ya descrita: el informe \englishText{LLM} hereda y amplifica los fallos
+de las etapas \englishText{NER} y de normalización terminológica que lo preceden.
+
+Estos resultados permiten concluir que el sistema desarrollado constituye una prueba de concepto
+técnicamente viable y arquitectónicamente completa --- cubre de extremo a extremo el flujo desde el
+audio hasta un recurso \englishText{FHIR} interoperable, respetando los requisitos de privacidad y
+seguridad planteados en la motivación del trabajo ---, pero que, en el estado actual, no alcanza el
+nivel de fiabilidad clínica necesario funcionar sin supervisión humana. En definitiva, el trabajo demuestra
+que la dificultad de este tipo de sistemas no reside
+únicamente en alcanzar buen desempeño en cada tarea de \englishText{PLN} por separado, sino en
+diseñar mecanismos de robustez y de propagación controlada del error a lo largo de todo el
+\textit{pipeline}.
+
+\section{Trabajos futuros}\label{section:trabajos_futuros}
+
+A partir de las limitaciones identificadas en la Sección~\ref{section:discusion_resultados}, se
+proponen las siguientes líneas de continuación:
+
+\begin{itemize}
+    \item \textbf{Mitigación de la propagación de errores entre etapas:} introducir mecanismos de
+    verificación intermedios entre módulos (por ejemplo, validación de la consistencia entre las
+    entidades \englishText{NER} y el texto fuente antes de pasarlas al módulo de normalización, o
+    confirmación cruzada de las negaciones detectadas) en lugar de un encadenamiento puramente
+    secuencial sin retroalimentación.
+
+    \item \textbf{Mejora del módulo \englishText{NER} sobre los patrones de error identificados:}
+    incorporar un diccionario o módulo de expansión de siglas y abreviaturas clínicas, y ajustar la
+    delimitación de \textit{spans} para reducir la sobre-segmentación de entidades compuestas
+    (diagnósticos en varias palabras, valores numéricos con unidades), que concentran la mayor parte
+    de los errores observados.
+
+    \item \textbf{Normalización terminológica sensible al contexto:} sustituir o complementar la
+    búsqueda por coincidencia de texto sobre la entidad aislada por un enlace de entidades
+    (\textit{entity linking}) que tenga en cuenta el contexto clínico del dictado completo, lo que
+    debería mejorar la precisión de la baja cobertura observada en \englishText{CIE-10-ES}.
+
+    \item \textbf{Reducción de alucinaciones del informe \englishText{LLM}:} explorar técnicas de
+    generación aumentada por recuperación (\englishText{RAG}) o de verificación post-generación que
+    contrasten cada afirmación del informe contra las entidades y el texto fuente, para detectar
+    inversiones de hechos clínicos, errores de magnitud en dosis y expansión incorrecta de siglas
+    antes de aceptar el informe como definitivo.
+
+    \item \textbf{Evaluación sobre infraestructura de mayor capacidad:} replicar la evaluación
+    \englishText{end-to-end} sobre \textit{hardware} con mayor VRAM disponible, lo que permitiría
+    emplear variantes de \englishText{LLM} de mayor escala que \texttt{llama3.1:8b} y determinar en
+    qué medida las limitaciones de calidad observadas (alucinaciones, colapsos de contenido) se deben
+    al tamaño del modelo o son inherentes a la arquitectura secuencial del \textit{pipeline}.
+\end{itemize}

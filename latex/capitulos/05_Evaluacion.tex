@@ -24,6 +24,11 @@ evaluación se organiza en dos niveles complementarios:
     (\textit{batch} y \textit{streaming}), descritas en la Sección~\ref{section:evaluacion_e2e}.
 }
 
+Toda la evaluación, incluida la medición de los tiempos de procesamiento reportados en la
+Sección~\ref{section:resultados_e2e}, se ejecutó sobre el equipo local descrito en la
+Sección~\ref{subsection:entorno_desarrollo}, sin aceleración \englishText{GPU} de servidor ni
+recursos en la nube.
+
 \section{Conjunto de datos de evaluación}\label{section:conjunto_datos_evaluacion}
 
 Para garantizar la reproducibilidad de las métricas obtenidas, se construirá un conjunto de evaluación
@@ -144,8 +149,8 @@ Durante la ejecución de esta evaluación se realizaron las siguientes dos prueb
     intestinales}).
 
     El objetivo de esta prueba es saber cuántos errores del modelo se debieron a un criterio de evaluación
-    demasiado estricto (al exigir límites exactos en las palabras), y cuántos a una pérdida
-    real de información clínica.
+    demasiado estricto (al exigir \textit{spans} exactos), y
+    cuántos a una pérdida real de información clínica.
 }
 
 \subsection{Normalización terminológica \englishText{SNOMED CT}/\englishText{CIE-10-ES}}\label{subsection:evaluacion_snomed}
