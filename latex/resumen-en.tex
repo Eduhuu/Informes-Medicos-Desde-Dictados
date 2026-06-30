@@ -5,6 +5,9 @@ system aimed at automating medical documentation by transforming voice dictation
 into standardized clinical reports. 
 The system proposes a workflow pipeline that outlines the following stages:
 \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parsep}{0pt}
+    \setlength{\topsep}{4pt}
     \item \textbf{Secure audio capture:} 
         Implementation of a client-server architecture with end-to-end encryption 
         to guarantee data integrity.
@@ -14,9 +17,10 @@ The system proposes a workflow pipeline that outlines the following stages:
     \item \textbf{Extraction and normalization of clinical entities:} 
         Identification, categorization, and normalization of clinical concepts under 
         international standards such as SNOMED CT and CIE-10-ES.
-    \item \textbf{Report generation via LLMs:} 
-        Information synthesis using Large Language Models, incorporating 
-        verification mechanisms to ensure clinical accuracy.
+    \item \textbf{Report generation via LLMs:}
+        Information synthesis using Large Language Models from a verified context of
+        previously normalized clinical entities, aimed at reducing the risk of fabricating
+        information absent from the original dictation.
     \item \textbf{Structured and interoperable output:} 
         Exporting results in standard formats (JSON/FHIR) for direct integration 
         into Electronic Health Record (\englishText{EHR}) systems and clinical report generation.
