@@ -4,10 +4,10 @@ Este trabajo fin de máster propone el diseño, desarrollo y evaluación de un s
 que transforma dictados médicos en informes clínicos completos y normalizados utilizando 
 Modelos de Lenguaje de Gran Escala (\englishText{LLMs}). Si bien los \englishText{LLMs} tienen 
 un gran potencial para automatizar y estructurar esta información, su integración 
-clínica propone tres retos fundamentales: la protección de la privacidad bajo marcos 
-legales estrictos, la eliminación de alucinaciones para garantizar la integridad de la información  
-y la adopción de estándares internacionales para asegurar la 
-interoperatividad. Para ello, se propone un sistema que integra las siguientes etapas:
+clínica propone tres retos fundamentales: la protección de la privacidad bajo marcos
+legales estrictos, la eliminación de alucinaciones para garantizar la integridad de la información
+y la adopción de estándares internacionales para asegurar la
+interoperabilidad. Para ello, se propone un sistema que integra las siguientes etapas:
 
 \boldparagraph{Captura y transmisión segura}{
     Establece un canal de comunicación protegido para el flujo de información sensible desde el punto de dictado hasta el núcleo de procesamiento.
@@ -47,22 +47,39 @@ edición posterior genera flujos de trabajo ineficientes.
 
 Diseñar, implementar y evaluar un sistema de procesamiento de lenguaje natural (\englishText{Natural Language Processing, NLP}) 
 \englishText{end-to-end} para la generación automatizada de informes clínicos estructurados 
-a partir de dictados médicos en español. El sistema deberá asegurar la interoperatividad 
-mediante el estándar \englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources}) y garantizar el cumplimiento estricto 
+a partir de dictados médicos en español. El sistema deberá asegurar la interoperabilidad
+mediante el estándar \englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources}) y garantizar el cumplimiento estricto
 de las normativas vigentes de privacidad de datos de salud.
 
 \subsection{Objetivos específicos}\label{section:objetivos-especificos}
 
 Para alcanzar el objetivo general, se plantean los siguientes objetivos específicos,
-los cuales definen los umbrales de desempeño esperados para el sistema
+los cuales definen los umbrales de desempeño esperados para el sistema.
 
 \begin{itemize}
     \item Lograr una tasa de error de palabra (\englishText{Word Error Rate, WER}) $\le$ 10--12\,\% 
     en la transcripción de dictados médicos en entornos controlados.
     \item Alcanzar una puntuación \englishText{F1} $\ge$ 0.85 en la extracción de entidades clínicas clave 
     (diagnósticos, procedimientos, fármacos, dosis y alergias).
-    \item Lograr que al menos el 80\,\% de los informes generados sean aceptados por el personal médico ó un agente de IA 
+    \item Lograr que al menos el 80\,\% de los informes generados sean aceptados por el personal médico o un agente de IA
     con un máximo de dos ediciones menores.
-    \item Generar salidas compatibles con el estándar \englishText{FHIR}, asegurando más del 95\,\% de 
+    \item Generar salidas compatibles con el estándar \englishText{FHIR}, asegurando más del 95\,\% de
     validaciones automáticas exitosas sin errores críticos.
 \end{itemize}
+
+\section{Estructura del documento}\label{section:estructura_documento}
+
+El resto de la memoria se organiza como sigue. El
+Capítulo~\ref{chapter:marco_teorico_y_referencial} revisa el estado del arte en
+\englishText{ASR}, \englishText{PLN} y \englishText{LLMs} aplicados a la documentación clínica, así
+como el marco teórico y conceptual en el que se apoya el sistema. El
+Capítulo~\ref{chapter:desarrollo} describe la metodología y la arquitectura del sistema desarrollado,
+detallando cada etapa del \textit{pipeline} y su implementación. El Capítulo~\ref{chapter:evaluacion}
+presenta el diseño experimental y las métricas empleadas para evaluar tanto los módulos individuales
+como el sistema \englishText{end-to-end}. El Capítulo~\ref{chapter:resultados} expone los
+resultados obtenidos y los discute a la luz de los objetivos planteados en esta introducción. El
+Capítulo~\ref{chapter:conclusiones} resume las conclusiones generales del trabajo y propone líneas de
+trabajo futuro. Finalmente, los apéndices recogen la planificación y gestión del proyecto, un análisis
+de innovación y modelo de negocio, los \textit{prompts} empleados con modelos de lenguaje como agentes
+auxiliares, el manual de usuario del sistema y los resultados completos de la evaluación
+\englishText{end-to-end}.

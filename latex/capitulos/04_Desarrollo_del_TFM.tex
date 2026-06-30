@@ -56,6 +56,39 @@ El desarrollo se apoyó en un conjunto de tecnologías y herramientas:
 La planificación temporal del proyecto, incluyendo el diagrama de Gantt con la secuenciación de las
 iteraciones anteriores, se detalla en el Apéndice~\ref{appendix:gestion}.
 
+\subsection{Entorno de desarrollo y pruebas}\label{subsection:entorno_desarrollo}
+
+Todo el sistema --- desarrollo, despliegue de los servicios Docker (Snowstorm, Ollama) y ejecución
+de la evaluación del Capítulo~\ref{chapter:evaluacion} --- se ejecutó íntegramente en un equipo local
+bajo Ubuntu~24.04 LTS, sin recurrir a infraestructura en la nube ni a aceleración remota. La
+Tabla~\ref{tab:entorno_hardware} resume sus características principales.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Componente} & \textbf{Especificación} \\
+\hline
+Procesador & Intel Core i7-12650H (10 núcleos / 16 hilos) \\
+Memoria RAM & 62\,GiB \\
+GPU & NVIDIA GeForce RTX 4050 Laptop (6\,GiB VRAM) \\
+Controlador / CUDA & Driver 595.71.05, CUDA 13.2 \\
+Sistema operativo & Ubuntu 24.04.4 LTS (\textit{kernel} 6.17) \\
+\hline
+\end{tabular}
+\caption{Entorno de \textit{hardware} utilizado para el desarrollo y la evaluación.}
+\label{tab:entorno_hardware}
+\end{table}
+
+Esta elección, motivada por el requisito de privacidad por diseño descrito en la
+Sección~\ref{subsection:seguridad_privacidad} (procesamiento local de los datos clínicos sin
+exfiltración hacia terceros), supone también una restricción relevante para la interpretación de los
+resultados: los 6\,GiB de VRAM disponibles condicionan el tamaño de los modelos empleados (por
+ejemplo, \texttt{llama3.1:8b} en lugar de variantes de mayor escala) y los tiempos de procesamiento
+reportados en la Sección~\ref{section:resultados_e2e} corresponden a este \textit{hardware} de gama
+de consumo, por lo que no son directamente extrapolables a un despliegue sobre infraestructura
+\englishText{GPU} de servidor.
+
 \section{Arquitectura del sistema}\label{section:arquitectura_sistema}
 
 \subsection{Vista general y despliegue}\label{subsection:vista_general}
@@ -257,8 +290,8 @@ fragmento de audio, o de forma diferida al cierre de sesión para la generación
 \boldparagraph{Procesamiento}{el orquestador \texttt{PlnOrchestrator} ejecuta en paralelo dos modelos
     \englishText{NER}: \texttt{pln\_medical} (\englishText{spanish\_medical\_ner}) para entidades
     clínicas generales y \texttt{pln\_farmacos} (\englishText{bsc-bio-ehr-es-pharmaconer}) para
-    terminología farmacológica. Si ambos modelos detectan el mismo intervalo de texto, se conserva
-    únicamente la entidad de \texttt{pln\_farmacos}, dado que este es más específico. El resultado
+    terminología farmacológica. Si ambos modelos detectan el mismo \textit{span}
+    se conserva únicamente la entidad de \texttt{pln\_farmacos}, dado que este es más específico. El resultado
     combinado, ya etiquetado con su modelo de origen (\texttt{pln\_source}), se pasa a la función
     \texttt{group\_entities}, que aplica dos optimizaciones introducidas durante el desarrollo. En
     primer lugar, descarta entidades de bajo valor: \textit{tokens} compuestos únicamente por
@@ -273,7 +306,8 @@ fragmento de audio, o de forma diferida al cierre de sesión para la generación
     \input{imagenes/diagramas/desarrollo_del_tfm/fusion_entidades_NER.tex}
 }
 
-    \boldparagraph{Salidas}{lista de entidades con etiqueta, texto, posición y origen del modelo.}
+    \boldparagraph{Salidas}{lista de entidades con etiqueta, texto, \textit{span} (posición de inicio
+    y fin) y origen del modelo.}
 
 \subsubsection{Módulo \englishText{SNOMED}}\label{subsubsection:modulo_snomed}
 
@@ -458,7 +492,7 @@ Entre los patrones de diseño aplicados destacan:
 
 \boldparagraph{Orquestador de \englishText{PLN}}{
     \texttt{PlnOrchestrator} coordina la ejecución paralela de los dos modelos \englishText{NER} y
-    aplica la regla de fusión por solapamiento de intervalos.
+    aplica la regla de fusión por solapamiento de \textit{spans}.
 }
 
 \boldparagraph{Separación \englishText{gateway}/\englishText{backend}}{

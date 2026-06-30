@@ -314,18 +314,20 @@ El \englishText{PLN} abarca tareas complejas que van desde el análisis morfosin
 (\englishText{NLU}), la gestión del conocimiento semántico y el reconocimiento de entidades nombradas (\englishText{NER}). 
 Este último permite extraer de forma automática identificar entidades en categorías previamente definidas.
 
-\subsection{Reconocimiento de Entidades Nombradas (\englishText{NER})}
+\subsection{Reconocimiento de Entidades Nombradas (\englishText{NER})}\label{subsection:marco_teorico_ner}
 El Reconocimiento de Entidades Nombradas (\englishText{Named Entity Recognition} o \englishText{NER}) 
 constituye una subtarea fundamental del \englishText{PLN} cuyo propósito es localizar y clasificar 
 elementos de texto no estructurado en categorías semánticas previamente definidas \citeText{jm3}.
 
-Los modelos \englishText{NER} se pueden entrenar para especializarse en un dominio específico, que en nuestro caso es 
-el dominio médico, se entrenan para escanear las transcripciones médicas e identificar y categorizar 
-entidades médicas de interés como patologías, procedimientos quirúrgicos, fármacos, anatomía y variables fisiológicas. 
-Las arquitecturas contemporáneas de \englishText{NER} emplean modelos basados en representaciones de 
-codificadores lingüísticos profundos (como variantes de \englishText{BERT} o \englishText{RoBERTa}) 
+Los modelos \englishText{NER} se pueden entrenar para especializarse en un dominio específico, que en nuestro caso es
+el dominio médico, se entrenan para escanear las transcripciones médicas e identificar y categorizar
+entidades médicas de interés como patologías, procedimientos quirúrgicos, fármacos, anatomía y variables fisiológicas.
+Las arquitecturas contemporáneas de \englishText{NER} emplean modelos basados en representaciones de
+codificadores lingüísticos profundos (como variantes de \englishText{BERT} o \englishText{RoBERTa})
 adaptadas al sector biomédico, los cuales analizan el contexto izquierdo y derecho de cada palabra
-para clasificar los límites de una entidad médica con alta precisión.
+para clasificar los límites de una entidad médica con alta precisión. A este tramo continuo de texto,
+delimitado por una posición inicial y una final, que el modelo etiqueta como perteneciente a una
+misma entidad, se le denomina \textit{span}.
 
 \input{imagenes/diagramas/capitulo_marco_teorico/PLN_NER}
 

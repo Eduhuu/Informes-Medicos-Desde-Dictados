@@ -19,11 +19,17 @@ Cada fila de caso incluye los conteos TP (verdaderos positivos), FP (falsos posi
 negativos) y las métricas derivadas de ellos. Una detección cuenta como TP si su texto coincide
 exactamente con una entidad de referencia; como FP si no coincide con ninguna; y cada entidad de
 referencia no cubierta se contabiliza como FN. La precisión, el \textit{recall} y el F1 de cada caso
-se obtienen respectivamente como $\mathrm{TP}/(\mathrm{TP}+\mathrm{FP})$,
-$\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ y la media armónica de ambas. La fila \textit{Macro} del
-pie de tabla promedia esas tres métricas entre los 10 casos; la fila \textit{Micro} suma los TP, FP
-y FN globales y recalcula las métricas sobre esos totales (véase la definición completa en la
-Sección~\ref{subsection:evaluacion_pln}).
+se obtienen respectivamente como:
+
+\begin{gather*}
+    \text{Precisión} = \frac{\mathrm{TP}}{\mathrm{TP} + \mathrm{FP}} \\[8pt]
+    \textit{Recall} = \frac{\mathrm{TP}}{\mathrm{TP} + \mathrm{FN}} \\[8pt]
+    \mathrm{F1} = 2 \cdot \frac{\text{Precisión} \cdot \textit{Recall}}{\text{Precisión} + \textit{Recall}}
+\end{gather*}
+
+La fila \textit{Macro} del pie de tabla promedia esas tres métricas entre los 10 casos; la fila
+\textit{Micro} suma los TP, FP y FN globales y recalcula las métricas sobre esos totales (véase la
+definición completa en la Sección~\ref{subsection:evaluacion_pln}).
 
 \input{tablas/capitulo_evaluacion/tabla_ner_detalle_estricta.tex}
 
