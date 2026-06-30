@@ -1,11 +1,14 @@
 % Editar este fichero y rellenar con el resumen del TFM
 
 Este Trabajo de Fin de Máster presenta el diseño, desarrollo y evaluación de un sistema 
-integral orientado a la automatización de la documentación médica mediante la 
+orientado a la automatización de la documentación médica mediante la 
 transformación de dictados de voz en informes clínicos normalizados. 
 El sistema propone un flujo de trabajo \englishText{pipeline} que enumera las 
 siguientes etapas:
 \begin{enumerate}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parsep}{0pt}
+    \setlength{\topsep}{4pt}
     \item \textbf{Captura segura de audio:} 
         Implementación de una arquitectura cliente-servidor con cifrado de extremo a extremo
         para garantizar la integridad de los datos.
@@ -15,9 +18,10 @@ siguientes etapas:
     \item \textbf{Extracción y normalización de entidades clínicas:} 
         Identificación, categorización y normalización de conceptos clínicos bajo estándares 
         internacionales como \englishText{SNOMED CT} y \englishText{CIE-10-ES}.
-    \item \textbf{Generación de informes mediante \englishText{LLMs}:} 
-        Síntesis de información utilizando modelos de lenguaje de gran escala, 
-        incorporando mecanismos de verificación para asegurar la fidelidad clínica.
+    \item \textbf{Generación de informes mediante \englishText{LLMs}:}
+        Síntesis de información utilizando modelos de lenguaje de gran escala a partir de un
+        contexto verificado de entidades clínicas previamente normalizadas, con el fin de
+        reducir el riesgo de invención de información ausente en el dictado original.
     \item \textbf{Salida estructurada e interoperable:} 
         Exportación de resultados en formatos estándares (\englishText{JSON}/\englishText{FHIR}) 
         para su integración directa en sistemas de Historia Clínica Electrónica (\englishText{HCE}) y
@@ -26,7 +30,6 @@ siguientes etapas:
 
 El proyecto se fundamenta en los principios de privacidad desde el diseño, 
 asegurando el cumplimiento riguroso de los marcos legales vigentes (\englishText{RGPD} y \englishText{LOPDGDD}). 
-La viabilidad de la propuesta se valida mediante una validación con especialistas 
-del sector y una evaluación cuantitativa basada en métricas de precisión técnica 
+La viabilidad de la propuesta se valida a través de una evaluación cuantitativa basada en métricas de precisión técnica 
 (\englishText{WER} para la transcripción y puntuación F$_{1}$ para la extracción de entidades), 
 así como indicadores de eficiencia temporal y relevancia clínica.
