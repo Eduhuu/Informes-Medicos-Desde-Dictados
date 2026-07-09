@@ -3,9 +3,51 @@
 \section{Estado del Arte}
 
 Históricamente, para la generación de informes médicos el uso de lápiz y papel fue la norma.
-Aunque la digitalización inicial buscaba reducir la carga administrativa, 
+Aunque la digitalización inicial buscaba reducir la carga administrativa,
 la transcripción manual de datos se convirtió en un nuevo obstáculo para los profesionales de la salud,
 limitando la agilidad de los sistemas modernos.
+
+\subsection{Estándares de Informes Médicos}\label{subsection:estandares_informes_medicos}
+
+Antes de revisar las tecnologías de reconocimiento de voz y generación de texto que emplea este
+trabajo, resulta necesario delimitar qué se entiende por un informe clínico normalizado.
+Un informe médico no es un texto libre arbitrario, sino un documento cuya estructura, contenido
+mínimo y codificación están sujetos, en mayor o menor medida, a normativas y estándares tanto
+nacionales como internacionales.
+
+A nivel de contenido, la práctica clínica habitual estructura un informe en torno a un conjunto de
+apartados recurrentes: la \textbf{anamnesis} (motivo de consulta y antecedentes relatados por el
+paciente), la \textbf{exploración física y las pruebas complementarias} realizadas, el
+\textbf{juicio diagnóstico} (diagnóstico principal y, en su caso, diagnósticos secundarios) y el
+\textbf{plan terapéutico} (tratamiento, procedimientos y recomendaciones). En España, esta
+estructura no es una mera convención, sino que viene fijada, para los informes generados en el
+Sistema Nacional de Salud, por el Real Decreto 1093/2010, que aprueba el conjunto mínimo de datos
+de los informes clínicos (\englishText{CMDIC}) y establece, los campos obligatorios
+del informe clínico de alta y del informe de consulta externa \citeText{boe2010cmdic}. El sistema
+propuesto en este trabajo adopta esta misma organización por secciones como esquema de referencia
+para el informe clínico que genera el \englishText{LLM} (Sección~\ref{subsection:llm}).
+
+A nivel de intercambio electrónico, el estándar internacional de referencia para la estructura y
+la semántica de los documentos clínicos es \englishText{HL7 Clinical Document Architecture}
+(\englishText{CDA}), un formato basado en \englishText{XML} que define una
+cabecera con los datos
+administrativo-asistenciales del documento (paciente, episodio, autor) y un cuerpo organizado en
+secciones clínicas codificadas con terminologías como \englishText{SNOMED CT}, \englishText{LOINC}
+o \englishText{ICD-10} \citeText{hl7cda2005}. En el ámbito español, estos documentos clínicos
+(informe de alta, de consulta externa, de urgencias, de atención primaria, entre otros) se
+comparten entre comunidades autónomas a través de la Historia Clínica Digital del Sistema Nacional
+de Salud (\englishText{HCDSNS}), una red descentralizada en la que cada comunidad autónoma custodia
+sus propios datos clínicos y los expone de forma interoperable a través de un nodo central
+\citeText{sanidad_hcdsns}.
+
+El sistema desarrollado en este trabajo no genera documentos \englishText{HL7 CDA}, sino que
+adopta el estándar \englishText{HL7 FHIR} (Sección~\ref{subsection:hl7_fhir}) como formato de salida
+estructurada, por ser una evolución más ligera y orientada a \englishText{API} del propio \englishText{HL7}.
+No obstante, ambos estándares comparten el mismo principio subyacente: un documento clínico solo es
+interoperable si su contenido está codificado frente a terminologías normalizadas. Por ello, las
+entidades clínicas que este sistema extrae del dictado médico se vinculan a los vocabularios de
+referencia \englishText{SNOMED CT} y \englishText{CIE-10-ES}, descritos en la
+Sección~\ref{subsection:estandares_interoperabilidad}.
 
 \subsection{\englishText{Automatic Speech Recognition} (\englishText{ASR})}
 
@@ -41,7 +83,8 @@ Esta escala de preentrenamiento le confiere una robustez notable frente a acento
 técnico~\citeText{radford2023whisper}. 
 
 En la actualidad, esta tecnología se aplica en diversas tareas de transcripción de informes médicos. Por un lado, se
-incorporan \englishText{LLMs} para refinar las transcripciones obtenidas \citeText{adedeji2024soundhealthcareimprovingmedical, li2024searchingbestpracticesmedical}; 
+incorporan Modelos de Lenguaje de Gran Escala (\englishText{LLMs, Large Language Models}) para refinar las
+transcripciones obtenidas \citeText{adedeji2024soundhealthcareimprovingmedical, li2024searchingbestpracticesmedical};
 por otro, se realiza el \englishText{fine-tuning} del modelo \englishText{Whisper} con el fin de reducir la tasa
 de error de palabra (\englishText{WER}) \citeText{10912421}. Asimismo, se emplean \englishText{LLMs} de altas
 prestaciones para identificar entidades clínicas complejas aprovechando los amplios contextos que estos poseen y la gran
@@ -69,22 +112,25 @@ El punto de inflexión llegó con la arquitectura \englishText{Transformer} y, e
 Los modelos basados en \englishText{Transformer} se distinguen por su mecanismo de auto-atención, que procesa eficientemente la 
 importancia relativa de cada palabra en una oración, mejorando la comprensión del contexto y las relaciones 
 dentro del texto, lo que les permitió superar a todos los modelos anteriores en tareas de \englishText{NER}. En el dominio 
-clínico, esto se tradujo en modelos especializados como \englishText{BioBERT} o \englishText{ClinicalBERT}, preentrenados sobre literatura 
-biomédica y notas clínicas \citeText{lee2020biobert}.
+clínico, esto se tradujo en modelos especializados como \englishText{BioBERT}~\citeText{lee2020biobert} o
+\englishText{ClinicalBERT}~\citeText{alsentzer2019clinicalbert}, preentrenados sobre literatura
+biomédica y notas clínicas.
 
 El contexto hispanohablante presenta, no obstante, un escenario histórico de recursos limitados, donde las herramientas
 de PLN para el dominio clínico han sido tradicionalmente escasas. Para paliar esta brecha, el Barcelona \englishText{Supercomputing Center (BSC)}, 
 en el marco del Plan de Impulso de las Tecnologías del Lenguaje (\englishText{Plan TL}), ha liderado la creación de la
 infraestructura básica de datos y modelos biomédicos en español. El esfuerzo fundacional más relevante de este
 organismo fue el reto \englishText{PharmaCoNER}, centrado en el reconocimiento de entidades farmacológicas en textos
-clínicos a partir del corpus \englishText{SPACCC (Spanish Clinical Case Corpus)}. Este recurso contiene 1.000 casos
+clínicos a partir del corpus \englishText{SPACCC (Spanish Clinical Case Corpus)}~\citeText{gonzalezagirre2019pharmaconer}.
+Este recurso contiene 1.000 casos
 clínicos en español anotados manualmente para la identificación de sustancias químicas, fármacos y proteínas.
 
 Trabajos posteriores del propio \englishText{BSC} ampliaron este ecosistema mediante campañas de evaluación consecutivas: 
 combinando los conjuntos de datos unificados \englishText{SympTEMIST} (síntomas), \englishText{MedProcNER} (procedimientos), 
 \englishText{DisTEMIST} (enfermedades) y el citado \englishText{PharmaCoNER}, se consolidó el mayor corpus multiclase
 de reconocimiento y vinculación \englishText{(entity linking)} de entidades biomédicas en notas clínicas en español, 
-integrando el mapeo conceptual hacia la ontología de referencia internacional \englishText{SNOMED CT}. 
+integrando el mapeo conceptual hacia la ontología de referencia internacional \englishText{SNOMED CT}
+(\englishText{Systematized Nomenclature of Medicine -- Clinical Terms}).
 Paralelamente, el \englishText{BSC} entrenó los primeros grandes modelos de lenguaje 
 especializados para la medicina en español, destacando la familia de modelos 
 \englishText{RoBERTa-base-biomedical-clinical-es} 
@@ -164,7 +210,9 @@ durante el entrenamiento, sino que se articula mediante diversos paradigmas oper
     u ontologías sin perder la riqueza semántica de la expresión original.
 \end{itemize}
 
-\subsection{Sistemas integrados: \englishText{ASR}, \englishText{PLN} y \englishText{LLM} 
+% Esta subsección cubre el segundo apartado pedido por el tutor (comentario pág. 25):
+% "herramientas específicas y publicaciones específicas que hablen de lo que vamos a hacer".
+\subsection{Sistemas integrados: \englishText{ASR}, \englishText{PLN} y \englishText{LLM}
 aplicados a la documentación clínica}
 
 Las secciones anteriores han trazado la evolución independiente de cada capa tecnológica 
@@ -181,8 +229,9 @@ donde el texto transcrito se entrega directamente al \englishText{LLM}, empleand
 técnicas de preprocesamiento para reducir el \englishText{WER} y aligerar la carga de 
 revisión manual. Por su parte, \citeText{10912421} aborda la especialización del modelo 
 \englishText{ASR} mediante \englishText{fine-tuning} de \englishText{Whisper} sobre datos 
-del dominio médico, e incorpora servicios de terceros para la traducción de conceptos 
-extraídos a vocabularios estándar como \englishText{CIE-10-ES} y \englishText{SNOMED CT}.
+del dominio médico, e incorpora servicios de terceros para la traducción de conceptos
+extraídos a vocabularios estándar como la \englishText{CIE-10-ES} (Clasificación Internacional de Enfermedades,
+10.\textsuperscript{a} revisión, modificación clínica española) y \englishText{SNOMED CT}.
 
 No obstante, el análisis de estos trabajos permite identificar una limitación estructural 
 común: la dependencia casi exclusiva de la capacidad generativa intrínseca del 
@@ -203,9 +252,9 @@ las limitaciones caracterizadas en las secciones anteriores:
     de Historia Clínica Electrónica (\englishText{HCE}) del Sistema Nacional de Salud.
 
     \item \textbf{Incompatibilidad con estándares de interoperabilidad} Ninguno de los 
-    trabajos referenciados produce una salida estructurada conforme al estándar 
-    \englishText{HL7 FHIR}, requisito indispensable para el intercambio de información 
-    clínica entre diferentes niveles asistenciales.
+    trabajos referenciados produce una salida estructurada conforme al estándar
+    \englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources}), requisito indispensable
+    para el intercambio de información clínica entre diferentes niveles asistenciales.
 \end{itemize}
 
 Para mitigar estas vulnerabilidades, el sistema propuesto en este trabajo introduce una 
@@ -221,7 +270,19 @@ contenido clínico ya ha sido validado y normalizado en etapas anteriores del pi
 
 \section{Marco Teórico}
 
-% Dentro de este trabajo fin de master se tomaran en cuenta los siguientes conceptos teoricos:
+Mientras que la sección anterior ha situado el sistema propuesto respecto a los trabajos previos
+en la literatura, esta sección presenta los fundamentos teóricos y tecnológicos concretos sobre
+los que se apoya su arquitectura. Los conceptos se introducen siguiendo
+el propio flujo de datos del sistema: se parte de la capa de aplicación y comunicación que
+captura y transporta el audio de forma segura (aplicación web, móvil, \textit{backend},
+\englishText{SSL/TLS}, \englishText{WebSocket} y \englishText{Gateway}); se continúa con la capa de
+inteligencia artificial que transforma ese audio en información clínica estructurada
+(\englishText{ASR}, \englishText{PLN}, \englishText{NER} y \englishText{LLM}); se prosigue con los
+estándares de codificación e interoperabilidad que normalizan dicha información
+(\englishText{SNOMED CT}, \englishText{CIE-10-ES} y \englishText{HL7 FHIR}); y se cierra con el marco
+normativo de protección de datos que condiciona el diseño de todas las capas anteriores. Esta
+organización busca justificar, en cada caso, por qué la tecnología o el estándar correspondiente
+resulta necesario para el sistema y cómo se relaciona con los elementos ya introducidos.
 
 \subsection{Aplicación web}
 
@@ -250,8 +311,14 @@ aplicación móvil, coordina los pipelines de procesamiento lingüístico y estr
 y crea los informes clínicos en formato estructurado.
 
 
+Puesto que la aplicación móvil y el \textit{backend} intercambian datos de salud a través de una
+red pública, esta arquitectura cliente-servidor requiere de un canal de transporte que garantice
+la confidencialidad e integridad del audio dictado desde el primer momento de la captura. Los dos
+siguientes conceptos, \englishText{SSL/TLS} y \englishText{WebSocket}, describen respectivamente el
+protocolo de cifrado y el protocolo de transporte en tiempo real que hacen posible dicho canal.
+
 \subsection{\englishText{SSL/TLS}}
-Los protocolos \englishText{Secure Sockets Layer} (\englishText{SSL}) y su sucesor evolutivo, 
+Los protocolos \englishText{Secure Sockets Layer} (\englishText{SSL}) y su sucesor evolutivo,
 \englishText{Transport Layer Security} (\englishText{TLS}), son protocolos criptográficos diseñados para garantizar
 la seguridad, confidencialidad e integridad de la información transmitida a través de una red informática. 
 
@@ -284,6 +351,12 @@ funciona como intermediario entre la aplicación móvil y el \englishText{backen
 \englishText{WSS}. Su función principal es recibir los audios enviados por la aplicación móvil, 
 transformarlos y transmitirlos al \englishText{backend} para su posterior procesamiento.
 
+Una vez que el audio llega al \textit{backend} a través del \englishText{Gateway}, comienza la capa
+de inteligencia del sistema, responsable de transformar la señal acústica en información
+clínica estructurada. Esta capa se organiza en cuatro etapas encadenadas: primero el \englishText{ASR}
+convierte el habla en texto; después el \englishText{PLN} y, en particular, el \englishText{NER}
+identifican dentro de ese texto las entidades médicas relevantes; y finalmente el \englishText{LLM}
+sintetiza dichas entidades, junto con la transcripción original, en un informe clínico redactado.
 
 \subsection{Reconocimiento Automático de Voz (\englishText{ASR})}
 
@@ -331,7 +404,7 @@ misma entidad, se le denomina \textit{span}.
 
 \input{imagenes/diagramas/capitulo_marco_teorico/PLN_NER}
 
-\subsection{Modelo de Lenguaje de Gran Escala (\englishText{LLM})}
+\subsection{Modelo de Lenguaje de Gran Escala (\englishText{LLM})}\label{subsection:llm}
 
 Un Modelo de Lenguaje de Gran Escala (\englishText{Large Language Model} o \englishText{LLM}) es un sistema 
 de inteligencia artificial basado en redes neuronales profundas que ha sido entrenado mediante aprendizaje 
@@ -346,7 +419,14 @@ toma la transcripción literal del audio médico, las entidades médicas extraí
 junto a los detalles extraídos de los vocabularios estándar de interoperabilidad (\englishText{SNOMED CT} y
 \englishText{CIE-10-ES}) para generar un informe clínico y coherente.
 
-\subsection{Estándares de Interoperabilidad (\englishText{SNOMED CT} y \englishText{CIE-10-ES})}
+Precisamente porque el \englishText{LLM} no debe inventar terminología clínica, las entidades que el
+\englishText{NER} extrae necesitan vincularse a vocabularios controlados y reconocidos oficialmente
+antes de llegar al \englishText{LLM}. Los dos siguientes estándares, \englishText{SNOMED CT} y
+\englishText{CIE-10-ES}, cumplen ese papel de vocabularios de referencia, mientras que
+\englishText{HL7 FHIR} define, a continuación, el formato en el que el informe final debe
+estructurarse para ser interoperable con los sistemas de Historia Clínica Electrónica.
+
+\subsection{Estándares de Interoperabilidad (\englishText{SNOMED CT} y \englishText{CIE-10-ES})}\label{subsection:estandares_interoperabilidad}
 La interoperabilidad semántica en los sistemas de información sanitaria digital exige el uso de estándares
 y clasificaciones normalizadas a nivel internacional. En el marco de este sistema, se 
 integran dos estándares fundamentales y complementarios, cada uno con un propósito arquitectónico 
@@ -379,15 +459,21 @@ y obtener un identificador único. Esto garantiza su interoperabilidad internaci
 de \englishText{SNOMED CT}, así como su integración con los sistemas nacionales de historias
 clínicas electrónicas (\englishText{HCE}), gracias a los identificadores de \englishText{CIE-10-ES}.
 
-\subsection{\englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources})}
+\subsection{\englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources})}\label{subsection:hl7_fhir}
 
 \englishText{HL7 FHIR} es un estándar para el intercambio de datos en el sector salud, 
 diseñado para facilitar la transferencia electrónica de información clínica de manera ágil y segura. Basado
 en arquitecturas web modernas y \englishText{APIs} de tipo \englishText{REST}, este estándar estructura la 
 información mediante un conjunto de componentes modulares denominados recursos y sus respectivas relaciones lógicas. 
 Esto permite que diversos sistemas de información sanitaria interactúen e integren sus datos con una alta eficiencia y 
-precisión semántica \cite{sanidad2023}.
+precisión semántica \cite{sanidad2023}.\cite{sanidad2023}
 
+Todas las capas descritas hasta ahora (aplicación, comunicación, inteligencia artificial y
+estándares clínicos) manejan en algún momento datos de salud, que la legislación considera una
+categoría especial de datos personales. El siguiente apartado recoge el marco normativo que
+condiciona, de forma transversal, las decisiones de diseño ya introducidas: desde el cifrado
+\englishText{TLS/WSS} del canal de comunicación hasta la ausencia de persistencia del audio en el
+\textit{backend}.
 
 \subsection{Normativo de Protección de Datos}
 

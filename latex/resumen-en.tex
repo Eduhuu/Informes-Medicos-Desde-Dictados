@@ -14,21 +14,26 @@ The system proposes a workflow pipeline that outlines the following stages:
     \item \textbf{Automatic Speech Recognition (ASR):} 
         Audio transcription using artificial intelligence models adapted to the 
         medical lexicon.
-    \item \textbf{Extraction and normalization of clinical entities:} 
-        Identification, categorization, and normalization of clinical concepts under 
-        international standards such as SNOMED CT and CIE-10-ES.
+    \item \textbf{Extraction and normalization of clinical entities:}
+        Identification, categorization, and normalization of clinical concepts under
+        international standards such as SNOMED CT (Systematized Nomenclature of Medicine --
+        Clinical Terms) and CIE-10-ES (the Spanish clinical modification of the 10th revision
+        of the International Statistical Classification of Diseases).
     \item \textbf{Report generation via LLMs:}
         Information synthesis using Large Language Models from a verified context of
         previously normalized clinical entities, aimed at reducing the risk of fabricating
         information absent from the original dictation.
-    \item \textbf{Structured and interoperable output:} 
-        Exporting results in standard formats (JSON/FHIR) for direct integration 
+    \item \textbf{Structured and interoperable output:}
+        Exporting results in standard formats (JSON/FHIR, Fast Healthcare Interoperability
+        Resources) for direct integration
         into Electronic Health Record (\englishText{EHR}) systems and clinical report generation.
 \end{enumerate}
 
-The project is grounded in the principles of privacy by design, ensuring strict 
-compliance with current legal frameworks (GDPR and \englishText{LOPDGDD}). 
-The feasibility of the proposal is validated through feedback from industry 
-specialists and a quantitative evaluation based on technical accuracy metrics 
-(\englishText{WER} for transcription and $F_1$ score for entity extraction), 
+The project is grounded in the principles of privacy by design, ensuring strict
+compliance with current legal frameworks (GDPR, the General Data Protection Regulation, and
+\englishText{LOPDGDD}, the Spanish Organic Law on the Protection of Personal Data and guarantee
+of digital rights).
+The feasibility of the proposal is validated through feedback from industry
+specialists and a quantitative evaluation based on technical accuracy metrics
+(\englishText{WER}, Word Error Rate, for transcription and $F_1$ score for entity extraction),
 as well as time-efficiency indicators and clinical relevance.
