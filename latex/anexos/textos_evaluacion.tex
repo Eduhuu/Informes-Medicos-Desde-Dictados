@@ -3,7 +3,9 @@
 Este apéndice recoge el texto de referencia completo de los 10 casos de prueba que integran el
 conjunto de evaluación descrito en la Sección~\ref{section:conjunto_datos_evaluacion}, empleados
 como dictado original en la evaluación \englishText{end-to-end} tanto en modalidad \textit{batch}
-como \textit{streaming} (Sección~\ref{section:evaluacion_e2e}).
+como \textit{streaming} (Sección~\ref{section:evaluacion_e2e}), así como una muestra de los
+informes clínicos reales generados por el sistema a partir de estos textos
+(Sección~\ref{anexo:ejemplos_informes_generados}).
 
 \section{Caso 1}\label{anexo:texto_caso_1}
 
@@ -137,3 +139,121 @@ ojo izquierdo.
 Se decidió no tratar, pero seguir a la paciente con revisiones periódicas, cada tres meses, por
 nuestra parte. En dicho seguimiento, progresivamente ha aparecido una leve proptosis y la visión de
 la paciente ha disminuido a 0,9 en el ojo izquierdo.
+
+\section{Ejemplos de informes generados}\label{anexo:ejemplos_informes_generados}
+
+Esta sección reproduce, sin ninguna edición, tres informes clínicos reales generados por el
+\englishText{LLM} del sistema (\texttt{Informe.txt}) a partir de los textos de referencia
+anteriores, seleccionados por ilustrar directamente los patrones de error discutidos en la
+Sección~\ref{section:resultados_e2e}: la propagación de un error de transcripción hasta un mapeo
+terminológico incorrecto (\texttt{Test2}, \textit{batch}; Listado~\ref{lst:informe_test2_batch}),
+la alucinación de un diagnóstico y de un tratamiento farmacológico inexistente en el dictado
+original (\texttt{Test9}, \textit{batch}; Listado~\ref{lst:informe_test9_batch}), y un informe
+aceptado bajo el criterio del \englishText{LLM-as-judge}, sin errores graves
+(\texttt{Test7}, \textit{streaming}; Listado~\ref{lst:informe_test7_streaming}).
+
+\begin{lstlisting}[
+    caption={Informe clínico generado para \texttt{Test2} (\textit{batch}, Anexo~\ref{anexo:texto_caso_2}). El motor de normalización mapea la sigla mal transcrita ``CTG'' a ``Cardiotochogram reactivity'' y ``Positiva'' a ``Mantoux: positive'', dos conceptos SNOMED CT ajenos al caso.},
+    label={lst:informe_test2_batch},
+    basicstyle=\scriptsize\ttfamily,
+    breaklines=true,
+    frame=single,
+    numbers=none
+]
+**INFORME CLÍNICO**
+
+* **Motivo de Consulta / Enfermedad Actual:** Paciente varón de 29 años, con antecedentes de
+amilatisis en la infancia y operado a los 6 años. Presenta hábito intestinal normal, analítica
+normal con ligera elevación persistente en las transaminazas, y resultados positivos para DQ2
+y negativos para DQ8.
+* **Plan Diagnóstico y Terapéutico:**
+ + Medicamentos: No se mencionan medicamentos específicos.
+ + Exámenes solicitados: Biopsía duodenal (ya realizada).
+* **Impresión Diagnóstica:** Celiacia, en estudio.
+
+**ANEXO DE CODIFICACIÓN CLÍNICA (SNOMED CT)**
+
+| Entidad | Concept ID | Término Preferido |
+| --- | --- | --- |
+| Fumador | 77176002 | Smoker (en) |
+| Infancia | 255398004 | Childhood (en) |
+| DQ2 | 117164003 | HLA-DQ2 antigen (en) |
+| DQ8 | 260068001 | Human leukocyte antigen DQ8(3) (en) |
+| CTG | 251667000 | Cardiotochogram reactivity (en) |
+| Positiva | 268376005 | Mantoux: positive (en) |
+| Atrofia moderada | 771307003 | Charcot-Marie-Tooth disease type 2B5 (en) |
+| Vellosidades intestinales | 23230007 | Intestinal villus (en) |
+| Lámina | 88446008 | Laminar (en) |
+
+Nota: Se han excluido las entidades que no tienen concepto SNOMED coincidente o correspondencia CIE-10.
+\end{lstlisting}
+
+\begin{lstlisting}[
+    caption={Informe clínico generado para \texttt{Test9} (\textit{batch}, Anexo~\ref{anexo:texto_caso_9}). El LLM expande la sigla truncada ``DSDRC'' como ``Distrofia de Duchenne de Becker'', sustituyendo el diagnóstico real (síndrome de dolor regional complejo), y alucina un plan terapéutico con seis fármacos ausentes del dictado original.},
+    label={lst:informe_test9_batch},
+    basicstyle=\scriptsize\ttfamily,
+    breaklines=true,
+    frame=single,
+    numbers=none
+]
+**INFORME CLÍNICO**
+
+* **Motivo de Consulta / Enfermedad Actual:** DSDRC (Distrofia de Duchenne de Becker) en ambas
+extremidades inferiores sin traumatismo previo. La niña de 13 años ha sido tratada con remisión
+completa del cuadro con aplicación del parche de capsaicina al 8% y tratamiento farmacológico.
+* **Plan Diagnóstico y Terapéutico:** Se han prescrito los siguientes medicamentos:
+ + Enalapril
+ + Losartán (x2)
+ + Omeprazol (x2)
+ + Metformina
+ + Atorvastatina
+ + Capasaicina al 8% en parche
+
+**ANEXO DE CODIFICACIÓN CLÍNICA (SNOMED CT)**
+
+| Entidad | Concept ID | Término Preferido |
+| --- | --- | --- |
+| Traumatismo | 417746004 | Traumatic injury |
+| Capsaicina | 400416009 | Capsaicin-containing product |
+
+Nota: Se han eliminado los códigos de medicamentos duplicados y solo se ha incluido el término
+preferido para cada entidad.
+\end{lstlisting}
+
+\begin{lstlisting}[
+    caption={Informe clínico generado para \texttt{Test7} (\textit{streaming}, Anexo~\ref{anexo:texto_caso_7}), uno de los tres informes aceptados en esta modalidad bajo el criterio del LLM-as-judge (Sección~\ref{section:resultados_e2e}).},
+    label={lst:informe_test7_streaming},
+    basicstyle=\scriptsize\ttfamily,
+    breaklines=true,
+    frame=single,
+    numbers=none
+]
+La información proporcionada parece ser un informe de caso médico que describe el tratamiento y
+evolución de una paciente con un tumoración polipoide en la uretra anterior. A continuación, se
+resumen los puntos clave del informe:
+
+1. **Antecedentes**: La paciente presentó síntomas de disuria (dolor al orinar) y uretrorragia
+(sangrado de la uretra).
+2. **Exploración**: Se realizó un estudio endoscópico bajo anestesia, que detectó una tumoración
+polipoide en la uretra anterior.
+3. **Diagnóstico**: El diagnóstico fue un papiloma invertido en la uretra anterior.
+4. **Tratamiento**: La paciente se sometió a una resección endoscópica de la tumoración.
+5. **Resultados**: El resultado anatomopatológico de la pieza quirúrgica fue un papiloma
+invertido, y la paciente evolucionó satisfactoriamente con desaparición de los síntomas.
+
+Las entidades identificadas en el informe son:
+
+1. **Dysuria** (disuria): dolor al orinar.
+2. **Uretrorragia**: sangrado de la uretra.
+3. **Papiloma invertido**: un tipo de tumor que puede ocurrir en la uretra.
+4. **Resección endoscópica**: una técnica quirúrgica utilizada para eliminar el tumor.
+5. **Anestesia**: medicamento utilizado para aliviar el dolor durante el procedimiento.
+
+En cuanto a las correspondencias con CIE-10 (Clasificación Internacional de Enfermedades, 10na
+revisión), se observa que algunas de las entidades identificadas no tienen una correspondencia
+directa en la clasificación. Esto puede deberse a diferentes nombres o descripciones utilizados
+en el informe en comparación con la clasificación CIE-10.
+
+Es importante destacar que la información proporcionada es un resumen del informe y puede no ser
+exhaustiva ni precisa al 100%.
+\end{lstlisting}
