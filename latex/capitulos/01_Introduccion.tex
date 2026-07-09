@@ -2,7 +2,7 @@
 
 Este trabajo fin de máster propone el diseño, desarrollo y evaluación de un sistema
 que transforma dictados médicos en informes clínicos completos y normalizados utilizando 
-Modelos de Lenguaje de Gran Escala (\englishText{LLMs}). Si bien los \englishText{LLMs} tienen 
+Modelos de Lenguaje de Gran Escala (\englishText{LLMs, Large Language Models}). Si bien los \englishText{LLMs} tienen 
 un gran potencial para automatizar y estructurar esta información, su integración 
 clínica propone tres retos fundamentales: la protección de la privacidad bajo marcos
 legales estrictos, la eliminación de alucinaciones para garantizar la integridad de la información
@@ -19,7 +19,8 @@ interoperabilidad. Para ello, se propone un sistema que integra las siguientes e
 
 
 \boldparagraph{Procesamiento y normalización clínica}{
-    Identificación de conceptos médicos y su vinculación con terminologías estándar internacionales (\englishText{SNOMED CT, CIE-10-ES}) para garantizar un lenguaje común.
+    Identificación de conceptos médicos y su vinculación con terminologías estándar internacionales 
+    (\englishText{SNOMED CT, CIE-10-ES})\citeText{snomed2026} \citeText{sanidad2026} para garantizar un lenguaje común.
 }
 
 \boldparagraph{Generación de informe con \englishText{LLMs}}{
@@ -29,7 +30,8 @@ interoperabilidad. Para ello, se propone un sistema que integra las siguientes e
 
 \boldparagraph{Salida estructurada (\englishText{JSON}/\englishText{FHIR})}{
     Transforma el informe final y las entidades codificadas en formatos de datos 
-    legibles por máquinas. Se prioriza el estándar \englishText{HL7 FHIR} (\englishText{Fast Healthcare Interoperability Resources}) para 
+    legibles por máquinas. Se prioriza el estándar \englishText{HL7 FHIR} \cite{sanidad2023}
+    (\englishText{Fast Healthcare Interoperability Resources}) para 
     facilitar la integración directa con sistemas de Historia Clínica Electrónica 
     (\englishText{HCE}) y asegurar el intercambio de información entre diferentes 
     niveles asistenciales.

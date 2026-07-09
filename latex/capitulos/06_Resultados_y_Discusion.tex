@@ -8,7 +8,7 @@ definidos en la Sección~\ref{section:objetivos-especificos}.
 
 \subsection{Transcripción \englishText{ASR}}\label{subsection:resultados_asr}
 
-La Tabla~\ref{tab:asr_scores_detalle} recoge, para cada uno de los 10 casos y ambas modalidades, el
+La Tabla~\ref{tab:asr_scores_detalle} recoge, para cada uno de los 10 casos (Anexo~\ref{anexo:textos_evaluacion}) y ambas modalidades, el
 porcentaje de palabras correctas obtenido frente al \textit{gold standard} y la puntuación que se
 deriva de él según la escala de la Tabla~\ref{tab:asr_escala} (Sección~\ref{subsection:evaluacion_asr}).
 
@@ -136,12 +136,12 @@ y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}
     el \englishText{ASR} obtiene una puntuación algo superior en \textit{streaming} que en
     \textit{batch} (4.0 frente a 3.75), en línea con los resultados de la evaluación por módulos de
     la Sección~\ref{subsection:resultados_asr}. El caso de \textit{batch} con mayor penalización es
-    \texttt{Test2} (puntuación 2, por la confusión \textit{``TTG''}~$\rightarrow$~\textit{``CTG''},
+    \texttt{Test2} (Anexo~\ref{anexo:texto_caso_2}; puntuación 2, por la confusión \textit{``TTG''}~$\rightarrow$~\textit{``CTG''},
     que induce aguas abajo un mapeo terminológico erróneo a \textit{Mantoux positive}). En el resto
     de casos de ambas modalidades, los errores residuales se concentran casi exclusivamente en
     siglas y epónimos clínicos cortos (\texttt{TTG}, \texttt{DLE}, \texttt{FII},
     \texttt{Billroth~II}, \texttt{AOC}/\texttt{DG}, \texttt{SDRC}~$\rightarrow$~\texttt{DSDRC} en
-    \texttt{Test9}), que se transcriben mal de forma persistente y rara vez se recuperan en las
+    \texttt{Test9} (Anexo~\ref{anexo:texto_caso_9})), que se transcriben mal de forma persistente y rara vez se recuperan en las
     etapas posteriores del \textit{pipeline}, mientras que los errores ortográficos menores sobre
     vocabulario común (p.\ ej.\ \textit{``eficiencia''} por \textit{``eficacia''}) se diluyen sin
     impacto clínico.
@@ -152,10 +152,12 @@ y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}
     \textit{streaming}. El procesamiento incremental favorece ligeramente la detección de entidades frente al
     bloque único del \textit{batch}. A pesar de ello, ambas modalidades comparten dos patrones de error:
     la pérdida de partículas de negación (p.\ ej., \textit{``no fumador''} detectado como \textit{``fumador''};
-    \textit{``sin complicaciones...''} interpretado como hallazgo positivo en \textit{streaming}~\texttt{Test4},
-    o \textit{``sin nevos''} invertido en \textit{streaming}~\texttt{Test5}) y la omisión de siglas o diagnósticos
-    clave (\texttt{AOC}/\texttt{DG} en \texttt{Test5}, proptosis en \texttt{batch}~\texttt{Test10} o disuria en
-    \texttt{batch}~\texttt{Test7}). La ventaja del \textit{streaming} radica en que el enfoque incremental
+    \textit{``sin complicaciones...''} interpretado como hallazgo positivo en \textit{streaming}~\texttt{Test4}
+    (Anexo~\ref{anexo:texto_caso_4}),
+    o \textit{``sin nevos''} invertido en \textit{streaming}~\texttt{Test5} (Anexo~\ref{anexo:texto_caso_5})) y la omisión de siglas o diagnósticos
+    clave (\texttt{AOC}/\texttt{DG} en \texttt{Test5}, proptosis en \texttt{batch}~\texttt{Test10}
+    (Anexo~\ref{anexo:texto_caso_10}) o disuria en
+    \texttt{batch}~\texttt{Test7} (Anexo~\ref{anexo:texto_caso_7})). La ventaja del \textit{streaming} radica en que el enfoque incremental
     no satura la ventana de contexto del modelo, optimizando su capacidad de extracción.
 }
 
@@ -179,9 +181,11 @@ y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}
     definido en la Sección~\ref{subsection:metodologia_e2e} del objetivo 
     específico~3 en la Sección~\ref{section:objetivos-especificos} (veredicto \texttt{Sí}/\texttt{No} del \englishText{LLM-as-judge} sobre la ausencia
     de errores graves de diagnóstico, dosis, lateralidad, antecedentes o inversión de hechos
-    clínicos), se obtienen 2 informes aceptables de 10 en \textit{batch} (20\,\%: \texttt{Test7} y
-    \texttt{Test10}, ambos sin alucinaciones ni inversiones y con una impresión diagnóstica correcta)
-    y 3 de 10 en \textit{streaming} (30\,\%: \texttt{Test2}, \texttt{Test4} y \texttt{Test7}), por lo
+    clínicos), se obtienen 2 informes aceptables de 10 en \textit{batch} (20\,\%: \texttt{Test7}
+    (Anexo~\ref{anexo:texto_caso_7}) y
+    \texttt{Test10} (Anexo~\ref{anexo:texto_caso_10}), ambos sin alucinaciones ni inversiones y con una impresión diagnóstica correcta)
+    y 3 de 10 en \textit{streaming} (30\,\%: \texttt{Test2} (Anexo~\ref{anexo:texto_caso_2}), \texttt{Test4}
+    (Anexo~\ref{anexo:texto_caso_4}) y \texttt{Test7} (Anexo~\ref{anexo:texto_caso_7})), por lo
     que el objetivo no se considera cumplido en ninguna de las dos modalidades. El análisis detallado
     revela que el rendimiento se ve afectado por dos dinámicas de fallo diferenciadas:
 
@@ -190,7 +194,7 @@ y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}
         escribir \textit{``No hay información suficiente para formular un diagnóstico'' o similar} ante diagnósticos ambiguos. Esto ocurre en 5 de los
         20 casos evaluados debido, principalmente, a que el módulo \englishText{NER} aguas arriba le transfiere
         entidades incompletas o truncadas (p.\ ej., \textit{``hernia''} en vez de \textit{``hernia discal''}).
-        No obstante, en un caso aislado (\textit{streaming}~\texttt{Test1}) se evidenció una limitación de
+        No obstante, en un caso aislado (\textit{streaming}~\texttt{Test1} (Anexo~\ref{anexo:texto_caso_1})) se evidenció una limitación de
         abstracción propia del LLM, que no logró trasladar el diagnóstico correcto al campo final a pesar de
         conocerlo.
 
@@ -226,7 +230,8 @@ y~\ref{tab:e2e_detalle_streaming} del Anexo~\ref{anexo:resultados_e2e_completos}
     ejecutar de forma independiente, para cada uno de los fragmentos de audio de la sesión, las etapas
     de \englishText{NER} y de traducción \englishText{CIE-10-ES} (\englishText{ConceptMap \$translate}),
     que en modo \textit{streaming} consumen más del 80\,\% del tiempo total en los casos de mayor
-    tamaño (\texttt{Test6} y \texttt{Test10}, con 412.8\,s y 378.2\,s respectivamente, frente a una
+    tamaño (\texttt{Test6} (Anexo~\ref{anexo:texto_caso_6}) y \texttt{Test10}
+    (Anexo~\ref{anexo:texto_caso_10}), con 412.8\,s y 378.2\,s respectivamente, frente a una
     etapa dominada por el \englishText{ASR} en un 70--85\,\% del tiempo en modo \textit{batch}). El
     modo \textit{batch}, al concentrar todo el audio en una sola invocación, evita esta repetición de
     llamadas y resulta sustancialmente más eficiente en tiempo total, a costa de no ofrecer
@@ -266,11 +271,11 @@ salida de la etapa anterior, de modo que los errores no se mantienen acotados
 a su módulo de origen, sino que se propagan y se amplifican aguas abajo en lugar de corregirse o
 diluirse. Esta cadena de propagación ya se observa repetidamente en los casos
 analizados a lo largo de este capítulo: la confusión fonética \texttt{TTG}~$\rightarrow$~\texttt{CTG}
-del \englishText{ASR} en \texttt{Test2} (\textit{batch}) --- un único error, irrelevante para el
+del \englishText{ASR} en \texttt{Test2} (\textit{batch}; Anexo~\ref{anexo:texto_caso_2}) --- un único error, irrelevante para el
 \englishText{WER} agregado del caso --- conduce a que \englishText{NER} extraiga la sigla mal
 transcrita y a que el motor de normalización la mapee a \textit{Mantoux positive}, un concepto
 \englishText{SNOMED CT} clínicamente erróneo; de forma análoga, la pérdida de la sigla
-\texttt{SDRC}~$\rightarrow$~\texttt{DSDRC} en \texttt{Test9} se traslada sin corrección hasta el
+\texttt{SDRC}~$\rightarrow$~\texttt{DSDRC} en \texttt{Test9} (Anexo~\ref{anexo:texto_caso_9}) se traslada sin corrección hasta el
 informe \englishText{LLM}, que la expande como ``Distrofia de Duchenne de Becker'', sustituyendo el
 diagnóstico real (un síndrome de dolor regional complejo) por uno completamente distinto; y la
 sobre-segmentación del \englishText{NER} al truncar \texttt{hernia discal} en solo \texttt{hernia}

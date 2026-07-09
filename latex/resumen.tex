@@ -12,24 +12,29 @@ siguientes etapas:
     \item \textbf{Captura segura de audio:} 
         Implementación de una arquitectura cliente-servidor con cifrado de extremo a extremo
         para garantizar la integridad de los datos.
-    \item \textbf{Reconocimiento automático del habla (\englishText{ASR}):} 
+    \item \textbf{Reconocimiento automático del habla (\englishText{ASR}, Automatic Speech Recognition):} 
         Transcripción del audio mediante modelos de inteligencia artificial
         adaptados al léxico médico.
-    \item \textbf{Extracción y normalización de entidades clínicas:} 
-        Identificación, categorización y normalización de conceptos clínicos bajo estándares 
-        internacionales como \englishText{SNOMED CT} y \englishText{CIE-10-ES}.
-    \item \textbf{Generación de informes mediante \englishText{LLMs}:}
+    \item \textbf{Extracción y normalización de entidades clínicas:}
+        Identificación, categorización y normalización de conceptos clínicos bajo estándares
+        internacionales como \englishText{SNOMED CT} (\englishText{Systematized Nomenclature of Medicine -- Clinical Terms})
+        y la \englishText{CIE-10-ES} (Clasificación Internacional de Enfermedades, 10.\textsuperscript{a} revisión,
+        modificación clínica española).
+    \item \textbf{Generación de informes mediante \englishText{LLMs} (Large Language Models):}
         Síntesis de información utilizando modelos de lenguaje de gran escala a partir de un
         contexto verificado de entidades clínicas previamente normalizadas, con el fin de
         reducir el riesgo de invención de información ausente en el dictado original.
-    \item \textbf{Salida estructurada e interoperable:} 
-        Exportación de resultados en formatos estándares (\englishText{JSON}/\englishText{FHIR}) 
+    \item \textbf{Salida estructurada e interoperable:}
+        Exportación de resultados en formatos estándares (\englishText{JSON}/\englishText{FHIR},
+        \englishText{Fast Healthcare Interoperability Resources})
         para su integración directa en sistemas de Historia Clínica Electrónica (\englishText{HCE}) y
         generación de informes clínicos.
 \end{enumerate}
 
-El proyecto se fundamenta en los principios de privacidad desde el diseño, 
-asegurando el cumplimiento riguroso de los marcos legales vigentes (\englishText{RGPD} y \englishText{LOPDGDD}). 
-La viabilidad de la propuesta se valida a través de una evaluación cuantitativa basada en métricas de precisión técnica 
-(\englishText{WER} para la transcripción y puntuación F$_{1}$ para la extracción de entidades), 
+El proyecto se fundamenta en los principios de privacidad desde el diseño,
+asegurando el cumplimiento riguroso de los marcos legales vigentes (\englishText{RGPD}, Reglamento General de
+Protección de Datos, y \englishText{LOPDGDD}, Ley Orgánica de Protección de Datos Personales y garantía de los
+derechos digitales).
+La viabilidad de la propuesta se valida a través de una evaluación cuantitativa basada en métricas de precisión técnica
+(\englishText{WER}, \englishText{Word Error Rate}, para la transcripción y puntuación F$_{1}$ para la extracción de entidades),
 así como indicadores de eficiencia temporal y relevancia clínica.
