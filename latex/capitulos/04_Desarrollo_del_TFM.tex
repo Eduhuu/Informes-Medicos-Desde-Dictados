@@ -193,6 +193,14 @@ ficheros pendientes de envío (Figura~\ref{fig:wireframes_app}b).
 
 \input{imagenes/diagramas/desarrollo_del_tfm/wireframes_app.tex}
 
+La Figura~\ref{fig:capturas_app} muestra estos mismos flujos ya implementados y en ejecución sobre
+la aplicación real: el modo \textit{Micrófono} en su estado inicial de espera
+(Figura~\ref{fig:capturas_app}a) y durante la captura y envío de audio, con el indicador de
+conexión activo (Figura~\ref{fig:capturas_app}b); y el modo \textit{Archivo} en su estado inicial,
+previo a la selección de un fichero \englishText{WAV} (Figura~\ref{fig:capturas_app}c).
+
+\input{imagenes/diagramas/desarrollo_del_tfm/capturas_app.tex}
+
 \boldparagraph{Entradas}{
     señal de audio del micrófono del dispositivo o ficheros de audio pregrabados en formato PCM/WAV.
     En el modo \textit{Archivo}, la aplicación valida que el fichero seleccionado cumpla el mismo
@@ -522,3 +530,8 @@ diferenciados:
     \item \textbf{\texttt{Fhir\_Reporte.json}} --- \englishText{Bundle FHIR} R4B generado de forma
     independiente del informe \englishText{LLM}, a partir de las entidades deduplicadas de la sesión.
 \end{itemize}
+
+El Listado~\ref{lst:informe_test7_streaming} del Anexo~\ref{anexo:ejemplos_informes_generados}
+reproduce, a modo de ejemplo, el \texttt{Informe.txt} real generado para uno de los casos de
+evaluación (\texttt{Test7}, \textit{streaming}; Anexo~\ref{anexo:texto_caso_7}). Ese mismo anexo
+recoge además ejemplos de casos con errores de propagación y alucinaciones del \englishText{LLM}.

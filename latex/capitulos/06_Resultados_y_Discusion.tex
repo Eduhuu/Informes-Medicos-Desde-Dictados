@@ -274,10 +274,13 @@ analizados a lo largo de este capítulo: la confusión fonética \texttt{TTG}~$\
 del \englishText{ASR} en \texttt{Test2} (\textit{batch}; Anexo~\ref{anexo:texto_caso_2}) --- un único error, irrelevante para el
 \englishText{WER} agregado del caso --- conduce a que \englishText{NER} extraiga la sigla mal
 transcrita y a que el motor de normalización la mapee a \textit{Mantoux positive}, un concepto
-\englishText{SNOMED CT} clínicamente erróneo; de forma análoga, la pérdida de la sigla
+\englishText{SNOMED CT} clínicamente erróneo (informe completo en el
+Listado~\ref{lst:informe_test2_batch} del Anexo~\ref{anexo:ejemplos_informes_generados}); de forma
+análoga, la pérdida de la sigla
 \texttt{SDRC}~$\rightarrow$~\texttt{DSDRC} en \texttt{Test9} (Anexo~\ref{anexo:texto_caso_9}) se traslada sin corrección hasta el
 informe \englishText{LLM}, que la expande como ``Distrofia de Duchenne de Becker'', sustituyendo el
-diagnóstico real (un síndrome de dolor regional complejo) por uno completamente distinto; y la
+diagnóstico real (un síndrome de dolor regional complejo) por uno completamente distinto, y
+alucinando además un plan terapéutico de seis fármacos ausentes del dictado original (Listado~\ref{lst:informe_test9_batch}); y la
 sobre-segmentación del \englishText{NER} al truncar \texttt{hernia discal} en solo \texttt{hernia}
 (Sección~\ref{subsection:resultados_pln}) hace que la normalización terminológica y, finalmente, la
 impresión diagnóstica del informe pierdan la localización exacta de la lesión. En los tres casos, el
