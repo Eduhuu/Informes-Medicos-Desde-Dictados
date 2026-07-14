@@ -1,0 +1,63 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 2 — MOTIVACIÓN (fondo claro)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+  
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+  
+    \node[anchor=north west, align=left] (title)
+      at ([xshift=1.4cm, yshift=-0.75cm]current page.north west)
+      {\kicker[accentBlue]{01 \,$\cdot$\, Motivación}};
+
+    \node[anchor=north west, align=left, text width=11.3cm] (t1)
+      at ([xshift=1.4cm, yshift=-1.45cm]current page.north west)
+      {\Large\bfseries\sffamily\color{inkText}%
+       La documentación clínica consume el tiempo que debería dedicarse al paciente};
+  
+    % --- Caja oscura izquierda: estadística gigante ---
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=5.4cm, minimum height=4.6cm, align=left,
+          inner sep=0pt]
+      (statbox) at ([xshift=1.4cm, yshift=-2.90cm]current page.north west) {};
+
+    \node[anchor=north west, align=left, text width=4.6cm]
+      at ([xshift=0.4cm, yshift=-0.35cm]statbox.north west)
+      {\fontsize{28}{28}\selectfont\bfseries\sffamily\color{accentTeal}25--40\%};
+
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1.35cm]statbox.north west)
+      {\parbox[t]{4.6cm}{\raggedright\small\bfseries\sffamily\color{white}%
+       del tiempo clínico se destina a redactar informes}};
+
+    \node[anchor=south west]
+      at ([xshift=0.4cm, yshift=1cm]statbox.south west)
+      {\parbox[b]{4.6cm}{\raggedright\scriptsize\sffamily\color{mutedText}%
+       Contribuye al agotamiento profesional y reduce la atención directa}};
+
+    % --- Columna derecha: 3 párrafos ---
+    \node[anchor=north west] (content1)
+      at ([xshift=7.2cm, yshift=-2.85cm]current page.north west)
+      {\parbox[t]{8.3cm}{\raggedright\normalsize\bfseries\sffamily\color{inkText}
+        El dictado de voz es habitual\\[1pt]
+        \footnotesize\normalfont\color{mutedText}
+        Ampliamente adoptado en la práctica clínica diaria
+       }};
+
+    \node[anchor=north west] (content2)
+      at ([yshift=0cm]content1.south west)
+      {\parbox[t]{8.3cm}{\raggedright\normalsize\bfseries\sffamily\color{inkText}
+        Pero depende de transcripción manual y edición posterior\\[1pt]
+        \footnotesize\normalfont\color{mutedText}%
+        Un proceso lento, propenso a errores y que retrasa el informe final
+      }};
+
+    \node[anchor=north west] (content3)
+      at ([yshift=0cm]content2.south west)
+      {\parbox[t]{8.3cm}{\raggedright\normalsize\bfseries\sffamily\color{inkText}Este flujo es ineficiente y no genera datos estructurados\\[1pt]
+       \footnotesize\normalfont\color{mutedText}%
+       El texto libre resultante no es interoperable ni reutilizable}};
+  
+  \end{tikzpicture}
+  \end{frame}

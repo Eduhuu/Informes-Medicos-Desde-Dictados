@@ -1,0 +1,47 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 1 — PORTADA (fondo oscuro)
+% ============================================================
+\begin{frame}[plain]
+    \begin{tikzpicture}[remember picture, overlay]
+    
+      \fill[inkDark] (current page.south west) rectangle (current page.north east);
+    
+      \fill[accentTeal] ([xshift=0cm]current page.north west) rectangle
+            ([yshift=-0.15cm]current page.north east);
+    
+      \node[anchor=north west, align=left, text width=13.2cm]
+        at ([xshift=1.4cm, yshift=-1.6cm]current page.north west)
+        {\footnotesize\bfseries\sffamily\color{accentTeal}%
+         TRABAJO FIN DE MÁSTER \,$\cdot$\, MÁSTER EN DESARROLLO DE SOFTWARE};
+    
+      \node[anchor=north west]
+        at ([xshift=1.4cm, yshift=-2.4cm]current page.north west)
+        {\parbox[t]{13.2cm}{\raggedright\Huge\bfseries\sffamily\color{white}%
+         Generación automáticaa de informes clínicos a partir de dictados médicos}};
+    
+      \draw[lineGrey, opacity=0.25, line width=0.5pt]
+        ([xshift=1.4cm, yshift=1.9cm]current page.south west) --
+        ([xshift=-1.4cm, yshift=1.9cm]current page.south east);
+    
+      \node[anchor=south west, align=left]
+        at ([xshift=1.4cm, yshift=2.3cm]current page.south west)
+        {\begin{minipage}{7cm}
+           {\footnotesize\sffamily\color{mutedText}\MakeUppercase{Autor}}\\[2pt]
+           {\large\sffamily\color{white}Eduardo Enrique Suárez Castro}
+         \end{minipage}};
+    
+      \node[anchor=south west, align=left]
+        at ([xshift=8.6cm, yshift=2.3cm]current page.south west)
+        {\begin{minipage}{6.5cm}
+           {\footnotesize\sffamily\color{mutedText}\MakeUppercase{Director}}\\[2pt]
+           {\large\sffamily\color{white}Francisco Javier Melero Rus}
+         \end{minipage}};
+    
+      \node[anchor=south west, align=left]
+        at ([xshift=1.4cm, yshift=0.9cm]current page.south west)
+        {\footnotesize\sffamily\color{mutedText}%
+         Escuela Internacional de Posgrado \,$\cdot$\, Universidad de Granada \,$\cdot$\, Julio 2026};
+    
+    \end{tikzpicture}
+    \end{frame}

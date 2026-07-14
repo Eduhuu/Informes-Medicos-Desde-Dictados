@@ -1,0 +1,111 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 6 — ARQUITECTURA (fondo claro)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{05 \,$\cdot$\, Arquitectura}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\large\bfseries\sffamily\color{inkText}Modelo cliente--\textit{gateway}--servicio en tres capas desacopladas};
+
+    % ------------------------------------------------------
+    % Columna izquierda: 3 cajas explicativas
+    % ------------------------------------------------------
+    \def\archW{5.5cm}
+    \def\archH{2.05cm}
+    \def\archGap{0.2cm}
+    \def\archTextW{4.9cm}
+    \def\archY{-2.1cm}
+
+    % Caja 1 — Capa cliente
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\archW, minimum height=\archH,
+          inner sep=0pt]
+      (a1) at ([xshift=1.4cm, yshift=\archY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (a1.north west) rectangle ([xshift=0.12cm]a1.south west);
+    \node[anchor=north west, text width=\archTextW, align=left]
+      at ([xshift=0.4cm, yshift=-0.26cm]a1.north west)
+      {\small\bfseries\sffamily\color{inkText}Capa cliente};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.65cm]a1.north west)
+      {\parbox[t]{\archTextW}{\raggedright\fontsize{7.5}{8.6}\selectfont\sffamily\color{mutedText}%
+       App móvil captura audio PCM (16\,kHz, mono) y lo transmite por \textit{WebSocket}}};
+
+    % Caja 2 — Capa de acceso
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\archW, minimum height=\archH,
+          inner sep=0pt]
+      (a2) at ([xshift=1.4cm, yshift=\archY-\archH-\archGap]current page.north west) {};
+    \fill[accentBlue, rounded corners=2pt]
+      (a2.north west) rectangle ([xshift=0.12cm]a2.south west);
+    \node[anchor=north west, text width=\archTextW, align=left]
+      at ([xshift=0.4cm, yshift=-0.26cm]a2.north west)
+      {\small\bfseries\sffamily\color{inkText}Capa de acceso};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.65cm]a2.north west)
+      {\parbox[t]{\archTextW}{\raggedright\fontsize{7.5}{8.6}\selectfont\sffamily\color{mutedText}%
+       El \textit{gateway} traduce \textit{WebSocket} a peticiones HTTP y acumula el estado de la sesión}};
+
+    % Caja 3 — Capa de procesamiento
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\archW, minimum height=\archH,
+          inner sep=0pt]
+      (a3) at ([xshift=1.4cm, yshift=\archY-2*\archH-2*\archGap]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (a3.north west) rectangle ([xshift=0.12cm]a3.south west);
+    \node[anchor=north west, text width=\archTextW, align=left]
+      at ([xshift=0.4cm, yshift=-0.26cm]a3.north west)
+      {\small\bfseries\sffamily\color{inkText}Capa de procesamiento};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.65cm]a3.north west)
+      {\parbox[t]{\archTextW}{\raggedright\fontsize{7.5}{8.6}\selectfont\sffamily\color{mutedText}%
+       Servicio \textit{FastAPI} ejecuta \textit{ASR}, \textit{PLN}, normalización y generación de informes}};
+
+    % ------------------------------------------------------
+    % Columna derecha: diagrama cliente-gateway-servicio
+    % ------------------------------------------------------
+    \def\diagW{5.6cm}
+    \def\diagH{1.55cm}
+    \def\diagGap{0.75cm}
+    \def\diagX{8.3cm}
+
+    % Bloque Cliente
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\diagW, minimum height=\diagH, align=center, inner sep=4pt]
+      (dc) at ([xshift=\diagX, yshift=-2.15cm]current page.north west)
+      {\small\bfseries\sffamily\color{white}Cliente\\[2pt]
+       \fontsize{7}{8}\selectfont\normalfont\color{mutedText}App móvil \,$\cdot$\, React Native};
+
+    % Bloque Gateway
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\diagW, minimum height=\diagH, align=center, inner sep=4pt]
+      (dg) at ([xshift=\diagX, yshift=-2.15cm-\diagGap-\diagH]current page.north west)
+      {\small\bfseries\sffamily\color{white}Gateway\\[2pt]
+       \fontsize{7}{8}\selectfont\normalfont\color{mutedText}Node.js \,$\cdot$\, WebSocket $\to$ REST};
+
+    % Bloque Servicio
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\diagW, minimum height=\diagH, align=center, inner sep=4pt]
+      (ds) at ([xshift=\diagX, yshift=-2.15cm-2*\diagGap-2*\diagH]current page.north west)
+      {\small\bfseries\sffamily\color{accentTeal}Servicio\\[2pt]
+       \fontsize{7}{8}\selectfont\normalfont\color{mutedText}FastAPI \,$\cdot$\, ASR + PLN + FHIR};
+
+    % Flechas y etiquetas de protocolo
+    \draw[->, accentTeal, line width=1.1pt] (dc.south) -- (dg.north)
+      node[midway, right, xshift=0.15cm]
+      {\fontsize{6.5}{7}\selectfont\sffamily\color{mutedText}\textit{WebSocket}};
+
+    \draw[->, accentTeal, line width=1.1pt] (dg.south) -- (ds.north)
+      node[midway, right, xshift=0.15cm]
+      {\fontsize{6.5}{7}\selectfont\sffamily\color{mutedText}HTTP REST};
+
+  \end{tikzpicture}
+  \end{frame}

@@ -1,0 +1,157 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 4 — PIPELINE CONCEPTUAL (fondo claro)
+% Diagrama de 5 etapas, inspirado en imagenes/diagramas/
+% capitulo_marco_teorico/Diagrama App.tex del documento TFM
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{03 \,$\cdot$\, Pipeline conceptual}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\Large\bfseries\sffamily\color{inkText}Del dictado al informe estructurado en cinco etapas};
+
+    % --- 5 tarjetas claras en fila, con icono + título + descripción ---
+    \def\pipeW{2.45cm}
+    \def\pipeStep{2.6875cm}
+    \def\pipeH{4.0cm}
+    \def\pipeTextW{2.05cm}
+    \def\pipeY{-2.3cm}
+
+    % ---------- Tarjeta 1 — Captura ----------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\pipeW, minimum height=\pipeH, inner sep=0pt]
+      (p1) at ([xshift=1.4cm, yshift=\pipeY]current page.north west) {};
+    \node[anchor=center, circle, fill=accentTeal, minimum size=14pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]p1.north west) {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{inkDark}1};
+    \begin{scope}[shift={($(p1.north)+(0,-0.95cm)$)}, scale=0.55]
+      \draw[thick, inkText, rounded corners=3pt] (-0.35,-0.6) rectangle (0.35,0.7);
+      \draw[fill=inkText, draw=none] (0,-0.45) circle (1.5pt);
+      \draw[thick, inkText] (-0.15,0.45) -- (0.15,0.45);
+    \end{scope}
+    \node[anchor=north, text width=\pipeTextW, align=center]
+      at ([yshift=-1.55cm]p1.north)
+      {\footnotesize\bfseries\sffamily\color{inkText}Captura};
+    \node[anchor=north]
+      at ([yshift=-1.95cm]p1.north)
+      {\parbox[t]{\pipeTextW}{\centering\fontsize{7}{7.6}\selectfont\sffamily\color{mutedText}%
+       Audio \textit{PCM} por \textit{WebSocket} seguro}};
+
+    % ---------- Tarjeta 2 — Orquestación ----------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\pipeW, minimum height=\pipeH, inner sep=0pt]
+      (p2) at ([xshift=1.4cm+\pipeStep, yshift=\pipeY]current page.north west) {};
+    \node[anchor=center, circle, fill=accentTeal, minimum size=14pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]p2.north west) {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{inkDark}2};
+    \begin{scope}[shift={($(p2.north)+(0,-0.95cm)$)}, scale=0.55]
+      \draw[thick, inkText, rounded corners=2pt] (-0.5,-0.5) rectangle (0.5,0.5);
+      \draw[thick, inkText] (-0.5,0.15) -- (0.5,0.15);
+      \draw[thick, inkText] (-0.5,-0.25) -- (0.5,-0.25);
+      \draw[fill=inkText, draw=none] (-0.2,-0.05) circle (1.5pt);
+      \draw[fill=inkText, draw=none] (0.2,-0.05) circle (1.5pt);
+    \end{scope}
+    \node[anchor=north, text width=\pipeTextW, align=center]
+      at ([yshift=-1.55cm]p2.north)
+      {\footnotesize\bfseries\sffamily\color{inkText}Orquestación};
+    \node[anchor=north]
+      at ([yshift=-1.95cm]p2.north)
+      {\parbox[t]{\pipeTextW}{\centering\fontsize{7}{7.6}\selectfont\sffamily\color{mutedText}%
+       El \textit{gateway} controla el estado de la sesión}};
+
+    % ---------- Tarjeta 3 — IA ----------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\pipeW, minimum height=\pipeH, inner sep=0pt]
+      (p3) at ([xshift=1.4cm+2*\pipeStep, yshift=\pipeY]current page.north west) {};
+    \node[anchor=center, circle, fill=accentTeal, minimum size=14pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]p3.north west) {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{inkDark}3};
+    \begin{scope}[shift={($(p3.north)+(0,-0.95cm)$)}, scale=0.55]
+      \draw[thick, inkText] (0,0) circle (0.3cm);
+      \foreach \a in {0,60,120,180,240,300} {
+        \draw[thick, inkText] (\a:0.3cm) -- (\a:0.45cm);
+      }
+    \end{scope}
+    \node[anchor=north, text width=\pipeTextW, align=center]
+      at ([yshift=-1.55cm]p3.north)
+      {\footnotesize\bfseries\sffamily\color{inkText}IA};
+    \node[anchor=north]
+      at ([yshift=-1.95cm]p3.north)
+      {\parbox[t]{\pipeTextW}{\centering\fontsize{7}{7.6}\selectfont\sffamily\color{mutedText}%
+       \textit{ASR} y extracción de entidades clínicas}};
+
+    % ---------- Tarjeta 4 — Normalización ----------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\pipeW, minimum height=\pipeH, inner sep=0pt]
+      (p4) at ([xshift=1.4cm+3*\pipeStep, yshift=\pipeY]current page.north west) {};
+    \node[anchor=center, circle, fill=accentTeal, minimum size=14pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]p4.north west) {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{inkDark}4};
+    \begin{scope}[shift={($(p4.north)+(0,-0.95cm)$)}, scale=0.55]
+      \draw[thick, inkText] (0,0.35) ellipse (0.38 and 0.11);
+      \draw[thick, inkText] (-0.38,0.35) -- (-0.38,-0.28);
+      \draw[thick, inkText] (0.38,0.35) -- (0.38,-0.28);
+      \draw[thick, inkText] (0,-0.28) ellipse (0.38 and 0.11);
+      \draw[thick, inkText] (-0.38,0.08) arc (180:360:0.38 and 0.11);
+      \draw[thick, inkText] (-0.38,-0.1) arc (180:360:0.38 and 0.11);
+    \end{scope}
+    \node[anchor=north, text width=\pipeTextW, align=center]
+      at ([yshift=-1.55cm]p4.north)
+      {\footnotesize\bfseries\sffamily\color{inkText}Normalización};
+    \node[anchor=north]
+      at ([yshift=-1.95cm]p4.north)
+      {\parbox[t]{\pipeTextW}{\centering\fontsize{7}{7.6}\selectfont\sffamily\color{mutedText}%
+       \textit{SNOMED CT} y \textit{CIE-10-ES}}};
+
+    % ---------- Tarjeta 5 — Informes ----------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=\pipeW, minimum height=\pipeH, inner sep=0pt]
+      (p5) at ([xshift=1.4cm+4*\pipeStep, yshift=\pipeY]current page.north west) {};
+    \node[anchor=center, circle, fill=accentTeal, minimum size=14pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]p5.north west) {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{inkDark}5};
+    \begin{scope}[shift={($(p5.north)+(0,-0.95cm)$)}, scale=0.55]
+      \draw[thick, inkText] (-0.4,-0.5) rectangle (0.4,0.5);
+      \draw[thick, inkText] (-0.2,0.2) -- (0.2,0.2);
+      \draw[thick, inkText] (-0.2,-0.1) -- (0.2,-0.1);
+      \draw[thick, inkText] (-0.2,-0.3) -- (0.1,-0.3);
+    \end{scope}
+    \node[anchor=north, text width=\pipeTextW, align=center]
+      at ([yshift=-1.55cm]p5.north)
+      {\footnotesize\bfseries\sffamily\color{inkText}Informes};
+    \node[anchor=north]
+      at ([yshift=-1.95cm]p5.north)
+      {\parbox[t]{\pipeTextW}{\centering\fontsize{7}{7.6}\selectfont\sffamily\color{mutedText}%
+       Generación con \textit{LLM} y salida \textit{FHIR}}};
+
+    % --- Flechas de conexión con etiqueta (a la altura del icono) ---
+    \draw[->, accentTeal, line width=1.1pt]
+      ([yshift=-1.2cm]p1.north east) -- ([yshift=-1.2cm]p2.north west)
+      node[midway, above, fill=paperBg, inner sep=1pt]
+      {\fontsize{6}{6}\selectfont\sffamily\color{mutedText}\textit{WebSocket}};
+    \draw[->, accentTeal, line width=1.1pt]
+      ([yshift=-1.2cm]p2.north east) -- ([yshift=-1.2cm]p3.north west)
+      node[midway, above, fill=paperBg, inner sep=1pt]
+      {\fontsize{6}{6}\selectfont\sffamily\color{mutedText}Por fragmento};
+    \draw[->, accentTeal, line width=1.1pt]
+      ([yshift=-1.2cm]p3.north east) -- ([yshift=-1.2cm]p4.north west)
+      node[midway, above, fill=paperBg, inner sep=1pt]
+      {\fontsize{6}{6}\selectfont\sffamily\color{mutedText}Entidades};
+    \draw[->, accentTeal, line width=1.1pt]
+      ([yshift=-1.2cm]p4.north east) -- ([yshift=-1.2cm]p5.north west)
+      node[midway, above, fill=paperBg, inner sep=1pt]
+      {\fontsize{6}{6}\selectfont\sffamily\color{mutedText}Códigos};
+
+    % --- Nota de cierre ---
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.6cm]p1.south west) -- ([yshift=-0.6cm]p5.south east);
+
+    \node[anchor=north, align=center, text width=13.2cm]
+      at ([yshift=-0.95cm]$(p1.south west)!0.5!(p5.south east)$)
+      {\normalsize\itshape\sffamily\color{mutedText}%
+       A partir de aquí, seguiremos un caso real\dots};
+
+  \end{tikzpicture}
+  \end{frame}
