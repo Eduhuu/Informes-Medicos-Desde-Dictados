@@ -1,0 +1,66 @@
+% !TeX root = main.tex
+% ============================================================
+% PREÁMBULO — TFM Eduardo Suárez Castro
+% ============================================================
+\documentclass[aspectratio=169, 11pt]{beamer}
+
+\usetheme{metropolis}
+
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Heros}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc}
+
+\usepackage{eso-pic}
+
+% ---------- Paleta de color ----------
+\definecolor{inkDark}{HTML}{0B1220}     % azul casi negro (fondos oscuros, cajas)
+\definecolor{inkDark2}{HTML}{111C2E}    % variante ligeramente más clara para tarjetas
+\definecolor{accentTeal}{HTML}{2DD4BF}  % teal acento (salud/tech)
+\definecolor{accentBlue}{HTML}{60A5FA}  % azul acento secundario
+\definecolor{paperBg}{HTML}{F7F8FA}     % fondo claro para slides de contenido
+\definecolor{inkText}{HTML}{101828}     % texto principal sobre fondo claro
+\definecolor{mutedText}{HTML}{667085}   % texto secundario / gris
+\definecolor{cardWhite}{HTML}{FFFFFF}   % tarjetas blancas sobre fondo claro
+\definecolor{lineGrey}{HTML}{E4E7EC}    % líneas divisorias sutiles
+\definecolor{accentRed}{HTML}{F87171}   % rojo acento (errores, alertas)
+
+% ---------- Metropolis palette overrides ----------
+\setbeamercolor{background canvas}{bg=paperBg}
+\setbeamercolor{normal text}{fg=inkText}
+\setbeamercolor{frametitle}{bg=paperBg, fg=inkText}
+\setbeamercolor{progress bar}{fg=accentTeal, bg=lineGrey}
+
+\setbeamertemplate{frame numbering}{}
+\setbeamertemplate{footline}{}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{title separator}{fg=accentTeal}
+
+\setlength{\parindent}{0pt}
+\setlength{\lineskiplimit}{-10pt} % permite interlineados ajustados sin que TeX aplique \lineskip de más
+
+% metropolis aplica \linespread{1.15} (beamerinnerthememetropolis.sty), lo que
+% multiplica por 1.15 el baselineskip de cada \fontsize{}{} usado en las láminas
+% (todas construidas a mano con tikz), produciendo un interlineado mucho más
+% suelto del que se especifica explícitamente. Se neutraliza para que el
+% segundo argumento de \fontsize sea el interlineado real.
+\renewcommand{\baselinestretch}{1}
+
+% ---------- Comandos de utilidad ----------
+\newcommand{\kicker}[2][inkText]{%
+  {\footnotesize\bfseries\sffamily\color{#1}\MakeUppercase{#2}}%
+}
+
+% ---------- Numeración automática de láminas (omite la portada) ----------
+\AddToShipoutPictureFG{%
+  \ifnum\value{page}>1
+    \begin{tikzpicture}[remember picture, overlay]
+      \node[anchor=north east, align=right]
+        at ([xshift=-1.4cm, yshift=-0.55cm]current page.north east)
+        {\sffamily\footnotesize\color{mutedText}\insertframenumber\,/\,\inserttotalframenumber};
+    \end{tikzpicture}%
+  \fi
+}
+
+\begin{document}

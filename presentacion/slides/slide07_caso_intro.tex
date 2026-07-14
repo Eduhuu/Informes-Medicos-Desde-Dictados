@@ -1,0 +1,44 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 7 — INTRO AL CASO CLÍNICO (fondo oscuro)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[inkDark] (current page.south west) rectangle (current page.north east);
+
+    \fill[accentTeal] ([xshift=0cm]current page.north west) rectangle
+          ([yshift=-0.15cm]current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.9cm]current page.north west)
+      {\kicker[accentTeal]{06 \,$\cdot$\, Caso clínico}};
+
+    % --- Comilla decorativa ---
+    \node[anchor=north west, align=left]
+      at ([xshift=1.25cm, yshift=-1.3cm]current page.north west)
+      {\fontsize{54}{54}\selectfont\bfseries\sffamily\color{accentTeal}\textquotedblleft};
+
+    % --- Cita textual del Caso 1 ---
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-2.55cm]current page.north west)
+      {\parbox[t]{13.0cm}{\raggedright\large\sffamily\color{white}%
+       Mujer de 53 años de edad diagnosticada de \textbf{\color{accentTeal}hernia discal}, en
+       tratamiento con Durogesic 50\,$\mu$g/h durante seis años, con buena eficacia y seguridad.\\[8pt]
+       \normalsize\sffamily\color{mutedText}%
+       Se cambia por fentanilo genérico y se nota un empeoramiento del cuadro doloroso. Se
+       vuelve a cambiar a Durogesic, y de nuevo se estabiliza la analgesia.}};
+
+    % --- Línea divisoria ---
+    \draw[lineGrey, opacity=0.25, line width=0.5pt]
+      ([xshift=1.4cm, yshift=1.55cm]current page.south west) --
+      ([xshift=-1.4cm, yshift=1.55cm]current page.south east);
+
+    % --- Fuente de la cita ---
+    \node[anchor=south west, align=left]
+      at ([xshift=1.4cm, yshift=1.0cm]current page.south west)
+      {\footnotesize\sffamily\color{mutedText}%
+       Caso 1 \,$\cdot$\, Anexo de textos de evaluación \,$\cdot$\, Corpus de dictados clínicos reales};
+
+  \end{tikzpicture}
+  \end{frame}

@@ -1,0 +1,102 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 3 — OBJETIVOS (fondo claro)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+  
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+  
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{02 \,$\cdot$\, Objetivos}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\Large\bfseries\sffamily\color{inkText}Objetivo general y objetivos específicos};
+
+    % --- Caja destacada: objetivo general ---
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=13.7cm, minimum height=1.75cm,
+          align=left, inner sep=0pt]
+      (goalbox) at ([xshift=1.4cm, yshift=-1.75cm]current page.north west) {};
+
+    \fill[accentTeal, rounded corners=2pt]
+      ([xshift=0cm, yshift=0cm]goalbox.north west) rectangle
+      ([xshift=0.12cm, yshift=0cm]goalbox.south west);
+
+    \node[anchor=north west, align=left, text width=13cm]
+      at ([xshift=0.5cm, yshift=-0.24cm]goalbox.north west)
+      {\scriptsize\sffamily\color{mutedText}\MakeUppercase{Objetivo general}};
+
+    \node[anchor=north west]
+      at ([xshift=0.5cm, yshift=-0.6cm]goalbox.north west)
+      {\parbox[t]{13cm}{\raggedright\fontsize{9}{8.3}\selectfont\sffamily\color{inkText}%
+       Diseñar, desarrollar y evaluar un sistema orientado a la
+       \textbf{\color{accentBlue}generación automatizada de informes clínicos estructurados}
+       a partir de dictados de voz médicos.}};
+
+    % --- 4 tarjetas oscuras (grid 2x2) ---
+    \def\cardW{6.85cm}
+    \def\cardH{2.35cm}
+    \def\cardGap{0.15cm}
+    \def\cardTextW{5.75cm}
+
+    % Tarjeta O1
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\cardW, minimum height=\cardH, inner sep=0pt]
+      (c1) at ([xshift=1.4cm, yshift=-3.65cm]current page.north west) {};
+    \node[anchor=north west, text width=\cardTextW, align=left]
+      at ([xshift=0.4cm, yshift=-0.28cm]c1.north west)
+      {\footnotesize\bfseries\sffamily\color{accentTeal}O1 \,$\cdot$\, Transcripción};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.72cm]c1.north west)
+      {\small\bfseries\sffamily\color{white}WER $\leq$ 10--12\%};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1.2cm]c1.north west)
+      {\parbox[t]{\cardTextW}{\raggedright\fontsize{7.5}{7.5}\selectfont\sffamily\color{mutedText}Tasa de error de palabra en la transcripción del habla médica}}; %
+
+    % Tarjeta O2
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\cardW, minimum height=\cardH, inner sep=0pt]
+      (c2) at ([xshift=1.4cm+\cardW+\cardGap, yshift=-3.65cm]current page.north west) {};
+    \node[anchor=north west, text width=\cardTextW, align=left]
+      at ([xshift=0.4cm, yshift=-0.28cm]c2.north west)
+      {\footnotesize\bfseries\sffamily\color{accentTeal}O2 \,$\cdot$\, Extracción de entidades};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.72cm]c2.north west)
+      {\small\bfseries\sffamily\color{white}F1 $\geq$ 0.85};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1.2cm]c2.north west)
+      {\parbox[t]{\cardTextW}{\raggedright\fontsize{7.5}{7.5}\selectfont\sffamily\color{mutedText}Identificación y normalización de conceptos clínicos}}; %
+
+    % Tarjeta O3
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\cardW, minimum height=\cardH, inner sep=0pt]
+      (c3) at ([xshift=1.4cm, yshift=-3.65cm-\cardH-\cardGap]current page.north west) {};
+    \node[anchor=north west, text width=\cardTextW, align=left]
+      at ([xshift=0.4cm, yshift=-0.28cm]c3.north west)
+      {\footnotesize\bfseries\sffamily\color{accentTeal}O3 \,$\cdot$\, Calidad clínica};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.72cm]c3.north west)
+      {\small\bfseries\sffamily\color{white}$\geq$ 80\% aceptación};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1.2cm]c3.north west)
+      {\parbox[t]{\cardTextW}{\raggedright\fontsize{7.5}{7.5}\selectfont\sffamily\color{mutedText}Informes valorados como clínicamente aceptables por especialistas}}; %
+
+    % Tarjeta O4
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\cardW, minimum height=\cardH, inner sep=0pt]
+      (c4) at ([xshift=1.4cm+\cardW+\cardGap, yshift=-3.65cm-\cardH-\cardGap]current page.north west) {};
+    \node[anchor=north west, text width=\cardTextW, align=left]
+      at ([xshift=0.4cm, yshift=-0.28cm]c4.north west)
+      {\footnotesize\bfseries\sffamily\color{accentTeal}O4 \,$\cdot$\, Interoperabilidad};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.72cm]c4.north west)
+      {\small\bfseries\sffamily\color{white}$>$ 95\% validación};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1.2cm]c4.north west)
+      {\parbox[t]{\cardTextW}{\raggedright\fontsize{7.5}{7.5}\selectfont\sffamily\color{mutedText}Salidas conformes al estándar FHIR sin errores de esquema}}; %
+  
+  \end{tikzpicture}
+\end{frame}

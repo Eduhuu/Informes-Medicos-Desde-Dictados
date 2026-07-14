@@ -1,0 +1,89 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 5 — ESTÁNDARES CLÍNICOS (fondo claro)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{04 \,$\cdot$\, Estándares clínicos}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\Large\bfseries\sffamily\color{inkText}Terminologías e interoperabilidad como base del sistema};
+
+    % --- 3 tarjetas oscuras en fila ---
+    \def\stdW{4.2cm}
+    \def\stdH{4.5cm}
+    \def\stdGap{0.3cm}
+    \def\stdTextW{3.5cm}
+    \def\stdY{-2.1cm}
+
+    % Tarjeta 1 — SNOMED CT
+    % Cada bloque de texto se ancla debajo del anterior (altura variable),
+    % así una línea extra por wrap nunca pisa el bloque siguiente.
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\stdW, minimum height=\stdH, inner sep=0pt]
+      (s1) at ([xshift=1.4cm, yshift=\stdY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      ([xshift=0cm]s1.north west) rectangle ([yshift=-0.12cm]s1.north east);
+    \node[anchor=north west, text width=\stdTextW, align=left] (s1title)
+      at ([xshift=0.4cm, yshift=-0.55cm]s1.north west)
+      {\normalsize\bfseries\sffamily\color{accentTeal}SNOMED CT};
+    \node[anchor=north west] (s1sub)
+      at ([yshift=-0.12cm]s1title.south west)
+      {\parbox[t]{\stdTextW}{\raggedright\fontsize{8.5}{10}\selectfont\sffamily\color{white}%
+       Terminología clínica de referencia}};
+    \node[anchor=north west]
+      at ([yshift=-0.18cm]s1sub.south west)
+      {\parbox[t]{\stdTextW}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{mutedText}%
+       Identifica y codifica con precisión semántica los conceptos médicos extraídos del dictado}};
+
+    % Tarjeta 2 — CIE-10-ES
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\stdW, minimum height=\stdH, inner sep=0pt]
+      (s2) at ([xshift=1.4cm+\stdW+\stdGap, yshift=\stdY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      ([xshift=0cm]s2.north west) rectangle ([yshift=-0.12cm]s2.north east);
+    \node[anchor=north west, text width=\stdTextW, align=left] (s2title)
+      at ([xshift=0.4cm, yshift=-0.55cm]s2.north west)
+      {\normalsize\bfseries\sffamily\color{accentTeal}CIE-10-ES};
+    \node[anchor=north west] (s2sub)
+      at ([yshift=-0.12cm]s2title.south west)
+      {\parbox[t]{\stdTextW}{\raggedright\fontsize{8.5}{10}\selectfont\sffamily\color{white}%
+       Clasificación diagnóstica oficial}};
+    \node[anchor=north west]
+      at ([yshift=-0.18cm]s2sub.south west)
+      {\parbox[t]{\stdTextW}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{mutedText}%
+       Traduce los conceptos \textit{SNOMED CT} a códigos diagnósticos usados en la práctica clínica española}};
+
+    % Tarjeta 3 — HL7 FHIR
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\stdW, minimum height=\stdH, inner sep=0pt]
+      (s3) at ([xshift=1.4cm+2*\stdW+2*\stdGap, yshift=\stdY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      ([xshift=0cm]s3.north west) rectangle ([yshift=-0.12cm]s3.north east);
+    \node[anchor=north west, text width=\stdTextW, align=left] (s3title)
+      at ([xshift=0.4cm, yshift=-0.55cm]s3.north west)
+      {\normalsize\bfseries\sffamily\color{accentTeal}HL7 FHIR};
+    \node[anchor=north west] (s3sub)
+      at ([yshift=-0.12cm]s3title.south west)
+      {\parbox[t]{\stdTextW}{\raggedright\fontsize{8.5}{10}\selectfont\sffamily\color{white}%
+       Estándar de interoperabilidad}};
+    \node[anchor=north west]
+      at ([yshift=-0.18cm]s3sub.south west)
+      {\parbox[t]{\stdTextW}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{mutedText}%
+       Estructura el informe final para su intercambio con sistemas de Historia Clínica Electrónica}};
+
+    % --- Nota inferior ---
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-7.0cm]current page.north west)
+      {\parbox[t]{13.2cm}{\raggedright\footnotesize\sffamily\color{mutedText}%
+       Los tres estándares actúan de forma encadenada: \textit{SNOMED CT} identifica el concepto,
+       \textit{CIE-10-ES} lo clasifica y \textit{HL7 FHIR} lo transporta.}};
+
+  \end{tikzpicture}
+  \end{frame}
