@@ -1,0 +1,142 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 13 — ETAPA 6: FHIR (fondo claro)
+% Datos: latex/capitulos/06_Resultados_y_Discusion.tex (Bundle FHIR, Objetivo 4)
+%        latex/capitulos/07_Conclusiones.tex (cumplimiento Objetivo 4)
+%        latex/tablas/capitulo_evaluacion/tabla_e2e_detalle_{batch,streaming}.tex
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{12 \,$\cdot$\, Caso clínico \,$\cdot$\, Etapa 6}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\large\bfseries\sffamily\color{inkText}El \textit{Bundle} \textit{FHIR} del caso: válido en forma, no en contenido};
+
+    % ------------------------------------------------------
+    % Breadcrumb de 6 etapas (Validación resaltada)
+    % ------------------------------------------------------
+    \def\bcW{2.05cm}
+    \def\bcH{0.5cm}
+    \def\bcStep{2.21cm}
+    \def\bcY{-1.70cm}
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+0*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}1\,\textperiodcentered\,Captura};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+1*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}2\,\textperiodcentered\,ASR};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+2*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}3\,\textperiodcentered\,NER};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+3*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}4\,\textperiodcentered\,Normaliz.};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+4*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}5\,\textperiodcentered\,Generación};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+5*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{accentTeal}6\,\textperiodcentered\,Validación};
+
+    % ------------------------------------------------------
+    % Izquierda: validación estructural superada
+    % Derecha: advertencia de corrección semántica no garantizada
+    % ------------------------------------------------------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=5.9cm, minimum height=4.35cm,
+          align=left, inner sep=0pt]
+      (fhirbox) at ([xshift=1.4cm, yshift=-2.45cm]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (fhirbox.north west) rectangle ([yshift=-0.12cm]fhirbox.north east);
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.35cm]fhirbox.north west)
+      {\footnotesize\sffamily\color{mutedText}\MakeUppercase{Validación estructural}};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1cm]fhirbox.north west)
+      {\Large\bfseries\sffamily\color{accentTeal}Bundle válido \normalfont\normalsize\sffamily\color{inkText}(4\,/\,5)};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1.75cm]fhirbox.north west)
+      {\parbox[t]{5.1cm}{\raggedright\fontsize{7.5}{9.2}\selectfont\sffamily\color{inkText}%
+       El \textit{Bundle} de este caso supera la validación estructural: \texttt{resourceType},
+       referencias \texttt{subject} y \texttt{meta.profile} correctos.\\[4pt]
+       Es, junto a \textit{ASR} y \textit{NER}, la dimensión mejor puntuada del caso ---muy por
+       encima de \textit{Terminología} e \textit{Informe} (2\,/\,5 ambas).}};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=6.4cm, minimum height=4.35cm,
+          align=left, inner sep=0pt]
+      (warnbox) at ([xshift=7.6cm, yshift=-2.45cm]current page.north west) {};
+    \fill[accentRed, rounded corners=2pt]
+      (warnbox.north west) rectangle ([yshift=-0.12cm]warnbox.north east);
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.35cm]warnbox.north west)
+      {\footnotesize\sffamily\color{mutedText}\MakeUppercase{Advertencia semántica}};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-1cm]warnbox.north west)
+      {\parbox[t]{5.6cm}{\raggedright\fontsize{7}{8.4}\selectfont\sffamily\color{inkText}%
+       La validación \textbf{no filtra} el contenido: el \textit{Bundle} traslada, sin corregirlos,
+       los errores ya vistos en este mismo caso.\\[3pt]
+       \textbf{\color{accentRed}NER:} \textit{"analgesia"} persiste como \texttt{Condition} (falso positivo).\\[2pt]
+       \textbf{\color{accentRed}Terminología:} \textit{"doloroso"} $\to$ \textit{Trigeminal neuralgia}
+       codificado como hallazgo (\textit{CIE-10} err.).\\[2pt]
+       \textbf{\color{accentRed}Informe:} dosis $\times$1000 (\textit{"50\,mg/hora"}) pasa intacta al
+       \texttt{MedicationStatement}.}};
+
+    % ------------------------------------------------------
+    % 3 tarjetas de estadísticas
+    % ------------------------------------------------------
+    \def\statCardW{4.2cm}
+    \def\statCardH{1.6cm}
+    \def\statCardGap{0.3cm}
+    \def\statCardY{-6.95cm}
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.10cm]st1.north west)
+      {\Large\bfseries\sffamily\color{accentTeal}4\,/\,5};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.70cm]st1.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Puntuación \textit{FHIR} de este caso (\textit{streaming} Test\,1)}};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.10cm]st2.north west)
+      {\Large\bfseries\sffamily\color{accentTeal}3};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.70cm]st2.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Persisten como hallazgos clínicos válidos}};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.10cm]st3.north west)
+      {\Large\bfseries\sffamily\color{accentTeal}100\,\%};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.70cm]st3.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Objetivo 4 solo en forma}};
+
+  \end{tikzpicture}
+\end{frame}

@@ -1,0 +1,120 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 16 — HALLAZGO CENTRAL (fondo oscuro)
+% Datos: latex/capitulos/06_Resultados_y_Discusion.tex
+%        (resultados_asr ~L18-23; resultados_pln ~L46-49; resultados_snomed ~L88-89;
+%         resultados_e2e "Informe LLM" ~L165-172; discusión ~L283-284)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[inkDark] (current page.south west) rectangle (current page.north east);
+
+    \fill[accentTeal] ([xshift=0cm]current page.north west) rectangle
+          ([yshift=-0.15cm]current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.9cm]current page.north west)
+      {\kicker[accentTeal]{15 \,$\cdot$\, Hallazgo central}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.45cm]current page.north west)
+      {\Large\bfseries\sffamily\color{white}Los errores no se diluyen en el \textit{pipeline}: se acumulan};
+
+    % ------------------------------------------------------
+    % Tabla comparativa: evaluación aislada vs. end-to-end
+    % ------------------------------------------------------
+    \def\tblX{1.4cm}
+    \def\tblW{13.2cm}
+    \def\tblTop{-2.35cm}
+    \def\rowH{0.92cm}
+    \def\colModX{0.35cm}
+    \def\colAisladoX{4.6cm}
+    \def\colArrowX{8.5cm}
+    \def\colE2eX{9.6cm}
+
+    \node[anchor=north west, fill=inkDark2, rounded corners=6pt,
+          minimum width=\tblW, minimum height=3*\rowH+0.58cm, inner sep=0pt]
+      (tbl) at ([xshift=\tblX, yshift=\tblTop]current page.north west) {};
+
+    % --- Cabecera ---
+    \node[anchor=north west]
+      at ([xshift=\colModX, yshift=-0.10cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Módulo}};
+    \node[anchor=north west]
+      at ([xshift=\colAisladoX, yshift=-0.10cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Evaluación aislada}};
+    \node[anchor=north west]
+      at ([xshift=\colE2eX, yshift=-0.15cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{\textit{End-to-end} (1--5)}};
+    \draw[lineGrey, opacity=0.3, line width=0.6pt]
+      ([yshift=-0.65cm]tbl.north west) -- ([yshift=-0.65cm]tbl.north east);
+
+    % --- Fila 1: ASR ---
+    \node[anchor=north west]
+      at ([xshift=\colModX, yshift=-0.50cm-0.35*\rowH]tbl.north west)
+      {\parbox[c]{2.8cm}{\raggedright\small\bfseries\sffamily\color{white}\textit{ASR}}};
+    \node[anchor=north west]
+      at ([xshift=\colAisladoX, yshift=-0.50cm-0.35*\rowH]tbl.north west)
+      {\parbox[c]{3.7cm}{\raggedright\small\bfseries\sffamily\color{accentTeal}$\approx$6.5\,\% \normalfont\footnotesize\color{mutedText}(WER)}};
+    \node[anchor=north west, align=center]
+      at ([xshift=\colArrowX, yshift=-0.50cm-0.35*\rowH]tbl.north west)
+      {\fontsize{11}{11}\selectfont\sffamily\color{mutedText}$\to$};
+    \node[anchor=north west]
+      at ([xshift=\colE2eX, yshift=-0.50cm-0.35*\rowH]tbl.north west)
+      {\parbox[c]{3.5cm}{\raggedright\small\bfseries\sffamily\color{white}3.75\,--\,4.0\,/\,5}};
+    \draw[lineGrey, opacity=0.15, line width=0.5pt]
+      ([yshift=-0.50cm-\rowH]tbl.north west) -- ([yshift=-0.50cm-\rowH]tbl.north east);
+
+    % --- Fila 2: NER ---
+    \node[anchor=north west]
+      at ([xshift=\colModX, yshift=-0.58cm-1.25*\rowH]tbl.north west)
+      {\parbox[c]{2.8cm}{\raggedright\small\bfseries\sffamily\color{white}\textit{NER}}};
+    \node[anchor=north west]
+      at ([xshift=\colAisladoX, yshift=-0.58cm-1.25*\rowH]tbl.north west)
+      {\parbox[c]{3.7cm}{\raggedright\small\bfseries\sffamily\color{accentTeal}32.0\,--\,43.8\,\% \normalfont\footnotesize\color{mutedText}(F1)}};
+    \node[anchor=north west, align=center]
+      at ([xshift=\colArrowX, yshift=-0.58cm-1.25*\rowH]tbl.north west)
+      {\fontsize{11}{11}\selectfont\sffamily\color{mutedText}$\to$};
+    \node[anchor=north west]
+      at ([xshift=\colE2eX, yshift=-0.58cm-1.25*\rowH]tbl.north west)
+      {\parbox[c]{3.5cm}{\raggedright\small\bfseries\sffamily\color{accentRed}2.10\,--\,2.90\,/\,5}};
+    \draw[lineGrey, opacity=0.15, line width=0.5pt]
+      ([yshift=-0.58cm-2*\rowH]tbl.north west) -- ([yshift=-0.58cm-2*\rowH]tbl.north east);
+
+    % --- Fila 3: Terminología (SNOMED CT / CIE-10-ES) ---
+    \node[anchor=north west]
+      at ([xshift=\colModX, yshift=-0.58cm-2.25*\rowH]tbl.north west)
+      {\parbox[c]{2.8cm}{\raggedright\small\bfseries\sffamily\color{white}Terminología}};
+    \node[anchor=north west]
+      at ([xshift=\colAisladoX, yshift=-0.58cm-2.25*\rowH]tbl.north west)
+      {\parbox[c]{3.7cm}{\raggedright\small\bfseries\sffamily\color{accentTeal}85.5\,\% \normalfont\footnotesize\color{mutedText}(SNOMED)}};
+    \node[anchor=north west, align=center]
+      at ([xshift=\colArrowX, yshift=-0.58cm-2.25*\rowH]tbl.north west)
+      {\fontsize{11}{11}\selectfont\sffamily\color{mutedText}$\to$};
+    \node[anchor=north west]
+      at ([xshift=\colE2eX, yshift=-0.58cm-2.25*\rowH]tbl.north west)
+      {\parbox[c]{3.5cm}{\raggedright\small\bfseries\sffamily\color{accentRed}1.55\,--\,1.90\,/\,5}};
+
+    % ------------------------------------------------------
+    % Explicación causal + estadística de cierre
+    % ------------------------------------------------------
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-5.75cm]current page.north west)
+      {\parbox[t]{8.3cm}{\raggedright\fontsize{9}{11}\selectfont\sffamily\color{mutedText}%
+       Cada etapa consume la salida de la anterior sin posibilidad de corrección aguas abajo: un
+       error moderado en origen (una sigla mal transcrita, una entidad truncada) se compone con el
+       siguiente y se amplifica hasta convertirse en un error clínico grave en el informe final.}};
+
+    \node[anchor=north west, fill=inkDark2, rounded corners=6pt,
+          minimum width=4.5cm, minimum height=2.55cm, inner sep=0pt]
+      (final) at ([xshift=10.1cm, yshift=-5.80cm]current page.north west) {};
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.32cm]final.north west)
+      {\Large\bfseries\sffamily\color{accentRed}20\,--\,30\,\%};
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-1.0cm]final.north west)
+      {\parbox[t]{3.3cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}de los informes completos resultan aceptables (\textit{LLM-as-judge})}};
+
+  \end{tikzpicture}
+\end{frame}

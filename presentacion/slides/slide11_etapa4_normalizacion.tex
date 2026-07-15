@@ -1,0 +1,182 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 11 — ETAPA 4: NORMALIZACIÓN (fondo claro)
+% Datos: backend/asr-service/reports/snomed_cie-10-es_tests/Test SNOMED CIE-10-ES - caso_1.csv
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{10 \,$\cdot$\, Caso clínico \,$\cdot$\, Etapa 4}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\large\bfseries\sffamily\color{inkText}Normalización: mapeo de entidades a \textit{SNOMED CT} y \textit{CIE-10-ES}};
+
+    % ------------------------------------------------------
+    % Breadcrumb de 6 etapas (Normalización resaltada)
+    % ------------------------------------------------------
+    \def\bcW{2.05cm}
+    \def\bcH{0.5cm}
+    \def\bcStep{2.21cm}
+    \def\bcY{-1.85cm}
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+0*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}1\,\textperiodcentered\,Captura};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+1*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}2\,\textperiodcentered\,ASR};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+2*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}3\,\textperiodcentered\,NER};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+3*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{accentTeal}4\,\textperiodcentered\,Normaliz.};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+4*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}5\,\textperiodcentered\,Generación};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=8pt,
+          minimum width=\bcW, minimum height=\bcH, align=center, inner sep=0pt]
+      at ([xshift=1.4cm+5*\bcStep, yshift=\bcY]current page.north west)
+      {\fontsize{6.5}{6.5}\selectfont\bfseries\sffamily\color{mutedText}6\,\textperiodcentered\,Validación};
+
+    % ------------------------------------------------------
+    % Tabla: esperado vs. obtenido por término
+    % ------------------------------------------------------
+    \def\tblX{1.4cm}
+    \def\tblW{13.2cm}
+    \def\tblTop{-2.45cm}
+    \def\rowH{1.0cm}
+    \def\colTermW{2.9cm}
+    \def\colSnomedX{4.5cm}
+    \def\colSnomedW{3.6cm}
+    \def\colCieX{8.3cm}
+    \def\colCieW{5.5cm}
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=6pt,
+          minimum width=\tblW, minimum height=3*\rowH+0.55cm, inner sep=0pt]
+      (tbl) at ([xshift=\tblX, yshift=\tblTop]current page.north west) {};
+
+    % --- Cabecera ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.15cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Término}};
+    \node[anchor=north west]
+      at ([xshift=\colSnomedX, yshift=-0.15cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{SNOMED CT}};
+    \node[anchor=north west]
+      at ([xshift=\colCieX, yshift=-0.15cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{CIE-10-ES}};
+    \draw[lineGrey, line width=0.6pt]
+      ([yshift=-0.75cm]tbl.north west) -- ([yshift=-0.75cm]tbl.north east);
+
+    % --- Fila 1: hernia discal ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.35cm-0.5*\rowH]tbl.north west)
+      {\parbox[c]{\colTermW}{\raggedright\small\bfseries\sffamily\color{inkText}hernia discal}};
+    \node[anchor=north west]
+      at ([xshift=\colSnomedX, yshift=-0.65cm-0.28cm]tbl.north west)
+      {\parbox[t]{\colSnomedW}{\raggedright\fontsize{8}{9.5}\selectfont\ttfamily\color{accentTeal}84857004\\[3.5pt]
+      %  \fontsize{7}{8}\selectfont\sffamily\normalfont\color{accentTeal}\textbf{Correcto}
+       }};
+    \node[anchor=north west]
+      at ([xshift=\colCieX, yshift=-0.65cm-0.28cm]tbl.north west)
+      {\parbox[t]{\colCieW}{\raggedright\fontsize{8}{9.5}\selectfont\ttfamily\color{mutedText}— (no aplica)\\[3.5pt]
+      %  \fontsize{7}{8}\selectfont\sffamily\normalfont\color{accentTeal}\textbf{Correcto}
+       }};
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.55cm-\rowH]tbl.north west) -- ([yshift=-0.55cm-\rowH]tbl.north east);
+
+    % --- Fila 2: fentanilo ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.35cm-1.5*\rowH]tbl.north west)
+      {\parbox[c]{\colTermW}{\raggedright\small\bfseries\sffamily\color{inkText}fentanilo}};
+    \node[anchor=north west]
+      at ([xshift=\colSnomedX, yshift=-0.55cm-1*\rowH-0.28cm]tbl.north west)
+      {\parbox[t]{\colSnomedW}{\raggedright\fontsize{8}{9.5}\selectfont\ttfamily\color{accentTeal}373492002\\[3.5pt]
+      %  \fontsize{7}{8}\selectfont\sffamily\normalfont\color{accentTeal}\textbf{Correcto}
+       }};
+    \node[anchor=north west]
+      at ([xshift=\colCieX, yshift=-0.55cm-1*\rowH-0.28cm]tbl.north west)
+      {\parbox[t]{\colCieW}{\raggedright\fontsize{7.5}{9}\selectfont\ttfamily\color{accentRed}T40.4 / X42 / X62 / Y12 / Y45.0\\[3.5pt]
+      %  \fontsize{7}{8}\selectfont\sffamily\normalfont\color{accentRed}\textbf{Falso negativo}
+       }};
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.55cm-2*\rowH]tbl.north west) -- ([yshift=-0.55cm-2*\rowH]tbl.north east);
+
+    % --- Fila 3: analgesia ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.30cm-2.5*\rowH]tbl.north west)
+      {\parbox[c]{\colTermW}{\raggedright\small\bfseries\sffamily\color{inkText}doloroso}};
+    \node[anchor=north west]
+      at ([xshift=\colSnomedX, yshift=-0.35cm-2*\rowH-0.28cm]tbl.north west)
+      {\parbox[t]{\colSnomedW}{\raggedright\fontsize{8}{9.5}\selectfont\ttfamily\color{accentRed}31681005\\[3.5pt]
+       \fontsize{7}{8}\selectfont\sffamily\normalfont\color{accentRed}\textbf{Valor incorrecto}
+       }};
+    \node[anchor=north west]
+      at ([xshift=\colCieX, yshift=-0.55cm-2*\rowH-0.28cm]tbl.north west)
+      {\parbox[t]{\colCieW}{\raggedright\fontsize{8}{9.5}\selectfont\ttfamily\color{accentRed}R20.0\\[3.5pt]
+      %  \fontsize{7}{8}\selectfont\sffamily\normalfont\color{accentRed}\textbf{Falso negativo}
+       }};
+
+    % --- Nota: términos sin código clínico esperado ---
+    \node[anchor=north west]
+      at ([xshift=0cm, yshift=0cm]tbl.south west)
+      {\parbox[t]{13.2cm}{\raggedright\fontsize{7.5}{9}\selectfont\itshape\sffamily\color{mutedText}%
+       \textit{Durogesic}, \textit{50\,$\mu$g/h} y \textit{cuadro doloroso} no tienen código clínico
+       esperado (marca comercial, dosis y síntoma inespecífico) y quedan fuera del cálculo de aciertos.}};
+
+    % ------------------------------------------------------
+    % 3 tarjetas de estadísticas
+    % ------------------------------------------------------
+    \def\statCardW{4.2cm}
+    \def\statCardH{1.75cm}
+    \def\statCardGap{0.3cm}
+    \def\statCardY{-7.0cm}
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.2cm]st1.north west)
+      {\Large\bfseries\sffamily\color{accentTeal}60\,\%};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.75cm]st1.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aciertos \textit{SNOMED CT} (3/5)}};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.2cm]st2.north west)
+      {\Large\bfseries\sffamily\color{accentRed}40\,\%};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.75cm]st2.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aciertos \textit{CIE-10-ES} (2/5)}};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.2cm]st3.north west)
+      {\Large\bfseries\sffamily\color{accentTeal}1.25\,s};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.75cm]st3.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Tiempo de normalización del caso}};
+
+  \end{tikzpicture}
+  \end{frame}

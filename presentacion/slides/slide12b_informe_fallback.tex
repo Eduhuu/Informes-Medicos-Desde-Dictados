@@ -1,0 +1,151 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 12.5 — AUDITORÍA DEL FALLBACK "CEFALEA A ESTUDIO" (fondo claro)
+% Datos: evaluacion_e2e_pipeline.md (secciones 1, 2 y 4)
+%        backend/asr-service/config.yaml (system_prompt, histórico)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{11 \,$\cdot$\, Caso clínico \,$\cdot$\, Etapa 5 \,$\cdot$\, Auditoría}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\large\bfseries\sffamily\color{inkText}"Cefalea a estudio" no siempre es una alucinación: auditoría de los 5 casos};
+
+    % ------------------------------------------------------
+    % Tabla: los 5 casos donde se activó el fallback
+    % ------------------------------------------------------
+    \def\tblX{1.4cm}
+    \def\tblW{13.2cm}
+    \def\tblTop{-1.9cm}
+    \def\rowH{0.95cm}
+    \def\colCasoW{2.3cm}
+    \def\colCausaX{3.9cm}
+    \def\colCausaW{5.6cm}
+    \def\colClasifX{9.7cm}
+    \def\colClasifW{2.5cm}
+    \def\colScoreX{12.3cm}
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=6pt,
+          minimum width=\tblW, minimum height=5*\rowH+0.55cm, inner sep=0pt]
+      (tbl) at ([xshift=\tblX, yshift=\tblTop]current page.north west) {};
+
+    % --- Cabecera ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.28cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Caso}};
+    \node[anchor=north west]
+      at ([xshift=\colCausaX, yshift=-0.28cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Causa raíz del fallback}};
+    \node[anchor=north west]
+      at ([xshift=\colClasifX, yshift=-0.28cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Clasificación}};
+    \node[anchor=north west]
+      at ([xshift=\colScoreX, yshift=-0.28cm]tbl.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Score}};
+    \draw[lineGrey, line width=0.6pt]
+      ([yshift=-0.55cm]tbl.north west) -- ([yshift=-0.55cm]tbl.north east);
+
+    % --- Fila 1: batches/test1 ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.55cm-0.5*\rowH]tbl.north west)
+      {\parbox[c]{\colCasoW}{\raggedright\small\bfseries\sffamily\color{inkText}Batches\\[-1pt]\fontsize{7}{8}\selectfont\normalfont\color{mutedText}Test 1}};
+    \node[anchor=north west]
+      at ([xshift=\colCausaX, yshift=-0.55cm-0.22cm]tbl.north west)
+      {\parbox[t]{\colCausaW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{inkText}NER trunca \textit{"hernia discal"} $\to$ \textit{"hernia"}: entra sin diagnóstico útil}};
+    \node[anchor=north west]
+      at ([xshift=\colClasifX, yshift=-0.55cm-0.22cm]tbl.north west)
+      {\parbox[t]{\colClasifW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\normalfont\color{accentBlue}\textbf{Entrada degradada} (NER)}};
+    \node[anchor=north west]
+      at ([xshift=\colScoreX, yshift=-0.55cm-0.22cm]tbl.north west)
+      {\fontsize{9}{9}\selectfont\bfseries\sffamily\color{mutedText}2};
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.55cm-\rowH]tbl.north west) -- ([yshift=-0.55cm-\rowH]tbl.north east);
+
+    % --- Fila 2: batches/test5 ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.55cm-1.5*\rowH]tbl.north west)
+      {\parbox[c]{\colCasoW}{\raggedright\small\bfseries\sffamily\color{inkText}Batches\\[-1pt]\fontsize{7}{8}\selectfont\normalfont\color{mutedText}Test 5}};
+    \node[anchor=north west]
+      at ([xshift=\colCausaX, yshift=-0.55cm-1*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colCausaW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{inkText}NER no detecta AOC ni DG, solo la entidad genérica \textit{"agudeza visual"}}};
+    \node[anchor=north west]
+      at ([xshift=\colClasifX, yshift=-0.55cm-1*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colClasifW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\normalfont\color{accentBlue}\textbf{Entrada degradada} (NER)}};
+    \node[anchor=north west]
+      at ([xshift=\colScoreX, yshift=-0.55cm-1*\rowH-0.22cm]tbl.north west)
+      {\fontsize{9}{9}\selectfont\bfseries\sffamily\color{mutedText}2};
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.55cm-2*\rowH]tbl.north west) -- ([yshift=-0.55cm-2*\rowH]tbl.north east);
+
+    % --- Fila 3: batches/test6 ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.55cm-2.5*\rowH]tbl.north west)
+      {\parbox[c]{\colCasoW}{\raggedright\small\bfseries\sffamily\color{inkText}Batches\\[-1pt]\fontsize{7}{8}\selectfont\normalfont\color{mutedText}Test 6}};
+    \node[anchor=north west]
+      at ([xshift=\colCausaX, yshift=-0.55cm-2*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colCausaW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{inkText}NER solo entrega \textit{"hipertensión"} genérica, no \textit{"HCA"} / hematoma cerebeloso}};
+    \node[anchor=north west]
+      at ([xshift=\colClasifX, yshift=-0.55cm-2*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colClasifW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\normalfont\color{accentBlue}\textbf{Entrada degradada} (NER)}};
+    \node[anchor=north west]
+      at ([xshift=\colScoreX, yshift=-0.55cm-2*\rowH-0.22cm]tbl.north west)
+      {\fontsize{9}{9}\selectfont\bfseries\sffamily\color{mutedText}2};
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.55cm-3*\rowH]tbl.north west) -- ([yshift=-0.55cm-3*\rowH]tbl.north east);
+
+    % --- Fila 4: streaming/test1 ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.55cm-3.5*\rowH]tbl.north west)
+      {\parbox[c]{\colCasoW}{\raggedright\small\bfseries\sffamily\color{inkText}Streaming\\[-1pt]\fontsize{7}{8}\selectfont\normalfont\color{mutedText}Test 1}};
+    \node[anchor=north west]
+      at ([xshift=\colCausaX, yshift=-0.55cm-3*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colCausaW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{inkText}NER \textbf{sí} entrega \textit{"hernia discal"} correctamente; el LLM no la traslada a la impresión}};
+    \node[anchor=north west]
+      at ([xshift=\colClasifX, yshift=-0.55cm-3*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colClasifW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\normalfont\color{accentRed}\textbf{Fallo real de abstracción} (LLM)}};
+    \node[anchor=north west]
+      at ([xshift=\colScoreX, yshift=-0.55cm-3*\rowH-0.22cm]tbl.north west)
+      {\fontsize{9}{9}\selectfont\bfseries\sffamily\color{mutedText}2};
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.55cm-4*\rowH]tbl.north west) -- ([yshift=-0.55cm-4*\rowH]tbl.north east);
+
+    % --- Fila 5: streaming/test9 ---
+    \node[anchor=north west]
+      at ([xshift=0.35cm, yshift=-0.55cm-4.5*\rowH]tbl.north west)
+      {\parbox[c]{\colCasoW}{\raggedright\small\bfseries\sffamily\color{inkText}Streaming\\[-1pt]\fontsize{7}{8}\selectfont\normalfont\color{mutedText}Test 9}};
+    \node[anchor=north west]
+      at ([xshift=\colCausaX, yshift=-0.55cm-4*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colCausaW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{inkText}Caso genuinamente ambiguo: la transcripción no establece un diagnóstico concreto}};
+    \node[anchor=north west]
+      at ([xshift=\colClasifX, yshift=-0.55cm-4*\rowH-0.22cm]tbl.north west)
+      {\parbox[t]{\colClasifW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\normalfont\color{accentTeal}\textbf{Uso correcto} del \textit{fallback}}};
+    \node[anchor=north west]
+      at ([xshift=\colScoreX, yshift=-0.55cm-4*\rowH-0.22cm]tbl.north west)
+      {\fontsize{9}{9}\selectfont\bfseries\sffamily\color{mutedText}4};
+
+    % ------------------------------------------------------
+    % Nota inferior
+    % ------------------------------------------------------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=13.2cm, minimum height=1.5cm,
+          align=left, inner sep=0pt]
+      (notebox) at ([xshift=0cm, yshift=-0.25cm]tbl.south west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (notebox.north west) rectangle ([xshift=0.12cm]notebox.south west);
+    \node[anchor=west]
+      at ([xshift=0.55cm]notebox.west)
+      {\parbox[t]{12.3cm}{\raggedright\fontsize{8.5}{10.5}\selectfont\sffamily\color{inkText}%
+       El \textit{system\_prompt} instruye explícitamente usar \textit{"Cefalea a estudio"} cuando el
+       diagnóstico es ambiguo: no es una plantilla alucinada. En 3 de 5 casos la causa fue la
+       pérdida de información en \textit{NER}, no del \textit{LLM}. Las puntuaciones no cambian
+       (persisten errores reales independientes, p.\,ej. dosis $\times$1000), pero la
+       atribución sí: solo \textit{streaming}/Test\,1 es un fallo real de abstracción del \textit{LLM}.}};
+
+  \end{tikzpicture}
+  \end{frame}
