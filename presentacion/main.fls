@@ -510,6 +510,7 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
 INPUT ./slides/slide17_cumplimiento_objetivos.tex
 INPUT ./slides/slide18_conclusiones.tex
 INPUT ./slides/slide19_trabajos_futuros.tex
+INPUT ./slides/slide20_cierre.tex
 OUTPUT main.nav
 OUTPUT main.toc
 OUTPUT main.snm
