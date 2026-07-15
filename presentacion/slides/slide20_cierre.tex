@@ -1,0 +1,54 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 20 — CIERRE (fondo oscuro)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[inkDark] (current page.south west) rectangle (current page.north east);
+
+    \fill[accentTeal] ([xshift=0cm]current page.north west) rectangle
+          ([yshift=-0.15cm]current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.9cm]current page.north west)
+      {\kicker[accentTeal]{19 \,$\cdot$\, Cierre}};
+
+    % --- Titular ---
+    \node[anchor=north west]
+      at ([xshift=1.35cm, yshift=-2.1cm]current page.north west)
+      {\fontsize{60}{60}\selectfont\bfseries\sffamily\color{white}Gracias};
+
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-3.85cm]current page.north west)
+      {\parbox[t]{12.4cm}{\raggedright\large\sffamily\color{mutedText}%
+       Preguntas y discusión}};
+
+    % --- Línea divisoria ---
+    \draw[lineGrey, opacity=0.25, line width=0.5pt]
+      ([xshift=1.4cm, yshift=2.55cm]current page.south west) --
+      ([xshift=-1.4cm, yshift=2.55cm]current page.south east);
+
+    % --- Datos de contacto ---
+    \node[anchor=south west, align=left]
+      at ([xshift=1.4cm, yshift=2.95cm]current page.south west)
+      {\begin{minipage}{6.4cm}
+         {\footnotesize\sffamily\color{mutedText}\MakeUppercase{Autor}}\\[2pt]
+         {\large\sffamily\color{white}Eduardo Enrique Suárez Castro}\\[1pt]
+         {\footnotesize\sffamily\color{accentTeal}eduardosuarez.c97@gmail.com}
+       \end{minipage}};
+
+    \node[anchor=south west, align=left]
+      at ([xshift=8.6cm, yshift=2.95cm]current page.south west)
+      {\begin{minipage}{6.5cm}
+         {\footnotesize\sffamily\color{mutedText}\MakeUppercase{Director}}\\[2pt]
+         {\large\sffamily\color{white}Francisco Javier Melero Rus}
+       \end{minipage}};
+
+    \node[anchor=south west, align=left]
+      at ([xshift=1.4cm, yshift=0.9cm]current page.south west)
+      {\footnotesize\sffamily\color{mutedText}%
+       Escuela Internacional de Posgrado \,$\cdot$\, Universidad de Granada \,$\cdot$\, Julio 2026};
+
+  \end{tikzpicture}
+  \end{frame}
