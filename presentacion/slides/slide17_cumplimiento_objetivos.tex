@@ -1,0 +1,152 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 17 — CUMPLIMIENTO DE OBJETIVOS (fondo claro)
+% Datos: latex/capitulos/01_Introduccion.tex (§1.2, objetivos específicos)
+%        latex/capitulos/07_Conclusiones.tex (§2, cumplimiento de objetivos)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{16 \,$\cdot$\, Cumplimiento de objetivos}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\Large\bfseries\sffamily\color{inkText}Cumplimiento dispar entre objetivos técnicos y clínicos};
+
+    % ------------------------------------------------------
+    % Tabla de 4 filas: icono | objetivo | resultado | explicación
+    % Cada celda encadena su valor al bloque anterior (.south west) para
+    % que un envoltorio a 2 líneas nunca pise el siguiente elemento.
+    % ------------------------------------------------------
+    \def\tblX{1.4cm}
+    \def\tblW{13.2cm}
+    \def\tblTop{-2.0cm}
+    \def\rowH{1.28cm}
+    \def\colIconX{0.35cm}
+    \def\colObjX{1.35cm}
+    \def\colObjW{3.5cm}
+    \def\colResX{5.15cm}
+    \def\colResW{2.55cm}
+    \def\colExpX{7.95cm}
+    \def\colExpW{4.9cm}
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt, rounded corners=6pt,
+          minimum width=\tblW, minimum height=4*\rowH, inner sep=0pt]
+      (tbl) at ([xshift=\tblX, yshift=\tblTop]current page.north west) {};
+
+    % ============== Fila 1: Objetivo 1 — Transcripción — CUMPLIDO ==============
+    \begin{scope}[shift={($(tbl.north west)+(\colIconX+0.28cm,-0.5*\rowH)$)}]
+      \fill[accentTeal] (0,0) circle (0.28cm);
+      \draw[white, line width=1.3pt, line cap=round, line join=round]
+        (-0.12,0) -- (-0.03,-0.1) -- (0.14,0.12);
+    \end{scope}
+    \node[anchor=north west] (o1lab)
+      at ([xshift=\colObjX, yshift=-0.20cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Objetivo 1 \,$\cdot$\, ASR}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o1lab.south west)
+      {\fontsize{8.5}{9.5}\selectfont\sffamily\color{inkText}\textit{WER} $\leq$10--12\,\%};
+    \node[anchor=north west] (o1res)
+      at ([xshift=\colResX, yshift=-0.20cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Resultado}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o1res.south west)
+      {\parbox[t]{\colResW}{\raggedright\small\bfseries\sffamily\color{accentTeal}$\approx$6.5\,\% \normalfont\footnotesize\color{mutedText}medio}};
+    \node[anchor=north west]
+      at ([xshift=\colExpX, yshift=-0.20cm]tbl.north west)
+      {\parbox[t]{\colExpW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Consistente en ambas modalidades y los 10 casos; rango bajo ($\approx$0.6--13.6\,\%).}};
+    \draw[lineGrey, line width=0.5pt]
+      ([yshift=-\rowH]tbl.north west) -- ([yshift=-\rowH]tbl.north east);
+
+    % ============== Fila 2: Objetivo 2 — NER — NO CUMPLIDO ==============
+    \begin{scope}[shift={($(tbl.north west)+(\colIconX+0.28cm,-1.5*\rowH)$)}]
+      \fill[accentRed] (0,0) circle (0.28cm);
+      \draw[white, line width=1.3pt, line cap=round]
+        (-0.11,-0.11) -- (0.11,0.11);
+      \draw[white, line width=1.3pt, line cap=round]
+        (-0.11,0.11) -- (0.11,-0.11);
+    \end{scope}
+    \node[anchor=north west] (o2lab)
+      at ([xshift=\colObjX, yshift=-\rowH-0.20cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Objetivo 2 \,$\cdot$\, NER}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o2lab.south west)
+      {\fontsize{8.5}{9.5}\selectfont\sffamily\color{inkText}\textit{F1} $\geq$0.85};
+    \node[anchor=north west] (o2res)
+      at ([xshift=\colResX, yshift=-\rowH-0.20cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Resultado}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o2res.south west)
+      {\small\bfseries\sffamily\color{accentRed}32.0\,--\,43.8\,\%};
+    \node[anchor=north west]
+      at ([xshift=\colExpX, yshift=-\rowH-0.20cm]tbl.north west)
+      {\parbox[t]{\colExpW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Muy por debajo del umbral: sobre-segmentación de \textit{spans} y siglas/abreviaturas no reconocidas.}};
+    \draw[lineGrey, line width=0.5pt]
+      ([yshift=-2*\rowH]tbl.north west) -- ([yshift=-2*\rowH]tbl.north east);
+
+    % ============== Fila 3: Objetivo 3 — Calidad clínica — NO CUMPLIDO ==============
+    \begin{scope}[shift={($(tbl.north west)+(\colIconX+0.28cm,-2.5*\rowH)$)}]
+      \fill[accentRed] (0,0) circle (0.28cm);
+      \draw[white, line width=1.3pt, line cap=round]
+        (-0.11,-0.11) -- (0.11,0.11);
+      \draw[white, line width=1.3pt, line cap=round]
+        (-0.11,0.11) -- (0.11,-0.11);
+    \end{scope}
+    \node[anchor=north west] (o3lab)
+      at ([xshift=\colObjX, yshift=-2*\rowH-0.15cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Objetivo 3 \,$\cdot$\, Clínica}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o3lab.south west)
+      {\fontsize{8.5}{9.5}\selectfont\sffamily\color{inkText}$\geq$80\,\% aceptación};
+    \node[anchor=north west] (o3res)
+      at ([xshift=\colResX, yshift=-2*\rowH-0.15cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Resultado}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o3res.south west)
+      {\small\bfseries\sffamily\color{accentRed}20\,\% \,$\cdot$\, 30\,\%};
+    \node[anchor=north west]
+      at ([xshift=\colExpX, yshift=-2*\rowH-0.15cm]tbl.north west)
+      {\parbox[t]{\colExpW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Propagación y amplificación de errores entre etapas del \textit{pipeline} secuencial.}};
+    \draw[lineGrey, line width=0.5pt]
+      ([yshift=-3*\rowH]tbl.north west) -- ([yshift=-3*\rowH]tbl.north east);
+
+    % ============== Fila 4: Objetivo 4 — Interoperabilidad — CON RESERVAS ==============
+    \begin{scope}[shift={($(tbl.north west)+(\colIconX+0.28cm,-3.5*\rowH)$)}]
+      \fill[accentBlue] (0,0) circle (0.28cm);
+      \draw[white, line width=1.3pt, line cap=round, line join=round]
+        (-0.12,0) -- (-0.03,-0.1) -- (0.14,0.12);
+    \end{scope}
+    \node[anchor=north west] (o4lab)
+      at ([xshift=\colObjX, yshift=-3*\rowH-0.20cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Objetivo 4 \,$\cdot$\, FHIR}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o4lab.south west)
+      {\fontsize{8.5}{9.5}\selectfont\sffamily\color{inkText}\textit{FHIR} $>$95\,\% válido};
+    \node[anchor=north west] (o4res)
+      at ([xshift=\colResX, yshift=-3*\rowH-0.20cm]tbl.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}\MakeUppercase{Resultado}};
+    \node[anchor=north west]
+      at ([yshift=-0.0cm]o4res.south west)
+      {\small\bfseries\sffamily\color{accentBlue}100\,\%};
+    \node[anchor=north west]
+      at ([xshift=\colExpX, yshift=-3*\rowH-0.20cm]tbl.north west)
+      {\parbox[t]{\colExpW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Válido no es lo mismo que correcto: hereda sin filtrar los errores semánticos previos.}};
+
+    % --- Leyenda de color ---
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-7.45cm]current page.north west)
+      {\fontsize{7.5}{7.5}\selectfont\sffamily\color{mutedText}%
+       \textcolor{accentTeal}{\textbullet} Cumplido \qquad
+       \textcolor{accentBlue}{\textbullet} Cumplido con reservas \qquad
+       \textcolor{accentRed}{\textbullet} No cumplido};
+
+  \end{tikzpicture}
+  \end{frame}

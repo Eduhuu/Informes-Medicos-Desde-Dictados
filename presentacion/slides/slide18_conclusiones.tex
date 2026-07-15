@@ -1,0 +1,102 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 18 — CONCLUSIONES (fondo oscuro)
+% Datos: latex/capitulos/07_Conclusiones.tex (§1, Conclusiones generales)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[inkDark] (current page.south west) rectangle (current page.north east);
+
+    \fill[accentTeal] ([xshift=0cm]current page.north west) rectangle
+          ([yshift=-0.15cm]current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.75cm]current page.north west)
+      {\kicker[accentTeal]{17 \,$\cdot$\, Conclusiones}};
+
+    % --- Comilla decorativa ---
+    \node[anchor=north west, align=left]
+      at ([xshift=1.25cm, yshift=-1.05cm]current page.north west)
+      {\fontsize{40}{40}\selectfont\bfseries\sffamily\color{accentTeal}\textquotedblleft};
+
+    % --- Cita textual ---
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-1.75cm]current page.north west)
+      {\parbox[t]{12.4cm}{\raggedright\large\sffamily\color{white}%
+       El desempeño de un sistema clínico de este tipo no puede inferirse a partir del desempeño
+       aislado de sus componentes.}};
+
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-2.85cm]current page.north west)
+      {\fontsize{8}{8}\selectfont\sffamily\color{mutedText}Conclusiones generales \,$\cdot$\, Capítulo 7};
+
+    \draw[lineGrey, opacity=0.25, line width=0.5pt]
+      ([xshift=1.4cm, yshift=-3.35cm]current page.north west) --
+      ([xshift=-1.4cm, yshift=-3.35cm]current page.north east);
+
+    % ------------------------------------------------------
+    % 3 tarjetas — puntos clave
+    % ------------------------------------------------------
+    \def\ccW{4.2cm}
+    \def\ccH{4.55cm}
+    \def\ccGap{0.3cm}
+    \def\ccTextW{3.5cm}
+    \def\ccY{-3.75cm}
+
+    % ---------- Punto 1 ----------
+    \node[anchor=north west, fill=inkDark2, rounded corners=6pt,
+          minimum width=\ccW, minimum height=\ccH, inner sep=0pt]
+      (c1) at ([xshift=1.4cm, yshift=\ccY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (c1.north west) rectangle ([yshift=-0.12cm]c1.north east);
+    \node[anchor=north west, circle, draw=accentTeal, line width=1pt, minimum size=16pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]c1.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{accentTeal}1};
+    \node[anchor=north west, text width=\ccTextW, align=left] (c1title)
+      at ([xshift=0.4cm, yshift=-0.95cm]c1.north west)
+      {\small\bfseries\sffamily\color{white}Arquitectura completa y funcional};
+    \node[anchor=north west]
+      at ([yshift=-0.18cm]c1title.south west)
+      {\parbox[t]{\ccTextW}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{mutedText}%
+       Cubre de extremo a extremo el flujo del audio al recurso \textit{FHIR}. Cumple el
+       Objetivo\,1 (\textit{WER}) y el Objetivo\,4 con reservas.}};
+
+    % ---------- Punto 2 ----------
+    \node[anchor=north west, fill=inkDark2, rounded corners=6pt,
+          minimum width=\ccW, minimum height=\ccH, inner sep=0pt]
+      (c2) at ([xshift=1.4cm+\ccW+\ccGap, yshift=\ccY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (c2.north west) rectangle ([yshift=-0.12cm]c2.north east);
+    \node[anchor=north west, circle, draw=accentTeal, line width=1pt, minimum size=16pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]c2.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{accentTeal}2};
+    \node[anchor=north west, text width=\ccTextW, align=left] (c2title)
+      at ([xshift=0.4cm, yshift=-0.95cm]c2.north west)
+      {\small\bfseries\sffamily\color{white}El problema es la propagación, no los módulos};
+    \node[anchor=north west]
+      at ([yshift=-0.18cm]c2title.south west)
+      {\parbox[t]{\ccTextW}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{mutedText}%
+       Errores moderados y aislados se amplifican al encadenarse sin corrección. Los
+       Objetivos\,2 y\,3 no se cumplen por esta causa.}};
+
+    % ---------- Punto 3 ----------
+    \node[anchor=north west, fill=inkDark2, rounded corners=6pt,
+          minimum width=\ccW, minimum height=\ccH, inner sep=0pt]
+      (c3) at ([xshift=1.4cm+2*\ccW+2*\ccGap, yshift=\ccY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (c3.north west) rectangle ([yshift=-0.12cm]c3.north east);
+    \node[anchor=north west, circle, draw=accentTeal, line width=1pt, minimum size=16pt, inner sep=0pt]
+      at ([xshift=0.4cm, yshift=-0.4cm]c3.north west)
+      {\fontsize{7.5}{7.5}\selectfont\bfseries\sffamily\color{accentTeal}3};
+    \node[anchor=north west, text width=\ccTextW, align=left] (c3title)
+      at ([xshift=0.4cm, yshift=-0.95cm]c3.north west)
+      {\small\bfseries\sffamily\color{white}Prueba de concepto, no producto clínico};
+    \node[anchor=north west]
+      at ([yshift=-0.18cm]c3title.south west)
+      {\parbox[t]{\ccTextW}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{mutedText}%
+       Técnicamente viable, pero sin el nivel de fiabilidad necesario para operar sin
+       supervisión clínica humana.}};
+
+  \end{tikzpicture}
+  \end{frame}

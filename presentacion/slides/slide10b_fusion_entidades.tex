@@ -1,0 +1,122 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 10.5 — MITIGACIÓN DE LA SOBRE-SEGMENTACIÓN (fondo claro)
+% Adaptación de imagenes/diagramas/desarrollo_del_tfm/fusion_entidades_NER.tex
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{09 \,$\cdot$\, Caso clínico \,$\cdot$\, Etapa 3 \,$\cdot$\, Mitigación}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\large\bfseries\sffamily\color{inkText}Filtrado y fusión de entidades contiguas para evitar la sobre-segmentación};
+
+    % ------------------------------------------------------
+    % 3 columnas: originales -> tras filtrado -> fusionada
+    % ------------------------------------------------------
+    \def\stageW{3.5cm}
+    \def\stageGap{1.3cm}
+    \def\chipH{0.95cm}
+    \def\chipGap{0.18cm}
+    \def\stageY{-2.35cm}
+
+    \def\colA{1.4cm}
+    \def\colB{1.4cm+\stageW+\stageGap}
+    \def\colC{1.4cm+2*\stageW+2*\stageGap}
+
+    % --- Columna A: entidades originales ---
+    \node[anchor=north west]
+      at ([xshift=\colA, yshift=\stageY]current page.north west)
+      {\parbox{\stageW}{\centering\footnotesize\bfseries\sffamily\color{mutedText}\MakeUppercase{Detectadas}}};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=4pt, minimum width=\stageW, minimum height=\chipH, inner sep=0pt]
+      (a1) at ([xshift=\colA, yshift=\stageY-0.45cm]current page.north west) {};
+    \node[anchor=center] at (a1.center)
+      {\parbox{3.1cm}{\centering\small\bfseries\sffamily\color{inkText}Hipertensión\\[1pt]
+       \fontsize{6.5}{7}\selectfont\normalfont\color{mutedText}PROBLEM \,$\cdot$\, 0.95}};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=4pt, minimum width=\stageW, minimum height=\chipH, inner sep=0pt]
+      (a2) at ([yshift=-\chipGap]a1.south west) {};
+    \node[anchor=center] at (a2.center)
+      {\parbox{3.1cm}{\centering\small\bfseries\sffamily\color{inkText}Arterial\\[1pt]
+       \fontsize{6.5}{7}\selectfont\normalfont\color{mutedText}SYMPTOM \,$\cdot$\, 0.97}};
+
+    % --- Flecha 1: filtrado ---
+    \coordinate (aMid) at ($(a1.east)!0.5!(a2.east)$);
+    \draw[->, accentTeal, line width=1.2pt] (aMid) -- ++(\stageGap,0);
+    \node[anchor=south, align=center]
+      at ([xshift=0.5*\stageGap, yshift=0.1cm]aMid)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}Filtrado};
+
+    % --- Columna B: tras filtrado ---
+    \node[anchor=north west]
+      at ([xshift=\colB, yshift=\stageY]current page.north west)
+      {\parbox{\stageW}{\centering\footnotesize\bfseries\sffamily\color{mutedText}\MakeUppercase{Filtradas}}};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=4pt, minimum width=\stageW, minimum height=\chipH, inner sep=0pt]
+      (b1) at ([xshift=\colB, yshift=\stageY-0.45cm]current page.north west) {};
+    \node[anchor=center] at (b1.center)
+      {\parbox{3.1cm}{\centering\small\bfseries\sffamily\color{inkText}Hipertensión\\[1pt]
+       \fontsize{6.5}{7}\selectfont\normalfont\color{mutedText}PROBLEM \,$\cdot$\, 0.95}};
+
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=4pt, minimum width=\stageW, minimum height=\chipH, inner sep=0pt]
+      (b2) at ([yshift=-\chipGap]b1.south west) {};
+    \node[anchor=center] at (b2.center)
+      {\parbox{3.1cm}{\centering\small\bfseries\sffamily\color{inkText}Arterial\\[1pt]
+       \fontsize{6.5}{7}\selectfont\normalfont\color{mutedText}SYMPTOM \,$\cdot$\, 0.97}};
+
+    % --- Flecha 2: fusión ---
+    \coordinate (bMid) at ($(b1.east)!0.5!(b2.east)$);
+    \draw[->, accentTeal, line width=1.2pt] (bMid) -- ++(\stageGap,0);
+    \node[anchor=south, align=center]
+      at ([xshift=0.5*\stageGap, yshift=0.1cm]bMid)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}Fusión};
+
+    % --- Columna C: entidad fusionada ---
+    \node[anchor=north west]
+      at ([xshift=\colC, yshift=\stageY]current page.north west)
+      {\parbox{\stageW}{\centering\footnotesize\bfseries\sffamily\color{mutedText}\MakeUppercase{Fusionada}}};
+
+    \node[anchor=north west, fill=accentTeal, rounded corners=4pt,
+          minimum width=\stageW, minimum height=2*\chipH+\chipGap, inner sep=0pt]
+      (c1) at ([xshift=\colC, yshift=\stageY-0.45cm]current page.north west) {};
+    \node[anchor=center] at (c1.center)
+      {\parbox{3.1cm}{\centering\bfseries\sffamily\color{inkDark}Hipertensión arterial\\[4pt]
+       \fontsize{7}{8}\selectfont\normalfont\color{inkDark}SYMPTOM \,$\cdot$\, 0.97}};
+
+    % --- Subtítulos pequeños bajo cada flecha (detalle del criterio) ---
+    \node[anchor=north, align=center]
+      at ([xshift=0.5*\stageGap, yshift=-0.28cm]aMid)
+      {\parbox{\stageGap}{\centering\fontsize{5.8}{6.5}\selectfont\normalfont\itshape\color{mutedText}score / ruido}};
+    \node[anchor=north, align=center]
+      at ([xshift=0.5*\stageGap, yshift=-0.28cm]bMid)
+      {\parbox{\stageGap}{\centering\fontsize{5.8}{6.5}\selectfont\normalfont\itshape\color{mutedText}mismo origen}};
+
+    % ------------------------------------------------------
+    % Nota inferior
+    % ------------------------------------------------------
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=13.2cm, minimum height=1.55cm,
+          align=left, inner sep=0pt]
+      (notebox) at ([xshift=1.4cm, yshift=-5.85cm]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (notebox.north west) rectangle ([xshift=0.12cm]notebox.south west);
+    \node[anchor=west]
+      at ([xshift=0.55cm]notebox.west)
+      {\parbox[t]{12.3cm}{\raggedright\fontsize{9}{11}\selectfont\sffamily\color{inkText}%
+       Dos entidades \textit{NER} contiguas del mismo modelo de origen (\texttt{pln\_source}) se
+       fusionan en una sola: la entidad resultante hereda la etiqueta del fragmento con mayor
+       confianza y una puntuación promediada, evitando que un concepto de varias palabras se
+       registre como entidades sueltas.}};
+
+  \end{tikzpicture}
+  \end{frame}

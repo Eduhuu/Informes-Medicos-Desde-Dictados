@@ -1,0 +1,173 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 15 — RESULTADOS END-TO-END: BATCH VS STREAMING (fondo claro)
+% Datos: latex/tablas/capitulo_evaluacion/tabla_e2e_detalle_{batch,streaming}.tex (fila Promedio)
+%        latex/capitulos/06_Resultados_y_Discusion.tex (Bundle FHIR, Tiempo total de procesamiento)
+% Escala 1--5; longitud de barra = valor * 1.68cm (5 -> 8.4cm)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{14 \,$\cdot$\, Resultados \textit{end-to-end}}};
+
+    \node[anchor=north west, align=left, text width=11.5cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\large\bfseries\sffamily\color{inkText}\textit{Streaming} puntúa más en las 5 dimensiones, pero cuesta $\approx$6$\times$ más tiempo};
+
+    % --- Leyenda ---
+    \node[anchor=north east, circle, fill=accentTeal, minimum size=7pt, inner sep=0pt]
+      at ([xshift=-1.85cm, yshift=-1.05cm]current page.north east) {};
+    \node[anchor=north west]
+      at ([xshift=-1.7cm, yshift=-0.98cm]current page.north east)
+      {\fontsize{7.5}{7.5}\selectfont\sffamily\color{inkText}\textit{Streaming}};
+    \node[anchor=north east, circle, fill=mutedText, minimum size=7pt, inner sep=0pt]
+      at ([xshift=-1.85cm, yshift=-1.40cm]current page.north east) {};
+    \node[anchor=north west]
+      at ([xshift=-1.7cm, yshift=-1.33cm]current page.north east)
+      {\fontsize{7.5}{7.5}\selectfont\sffamily\color{inkText}\textit{Batch}};
+
+    % ------------------------------------------------------
+    % Gráfico de barras horizontales (5 dimensiones)
+    % Columna de etiquetas: 1.4cm -- 4.3cm ; origen de barras: x=4.3cm
+    % Escala: 1.68cm por punto (0--5)
+    % ------------------------------------------------------
+
+    % --- Líneas de rejilla verticales (0,1,2,3,4,5) + etiquetas de eje ---
+    \foreach \g/\gx in {0/0, 1/1.68, 2/3.36, 3/5.04, 4/6.72, 5/8.40} {
+      \draw[lineGrey, opacity=0.7, line width=0.5pt]
+        ([xshift=4.3cm+\gx cm, yshift=-2.05cm]current page.north west) --
+        ([xshift=4.3cm+\gx cm, yshift=-6.35cm]current page.north west);
+      \node[anchor=north]
+        at ([xshift=4.3cm+\gx cm, yshift=-6.35cm]current page.north west)
+        {\fontsize{6.5}{6.5}\selectfont\sffamily\color{mutedText}\g};
+    }
+
+    % ============== Fila 1: ASR (batch 3.75 / streaming 4.0) ==============
+    \node[anchor=west]
+      at ([xshift=1.4cm, yshift=-2.55cm]current page.north west)
+      {\fontsize{8.5}{8.5}\selectfont\bfseries\sffamily\color{inkText}\textit{ASR}};
+    \fill[accentTeal, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-2.25cm]current page.north west) rectangle
+      ([xshift=4.3cm+6.72cm, yshift=-2.55cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+6.72cm+0.12cm, yshift=-2.40cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{accentTeal}4.0};
+    \fill[mutedText, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-2.61cm]current page.north west) rectangle
+      ([xshift=4.3cm+6.30cm, yshift=-2.85cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+6.30cm+0.12cm, yshift=-2.73cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}3.75};
+
+    % ============== Fila 2: NER (batch 2.10 / streaming 2.9) ==============
+    \node[anchor=west]
+      at ([xshift=1.4cm, yshift=-3.35cm]current page.north west)
+      {\fontsize{8.5}{8.5}\selectfont\bfseries\sffamily\color{inkText}\textit{NER}};
+    \fill[accentTeal, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-3.05cm]current page.north west) rectangle
+      ([xshift=4.3cm+4.87cm, yshift=-3.35cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+4.87cm+0.12cm, yshift=-3.20cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{accentTeal}2.9};
+    \fill[mutedText, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-3.41cm]current page.north west) rectangle
+      ([xshift=4.3cm+3.53cm, yshift=-3.65cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+3.53cm+0.12cm, yshift=-3.53cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}2.10};
+
+    % ============== Fila 3: Terminología (batch 1.55 / streaming 1.9) ==============
+    \node[anchor=west]
+      at ([xshift=1.4cm, yshift=-4.15cm]current page.north west)
+      {\fontsize{8.5}{8.5}\selectfont\bfseries\sffamily\color{inkText}Terminología};
+    \fill[accentTeal, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-3.85cm]current page.north west) rectangle
+      ([xshift=4.3cm+3.19cm, yshift=-4.15cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+3.19cm+0.12cm, yshift=-4.00cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{accentTeal}1.9};
+    \fill[mutedText, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-4.21cm]current page.north west) rectangle
+      ([xshift=4.3cm+2.60cm, yshift=-4.45cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+2.60cm+0.12cm, yshift=-4.33cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}1.55};
+
+    % ============== Fila 4: Informe LLM (batch 1.95 / streaming 2.2) ==============
+    \node[anchor=west]
+      at ([xshift=1.4cm, yshift=-4.95cm]current page.north west)
+      {\fontsize{8.5}{8.5}\selectfont\bfseries\sffamily\color{inkText}Informe \textit{LLM}};
+    \fill[accentTeal, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-4.65cm]current page.north west) rectangle
+      ([xshift=4.3cm+3.70cm, yshift=-4.95cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+3.70cm+0.12cm, yshift=-4.80cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{accentTeal}2.2};
+    \fill[mutedText, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-5.01cm]current page.north west) rectangle
+      ([xshift=4.3cm+3.28cm, yshift=-5.25cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+3.28cm+0.12cm, yshift=-5.13cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}1.95};
+
+    % ============== Fila 5: FHIR (batch 2.70 / streaming 3.2) ==============
+    \node[anchor=west]
+      at ([xshift=1.4cm, yshift=-5.75cm]current page.north west)
+      {\fontsize{8.5}{8.5}\selectfont\bfseries\sffamily\color{inkText}\textit{FHIR}};
+    \fill[accentTeal, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-5.45cm]current page.north west) rectangle
+      ([xshift=4.3cm+5.38cm, yshift=-5.75cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+5.38cm+0.12cm, yshift=-5.60cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{accentTeal}3.2};
+    \fill[mutedText, rounded corners=1pt]
+      ([xshift=4.3cm, yshift=-5.81cm]current page.north west) rectangle
+      ([xshift=4.3cm+4.54cm, yshift=-6.05cm]current page.north west);
+    \node[anchor=west]
+      at ([xshift=4.3cm+4.54cm+0.12cm, yshift=-5.93cm]current page.north west)
+      {\fontsize{7}{7}\selectfont\bfseries\sffamily\color{mutedText}2.70};
+
+    % ------------------------------------------------------
+    % 3 tarjetas de estadísticas
+    % ------------------------------------------------------
+    \def\statCardW{4.2cm}
+    \def\statCardH{1.65cm}
+    \def\statCardGap{0.3cm}
+    \def\statCardY{-6.95cm}
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.15cm]st1.north west)
+      {\normalsize\bfseries\sffamily\color{accentTeal}5\,/\,5};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.70cm]st1.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Dimensiones donde \textit{streaming} supera a \textit{batch}}};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.15cm]st2.north west)
+      {\normalsize\bfseries\sffamily\color{accentRed}$\approx$6$\times$};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.70cm]st2.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Más tiempo: 184.9\,s vs 30.6\,s de media}};
+
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+      (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
+    \node[anchor=north west, align=left]
+      at ([xshift=0.4cm, yshift=-0.15cm]st3.north west)
+      {\normalsize\bfseries\sffamily\color{accentTeal}\textit{FHIR}};
+    \node[anchor=north west]
+      at ([xshift=0.4cm, yshift=-0.70cm]st3.north west)
+      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Dimensión mejor puntuada en ambos modos}};
+
+  \end{tikzpicture}
+  \end{frame}

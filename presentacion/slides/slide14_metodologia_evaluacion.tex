@@ -1,0 +1,113 @@
+% !TeX root = ../main.tex
+% ============================================================
+% LÁMINA 14 — METODOLOGÍA DE EVALUACIÓN (fondo claro)
+% Datos: latex/capitulos/05_Evaluacion.tex (secciones 5.1-5.4)
+% ============================================================
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+
+    \fill[paperBg] (current page.south west) rectangle (current page.north east);
+
+    \node[anchor=north west, align=left]
+      at ([xshift=1.4cm, yshift=-0.55cm]current page.north west)
+      {\kicker[accentBlue]{13 \,$\cdot$\, Metodología de evaluación}};
+
+    \node[anchor=north west, align=left, text width=13.2cm]
+      at ([xshift=1.4cm, yshift=-1.05cm]current page.north west)
+      {\Large\bfseries\sffamily\color{inkText}Evaluación por módulos y de extremo a extremo};
+
+    % --- 4 tarjetas oscuras en fila ---
+    \def\mW{3.075cm}
+    \def\mGap{0.3cm}
+    \def\mH{5.0cm}
+    \def\mTextW{2.28cm}
+    \def\mY{-2.0cm}
+
+    % ---------- Tarjeta 1 — 10 casos ----------
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\mW, minimum height=\mH, inner sep=0pt]
+      (m1) at ([xshift=1.4cm, yshift=\mY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (m1.north west) rectangle ([yshift=-0.12cm]m1.north east);
+    \node[anchor=north west, text width=\mTextW, align=left] (m1title)
+      at ([xshift=0.4cm, yshift=-0.55cm]m1.north west)
+      {\LARGE\bfseries\sffamily\color{accentTeal}10};
+    \node[anchor=north west] (m1sub)
+      at ([yshift=-0.05cm]m1title.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{8.5}{10}\selectfont\bfseries\sffamily\color{white}%
+       casos de referencia}};
+    \node[anchor=north west]
+      at ([yshift=-0.22cm]m1sub.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Muestreo aleatorio de \textit{SPACCC} (1.000 casos); \textit{gold standard} anotado con
+       \textit{Claude Opus 4.5}.}};
+
+    % ---------- Tarjeta 2 — 2 modalidades ----------
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\mW, minimum height=\mH, inner sep=0pt]
+      (m2) at ([xshift=1.4cm+3*\mW+3*\mGap, yshift=\mY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (m2.north west) rectangle ([yshift=-0.12cm]m2.north east);
+    \node[anchor=north west, text width=\mTextW, align=left] (m2title)
+      at ([xshift=0.4cm, yshift=-0.55cm]m2.north west)
+      {\LARGE\bfseries\sffamily\color{accentTeal}2};
+    \node[anchor=north west] (m2sub)
+      at ([yshift=-0.05cm]m2title.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{8.5}{10}\selectfont\bfseries\sffamily\color{white}%
+       modalidades: \textit{batch} y \textit{streaming}}};
+    \node[anchor=north west]
+      at ([yshift=-0.22cm]m2sub.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Mismo motor \textit{ASR}; cambia cómo el \textit{gateway} agrupa el audio.}};
+
+    % ---------- Tarjeta 3 — Evaluación por módulos ----------
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\mW, minimum height=\mH, inner sep=0pt]
+      (m3) at ([xshift=1.4cm+\mW+\mGap, yshift=\mY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (m3.north west) rectangle ([yshift=-0.12cm]m3.north east);
+    \node[anchor=north west, text width=\mTextW, align=left] (m3title)
+      at ([xshift=0.4cm, yshift=-0.55cm]m3.north west)
+      {\normalsize\bfseries\sffamily\color{accentTeal}Evaluación por módulos};
+    \node[anchor=north west] (m3sub)
+      at ([yshift=-0.12cm]m3title.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{8.5}{10}\selectfont\bfseries\sffamily\color{white}%
+       \textit{ASR} \,$\cdot$\, \textit{NER} \,$\cdot$\, Terminología}};
+    \node[anchor=north west]
+      at ([yshift=-0.10cm]m3sub.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Cada etapa, aislada, frente a su propio \textit{gold standard} (\textit{WER}, precisión,
+       \textit{recall}, \textit{F1}).}};
+
+    % ---------- Tarjeta 4 — LLM-as-judge ----------
+    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+          minimum width=\mW, minimum height=\mH, inner sep=0pt]
+      (m4) at ([xshift=1.4cm+2*\mW+2*\mGap, yshift=\mY]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (m4.north west) rectangle ([yshift=-0.12cm]m4.north east);
+    \node[anchor=north west, text width=\mTextW, align=left] (m4title)
+      at ([xshift=0.4cm, yshift=-0.55cm]m4.north west)
+      {\normalsize\bfseries\sffamily\color{accentTeal}\textit{LLM-as-judge}};
+    \node[anchor=north west] (m4sub)
+      at ([yshift=-0.12cm]m4title.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{8.5}{10}\selectfont\bfseries\sffamily\color{white}%
+       Evaluación \textit{end-to-end}}};
+    \node[anchor=north west]
+      at ([yshift=-0.15cm]m4sub.south west)
+      {\parbox[t]{\mTextW}{\raggedright\fontsize{7.5}{9}\selectfont\sffamily\color{mutedText}%
+       Puntúa 1--5 en 5 dimensiones y emite veredicto de aceptación clínica (\textit{proxy} del
+       Objetivo\,3).}};
+
+    % --- Nota inferior ---
+    \draw[lineGrey, opacity=0.6, line width=0.5pt]
+      ([yshift=-0.35cm]m1.south west) -- ([yshift=-0.35cm]m4.south east);
+
+    \node[anchor=north west]
+      at ([xshift=1.4cm, yshift=-7.55cm]current page.north west)
+      {\parbox[t]{13.2cm}{\raggedright\footnotesize\sffamily\color{mutedText}%
+       Los tres artefactos de salida (\texttt{Reporte.txt}, \texttt{Informe.txt},
+       \texttt{Fhir\_Reporte.json}) se contrastan contra el texto de referencia de cada caso, en
+       local y sin \textit{GPU} de servidor.}};
+
+  \end{tikzpicture}
+  \end{frame}
