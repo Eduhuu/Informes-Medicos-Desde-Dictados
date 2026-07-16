@@ -94,7 +94,7 @@
       {\parbox[t]{5.6cm}{\raggedright\fontsize{7}{8.4}\selectfont\sffamily\color{inkText}%
        La validación \textbf{no filtra} el contenido: el \textit{Bundle} traslada, sin corregirlos,
        los errores ya vistos en este mismo caso.\\[3pt]
-       \textbf{\color{accentRed}NER:} \textit{"analgesia"} persiste como \texttt{Condition} (falso positivo).\\[2pt]
+      %  \textbf{\color{accentRed}NER:} \textit{"analgesia"} persiste como \texttt{Condition} (falso positivo).\\[2pt]
        \textbf{\color{accentRed}Terminología:} \textit{"doloroso"} $\to$ \textit{Trigeminal neuralgia}
        codificado como hallazgo (\textit{CIE-10} err.).\\[2pt]
        \textbf{\color{accentRed}Informe:} dosis $\times$1000 (\textit{"50\,mg/hora"}) pasa intacta al
@@ -103,40 +103,40 @@
     % ------------------------------------------------------
     % 3 tarjetas de estadísticas
     % ------------------------------------------------------
-    \def\statCardW{4.2cm}
-    \def\statCardH{1.6cm}
-    \def\statCardGap{0.3cm}
-    \def\statCardY{-6.95cm}
+    % \def\statCardW{4.2cm}
+    % \def\statCardH{1.6cm}
+    % \def\statCardGap{0.3cm}
+    % \def\statCardY{-6.95cm}
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.10cm]st1.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}4\,/\,5};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.70cm]st1.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Puntuación \textit{FHIR} de este caso (\textit{streaming} Test\,1)}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.10cm]st1.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}4\,/\,5};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.70cm]st1.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Puntuación \textit{FHIR} de este caso (\textit{streaming} Test\,1)}};
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.10cm]st2.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}3};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.70cm]st2.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Persisten como hallazgos clínicos válidos}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.10cm]st2.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}3};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.70cm]st2.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Persisten como hallazgos clínicos válidos}};
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.10cm]st3.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}100\,\%};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.70cm]st3.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Objetivo 4 solo en forma}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.10cm]st3.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}100\,\%};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.70cm]st3.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Objetivo 4 solo en forma}};
 
   \end{tikzpicture}
 \end{frame}

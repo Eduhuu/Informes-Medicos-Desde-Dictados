@@ -89,42 +89,59 @@
       {\fontsize{6.5}{6.5}\selectfont\sffamily\color{mutedText}\textit{ASR}};
 
     % ------------------------------------------------------
-    % 3 tarjetas de estadísticas
+    % Nota: errores típicos del ASR
     % ------------------------------------------------------
-    \def\statCardW{4.2cm}
-    \def\statCardH{2.0cm}
-    \def\statCardGap{0.3cm}
-    \def\statCardY{-5.55cm}
-
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.2cm]st1.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}$\approx$6.5\%};
+    \node[anchor=north west, fill=cardWhite, draw=lineGrey, line width=0.6pt,
+          rounded corners=6pt, minimum width=13.2cm, minimum height=2.25cm,
+          align=left, inner sep=0pt]
+      (asrnote) at ([xshift=1.4cm, yshift=-5.15cm]current page.north west) {};
+    \fill[accentTeal, rounded corners=2pt]
+      (asrnote.north west) rectangle ([xshift=0.12cm]asrnote.south west);
     \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.80cm]st1.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Tasa de error de palabra (\textit{WER})}};
-
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.2cm]st2.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}93.6\%};
+      at ([xshift=0.55cm, yshift=-0.22cm]asrnote.north west)
+      {\footnotesize\bfseries\sffamily\color{inkText}\MakeUppercase{Errores observados en el ASR}};
     \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.80cm]st2.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Palabras transcritas correctamente}};
+      at ([xshift=0.55cm, yshift=-0.68cm]asrnote.north west)
+      {\parbox[t]{12.3cm}{\raggedright\fontsize{8.5}{10.5}\selectfont\sffamily\color{mutedText}%
+       \textbullet\ \textbf{Siglas y epónimos clínicos cortos} p.\,ej.\ \textit{"TTG"} \\
+       \textbullet\ \textbf{Confusiones fonéticas entre siglas similares}, p.\,ej.\ \textit{"TTG"} $\to$ \textit{"CTG"}\\[2pt]
+       \textbullet\ \textbf{Errores ortográficos menores} sobre vocabulario común (p.\,ej.\
+       \textit{"eficiencia"} por \textit{"eficacia"}).}};
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.2cm]st3.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}$\leq$10--12\%};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.80cm]st3.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Umbral objetivo definido (O1)}};
+    % \def\statCardW{4.2cm}
+    % \def\statCardH{2.0cm}
+    % \def\statCardGap{0.3cm}
+    % \def\statCardY{-5.55cm}
+
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.2cm]st1.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}$\approx$6.5\%};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.80cm]st1.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Tasa de error de palabra (\textit{WER})}};
+
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.2cm]st2.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}93.6\%};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.80cm]st2.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Palabras transcritas correctamente}};
+
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.2cm]st3.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}$\leq$10--12\%};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.80cm]st3.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Umbral objetivo definido (O1)}};
 
   \end{tikzpicture}
   \end{frame}

@@ -143,40 +143,40 @@
     % ------------------------------------------------------
     % 3 tarjetas de estadísticas
     % ------------------------------------------------------
-    \def\statCardW{4.2cm}
-    \def\statCardH{1.75cm}
-    \def\statCardGap{0.3cm}
-    \def\statCardY{-7.0cm}
+    % \def\statCardW{4.2cm}
+    % \def\statCardH{1.75cm}
+    % \def\statCardGap{0.3cm}
+    % \def\statCardY{-7.0cm}
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.2cm]st1.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}60\,\%};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.75cm]st1.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aciertos \textit{SNOMED CT} (3/5)}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.2cm]st1.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}60\,\%};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.75cm]st1.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aciertos \textit{SNOMED CT} (3/5)}};
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.2cm]st2.north west)
-      {\Large\bfseries\sffamily\color{accentRed}40\,\%};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.75cm]st2.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aciertos \textit{CIE-10-ES} (2/5)}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.2cm]st2.north west)
+    %   {\Large\bfseries\sffamily\color{accentRed}40\,\%};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.75cm]st2.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aciertos \textit{CIE-10-ES} (2/5)}};
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.2cm]st3.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}1.25\,s};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.75cm]st3.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Tiempo de normalización del caso}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.2cm]st3.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}1.25\,s};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.75cm]st3.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Tiempo de normalización del caso}};
 
   \end{tikzpicture}
   \end{frame}
