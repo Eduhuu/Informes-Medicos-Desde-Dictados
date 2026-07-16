@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1784231127.61953 "main.xdv" "main.pdf" "main" 1784231127.67379 0
-  "main.xdv" 1784231127.54239 382192 6701f3bb2aed66b4db6c549f99fc06aa "xelatex"
+["xdvipdfmx"] 1784233558.00483 "main.xdv" "main.pdf" "main" 1784233558.07575 0
+  "main.xdv" 1784233557.92659 383396 28aab04808358f08bc872e41d1689afa "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1784231125.68104 "main.tex" "main.xdv" "main" 1784231127.67199 0
+["xelatex"] 1784233556.0039 "main.tex" "main.xdv" "main" 1784233558.074 0
   "/etc/texmf/web2c/texmf.cnf" 1780664784.45967 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -218,12 +218,14 @@
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1783964034 9072652 bb406a6e7b26197966d8f79910ddbf67 ""
   "imagenes/app_idle_crop.jpeg" 1784043165.4322 26873 c70431f31b7490b7b485299311e96154 ""
   "imagenes/app_sending_crop.jpeg" 1784043165.45435 26725 dd5d556ed22c5396fdeca79aa07b4a10 ""
-  "main.aux" 1784231127.54139 4690 0b991971b5af5b787509c187bf5abc96 "xelatex"
-  "main.nav" 1784231127.54239 1853 3d3af853e0752fc75bf550a83110b9cc "xelatex"
-  "main.out" 1784231126.42673 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
+  "imagenes/logo-vector-escuela-internacional-de-posgrado-ugr.png" 1784233420.13879 39245 a84e6903ffda310b232391dbf882254d ""
+  "imagenes/logo_ugrfin.jpg" 1784233420.13772 218428 d0868281cc15e3c738f1d5ad0ddeb649 ""
+  "main.aux" 1784233557.92592 4690 0b991971b5af5b787509c187bf5abc96 "xelatex"
+  "main.nav" 1784233557.92659 1853 3d3af853e0752fc75bf550a83110b9cc "xelatex"
+  "main.out" 1784233556.79491 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
   "main.tex" 1784230854.97917 990 3b965fd488500e72d6f99c50fd22d27b ""
   "preamble.tex" 1784046661.65257 2711 26dc0b68b4ce4b88c224595299161fa0 ""
-  "slides/slide01_portada.tex" 1784141165.40039 2169 6a91557a3dc2a0614b18be13a2e1ad6e ""
+  "slides/slide01_portada.tex" 1784233548.90027 2504 8dca19dc16054c7e74db491fae680c2d ""
   "slides/slide02_portada.tex" 1784228067.72972 3224 75e49c2aa857ac7d65067ae61deb1f30 ""
   "slides/slide03_portada.tex" 1784219107.26593 5564 d3569fbc1d9e7a3c862e6e971236806c ""
   "slides/slide04_pipeline.tex" 1784230874.17172 8657 2e5095ef55cb0d1aef7e3156bbd168c4 ""
