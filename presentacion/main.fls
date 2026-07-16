@@ -367,6 +367,12 @@ INPUT main.nav
 INPUT ./slides/slide01_portada.tex
 INPUT ./slides/slide01_portada.tex
 INPUT slides/slide01_portada.tex
+INPUT ./imagenes/logo_ugrfin.jpg
+INPUT ./imagenes/logo_ugrfin.jpg
+INPUT ./imagenes/logo_ugrfin.jpg
+INPUT ./imagenes/logo-vector-escuela-internacional-de-posgrado-ugr.png
+INPUT ./imagenes/logo-vector-escuela-internacional-de-posgrado-ugr.png
+INPUT ./imagenes/logo-vector-escuela-internacional-de-posgrado-ugr.png
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmss9.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmss8.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmss8.tfm
