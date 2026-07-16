@@ -106,40 +106,40 @@
     % ------------------------------------------------------
     % 3 tarjetas de estadísticas
     % ------------------------------------------------------
-    \def\statCardW{4.2cm}
-    \def\statCardH{1.6cm}
-    \def\statCardGap{0.3cm}
-    \def\statCardY{-6.90cm}
+    % \def\statCardW{4.2cm}
+    % \def\statCardH{1.6cm}
+    % \def\statCardGap{0.3cm}
+    % \def\statCardY{-6.90cm}
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.15cm]st1.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}2\,/\,5};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.70cm]st1.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Puntuación del informe \textit{LLM} (Test 1)}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st1) at ([xshift=1.4cm, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.15cm]st1.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}2\,/\,5};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.70cm]st1.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Puntuación del informe \textit{LLM} (Test 1)}};
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.15cm]st2.north west)
-      {\Large\bfseries\sffamily\color{accentRed}30\,\%};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.70cm]st2.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aceptación clínica \,$\cdot$\, O3 $\geq$80\,\% no alcanzado}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st2) at ([xshift=1.4cm+\statCardW+\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.15cm]st2.north west)
+    %   {\Large\bfseries\sffamily\color{accentRed}30\,\%};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.70cm]st2.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Aceptación clínica \,$\cdot$\, O3 $\geq$80\,\% no alcanzado}};
 
-    \node[anchor=north west, fill=inkDark, rounded corners=6pt,
-          minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
-      (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
-    \node[anchor=north west, align=left]
-      at ([xshift=0.4cm, yshift=-0.15cm]st3.north west)
-      {\Large\bfseries\sffamily\color{accentTeal}34.1\,s};
-    \node[anchor=north west]
-      at ([xshift=0.4cm, yshift=-0.70cm]st3.north west)
-      {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Tiempo total del caso}};
+    % \node[anchor=north west, fill=inkDark, rounded corners=6pt,
+    %       minimum width=\statCardW, minimum height=\statCardH, inner sep=0pt]
+    %   (st3) at ([xshift=1.4cm+2*\statCardW+2*\statCardGap, yshift=\statCardY]current page.north west) {};
+    % \node[anchor=north west, align=left]
+    %   at ([xshift=0.4cm, yshift=-0.15cm]st3.north west)
+    %   {\Large\bfseries\sffamily\color{accentTeal}34.1\,s};
+    % \node[anchor=north west]
+    %   at ([xshift=0.4cm, yshift=-0.70cm]st3.north west)
+    %   {\parbox[t]{3.4cm}{\raggedright\fontsize{8}{9.5}\selectfont\sffamily\color{white}Tiempo total del caso}};
 
   \end{tikzpicture}
 \end{frame}
